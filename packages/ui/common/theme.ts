@@ -8,7 +8,15 @@ const theme = {
   fontFamily: {
     ubuntu: ['Ubuntu', 'sans-serif'],
   },
-  fontSize: {},
+  fontSize: {
+    h1: '24px',
+    h2: '22px',
+    h3: '20px',
+    caption: '14px',
+    body: '16px',
+    smallText: '12px',
+    textXs: '10px',
+  },
   colors: {
     white: {
       200: '#CFD7D7',
@@ -21,7 +29,15 @@ const theme = {
       900: '#0B161A',
       800: '#111A1F',
       300: '#1B2830',
+      200: '#152A31',
     },
+
+    hover: {
+      black: {
+        200: '#1B3741',
+      },
+    },
+
     transparent: 'transparent',
   },
 
@@ -30,6 +46,7 @@ const theme = {
     4: '4px',
     6: '6px',
     8: '8px',
+    9: '9px',
     10: '10px',
     12: '12px',
     14: '14px',
@@ -55,6 +72,7 @@ const theme = {
     10: '10px',
     11: '11px',
     12: '12px',
+    13: '13px',
     14: '14px',
     16: '16px',
     18: '18px',

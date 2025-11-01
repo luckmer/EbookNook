@@ -1,15 +1,23 @@
-import Header from '@pages/Home/Header'
 import '@styles/import.css'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { Route, Routes } from 'react-router-dom'
 import { routes } from './routes'
+import Header from '@pages/Header'
+import { useDispatch, useSelector } from 'react-redux'
+import { searchSelector } from '@store/selectors/search'
+import { actions } from '@store/reducers/search'
 
 function App() {
+  const searchValue = useSelector(searchSelector.value)
+  const dispatch = useDispatch()
+
   return (
-    <div className="w-full h-full flex flex-col gap-4 py-4 px-4">
+    <div className="w-full h-full flex flex-col gap-4">
       <Header
-        value=""
-        onChange={() => {}}
+        value={searchValue}
+        onChange={(value) => {
+          dispatch(actions.setValue(value))
+        }}
         onClickClose={async () => {
           try {
             const appWindow = getCurrentWindow()
@@ -35,7 +43,7 @@ function App() {
           }
         }}
       />
-      <div className="w-full h-full flex flex-row  gap-4">
+      <div className="w-full h-full flex flex-row gap-4">
         <div className="overflow-hidden h-full w-full">
           <Routes>
             {routes.map((route) => (

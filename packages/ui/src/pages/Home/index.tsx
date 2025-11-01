@@ -1,11 +1,16 @@
-import { Typography } from '@components/Typography'
+import EmptyLibrary from '@pages/EmptyLibrary'
+import { FC, memo } from 'react'
 
-const Home = () => {
+export interface IProps {
+  onClick: (file: File) => void
+}
+
+const Home: FC<IProps> = ({ onClick }) => {
   return (
     <main className="w-full h-full">
-      <Typography>Home</Typography>
+      <EmptyLibrary onClick={onClick} />
     </main>
   )
 }
 
-export default Home
+export default memo(Home)

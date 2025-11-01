@@ -7,7 +7,7 @@ export interface IProps {
   onClickMaximize: () => void
   onClickMinimize: () => void
   value: string
-  onChange: () => void
+  onChange: (value: string) => void
 }
 
 const Header: FC<IProps> = ({
