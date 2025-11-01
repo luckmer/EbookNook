@@ -24,6 +24,7 @@ const UploadButton: React.FC<IProps> = ({ label, onClick }) => {
           if (file) {
             onClick(file)
           }
+          event.target.value = ''
         }}
         className="hidden"
       />

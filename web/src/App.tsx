@@ -43,7 +43,7 @@ function App() {
           }
         }}
       />
-      <div className="w-full h-full flex flex-row gap-4">
+      <div className="w-full h-full flex flex-row">
         <div className="overflow-hidden h-full w-full">
           <Routes>
             {routes.map((route) => (
