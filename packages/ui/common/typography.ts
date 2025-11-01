@@ -1,21 +1,21 @@
-import { cva } from "class-variance-authority";
+import { cva } from 'class-variance-authority'
 
-export const typography = cva("not-italic select-none", {
+export const typography = cva('not-italic select-none', {
   variants: {
     text: {},
     color: {
-      white: "text-white-100",
+      white: 'text-white-100',
     },
     ellipsis: {
-      true: "text-ellipsis overflow-hidden whitespace-nowrap",
+      true: 'text-ellipsis overflow-hidden whitespace-nowrap',
     },
     font: {
-      default: "font-[family-name:Akatab], sans-serif",
+      default: 'font-ubuntu',
     },
   },
   defaultVariants: {
-    font: "default",
+    font: 'default',
     // text: "body",
-    color: "white",
+    color: 'white',
   },
-});
+})

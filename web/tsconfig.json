@@ -30,7 +30,7 @@
         "./src/styles/*"
       ],
       "@interfaces/*": [
-        "./src/types/*"
+        "./src/interfaces/*"
       ],
       "@static/*": [
         "./src/static/*"

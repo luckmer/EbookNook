@@ -14,6 +14,7 @@
     "@tauri-apps/api": "2",
     "@tauri-apps/plugin-opener": "2",
     "react-redux": "^9.2.0",
+    "react-router-dom": "^7.9.5",
     "redux-batched-actions": "^0.5.0",
     "redux-saga": "^1.4.2",
     "reselect": "^5.1.1",

@@ -27,7 +27,7 @@
     "noFallthroughCasesInSwitch": true,
     "paths": {
       "@interfaces/*": [
-        "../../web/src/types/*"
+        "../../web/src/interfaces/*"
       ],
       "@common/*": [
         "./common/*"
