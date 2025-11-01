@@ -1,8 +1,8 @@
-import Home from "@pages/Home";
-import "@styles/import.css";
+import Home from '@pages/Home'
+import '@styles/import.css'
 
 function App() {
-  return <Home />;
+  return <Home />
 }
 
-export default App;
+export default App
