@@ -8,21 +8,26 @@
   ],
   "scripts": {
     "dev": "cd web && pnpm tauri dev",
+    "storybook": "cd packages/ui && pnpm storybook",
+    "build-storybook": "cd packages/ui && storybook build",
     "build": "cd web && pnpm build"
   },
   "dependencies": {
-    "@tailwindcss/postcss": "^4.1.16",
-    "@types/node": "^24.9.2",
-    "autoprefixer": "^10.4.20",
-    "class-variance-authority": "^0.7.0",
-    "postcss": "^8.4.47",
-    "postcss-import": "^16.1.0",
-    "tailwindcss": "^4.1.16",
-    "vite-tsconfig-paths": "^5.1.4",
-    "react": "^19.1.0"
+    "@tailwindcss/postcss": "4.1.16",
+    "@types/node": "24.9.2",
+    "autoprefixer": "10.4.20",
+    "class-variance-authority": "0.7.0",
+    "postcss": "8.4.47",
+    "postcss-import": "16.1.0",
+    "tailwindcss": "4.1.16",
+    "vite-tsconfig-paths": "5.1.4",
+    "react": "19.1.0",
+    "react-dom": "19.1.0"
   },
   "devDependencies": {
-    "@types/react": "^19.1.8"
+    "@vitejs/plugin-react": "5.1.0",
+    "@types/react": "19.1.8",
+    "vite": "7.0.4"
   },
   "engines": {
     "pnpm": ">=10.14.0",

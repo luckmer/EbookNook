@@ -1,9 +1,9 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 @config "../../tailwind.config.js";
 
 :root body {
   font-variant-numeric: tabular-nums;
-  font-family: "poppins", "Noto Sans CJK", sans-serif, "Twemoji Chromium";
+  font-family: 'poppins', 'Noto Sans CJK', sans-serif, 'Twemoji Chromium';
   background-color: #030a13;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
