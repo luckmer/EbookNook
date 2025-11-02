@@ -11,8 +11,8 @@ const HomeRoot = () => {
 
   return (
     <Home
+      books={books}
       onClick={async (file) => {
-        console.log('make request')
         dispatch(actions.importBook(file))
       }}
     />

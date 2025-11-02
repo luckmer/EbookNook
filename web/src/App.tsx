@@ -43,14 +43,12 @@ function App() {
           }
         }}
       />
-      <div className="w-full h-full flex flex-row">
-        <div className="overflow-hidden h-full w-full">
-          <Routes>
-            {routes.map((route) => (
-              <Route key={route.path} path={route.path} element={route.element()} />
-            ))}
-          </Routes>
-        </div>
+      <div className="overflow-hidden h-full w-full">
+        <Routes>
+          {routes.map((route) => (
+            <Route key={route.path} path={route.path} element={route.element()} />
+          ))}
+        </Routes>
       </div>
     </div>
   )
