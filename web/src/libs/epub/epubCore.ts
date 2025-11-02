@@ -5,7 +5,7 @@ export class EpubCore extends EpubApiClientProvider {
     super(file)
   }
 
-  loadFile() {
-    return this._loadFile()
+  async open() {
+    return this._open()
   }
 }

@@ -13,7 +13,7 @@ class DocumentApiCore {
     return file.name.endsWith(`.${FORMAT.EPUB}`)
   }
 
-  _load() {
+  async _open() {
     let book = null
     let format: BookFormat = 'EPUB'
 
@@ -21,11 +21,10 @@ class DocumentApiCore {
       throw new Error('File is empty')
     }
 
-    console.log(this.isEpub(this.file))
-    if (this.isEpub(this.file)) {
-      format = 'EPUB'
-      book = getEpub(this.file).loadFile()
-    }
+    // if (this.isEpub(this.file)) {
+    format = 'EPUB'
+    book = await getEpub(this.file).open()
+    // }
 
     return { book, format }
   }

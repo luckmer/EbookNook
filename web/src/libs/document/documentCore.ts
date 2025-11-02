@@ -5,7 +5,7 @@ export class DocumentCore extends documentApiCore {
     super(file)
   }
 
-  load() {
-    return this._load()
+  open() {
+    return this._open()
   }
 }

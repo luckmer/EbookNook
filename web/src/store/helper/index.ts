@@ -1,3 +1,4 @@
+import { ActionCreatorWithoutPayload, ActionCreatorWithPayload } from '@reduxjs/toolkit'
 import { createSelector, Selector } from 'reselect'
 
 type StoreState<T> = {
@@ -6,6 +7,14 @@ type StoreState<T> = {
 
 type StoreSelectors<T> = {
   [K in keyof T]: Selector<StoreState<T>, T[K]>
+}
+
+export type PayloadType<T> = {
+  [K in keyof T]: T[K] extends ActionCreatorWithPayload<infer P>
+    ? P
+    : T[K] extends ActionCreatorWithoutPayload
+    ? undefined
+    : never
 }
 
 export const createStoreSelectors = <T extends Record<string, any>>(store: {

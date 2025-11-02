@@ -1,25 +1,31 @@
+import { IBook } from '@interfaces/book/interfaces'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { PayloadType } from '@store/helper'
 
-export const searchStore = 'searchStore'
+export const booksStore = 'booksStore'
 
-export interface ISearchState {
-  value: string
+export interface IBookState {
+  books: IBook[]
 }
 
-const defaultState: ISearchState = {
-  value: '',
+const defaultState: IBookState = {
+  books: [],
 }
 
 export const store = createSlice({
-  name: searchStore,
+  name: booksStore,
   initialState: defaultState,
   reducers: {
     load(state) {
       return state
     },
-    setValue(state, action: PayloadAction<string>) {
-      state.value = action.payload
+
+    importBook(state, _: PayloadAction<File>) {
+      return state
+    },
+
+    setBook(state, action: PayloadAction<IBook>) {
+      state.books.push(action.payload)
       return state
     },
   },
