@@ -11,7 +11,7 @@ export interface IProps {
 
 const Home: FC<IProps> = ({ onClick, books }) => {
   return (
-    <main className="w-full h-full overflow-y-auto">
+    <main className="w-full h-full overflow-y-auto px-24 py-12">
       <Show when={books.length > 0} fallback={<EmptyLibrary onClick={onClick} />}>
         <BookShelf books={books} />
       </Show>

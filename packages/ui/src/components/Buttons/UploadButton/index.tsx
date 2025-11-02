@@ -1,18 +1,28 @@
+import Show from '@components/Show'
 import { Typography } from '@components/Typography'
-import React, { memo } from 'react'
+import clsx from 'clsx'
+import React, { JSX, memo } from 'react'
 
 export interface IProps {
-  label: string
+  label?: string
   onClick: (file: File) => void
+  className?: string
+  labelClassName?: string
+  icon?: JSX.Element
 }
 
-const UploadButton: React.FC<IProps> = ({ label, onClick }) => {
+const UploadButton: React.FC<IProps> = ({ label, onClick, className, labelClassName, icon }) => {
   return (
-    <div className="flex flex-col">
+    <div className={clsx('flex flex-col', className)}>
       <label
         htmlFor="epubUpload"
-        className="cursor-pointer text-white-100 px-48 py-13 bg-black-200 rounded-9 transition-colors duration-300 hover:bg-hover-black-200">
-        <Typography>{label}</Typography>
+        className={clsx(
+          'cursor-pointer h-full text-white-100 px-48 py-13 bg-black-200 rounded-9 transition-colors duration-300 hover:bg-hover-black-200',
+          labelClassName
+        )}>
+        <Show when={typeof label !== 'undefined'} fallback={<>{icon}</>}>
+          <Typography>{label}</Typography>
+        </Show>
       </label>
       <input
         id="epubUpload"
