@@ -1,11 +1,11 @@
+import { IBook } from '@interfaces/book/interfaces'
 import EpubApiClientProvider from './epubApiCore'
 
 export class EpubCore extends EpubApiClientProvider {
-  constructor(file: File) {
-    super(file)
+  async open(file: File): Promise<IBook> {
+    return this._open(file)
   }
-
-  async open() {
-    return this._open()
+  async loadBook(filePath: string) {
+    return this._loadBook(filePath)
   }
 }

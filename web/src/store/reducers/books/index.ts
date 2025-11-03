@@ -24,6 +24,10 @@ export const store = createSlice({
       return state
     },
 
+    loadBook(state, _: PayloadAction<string>) {
+      return state
+    },
+
     setBook(state, action: PayloadAction<IBook>) {
       state.books.push(action.payload)
       return state

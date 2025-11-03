@@ -15,10 +15,15 @@ export interface IMetadata {
   series?: { name: string; position?: number } | null
 }
 
+export interface Chapter {
+  id: string
+  content: string
+}
+
 export interface IBook {
   url?: string
-  filePath?: string
   hash: string
+  rootFilePath: string
   format: BookFormat
   title: string
   sourceTitle?: string
