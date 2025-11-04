@@ -41,6 +41,9 @@
       "@store/*": [
         "./src/store/*"
       ],
+      "@libs/*": [
+        "./src/libs/*"
+      ],
       "@icons/*": [
         "../packages/ui/common/svg/*"
       ],

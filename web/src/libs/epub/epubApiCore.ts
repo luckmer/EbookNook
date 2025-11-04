@@ -176,7 +176,7 @@ class EpubApiClientProvider {
     return book
   }
 
-  async _loadBook(filePath: string) {
+  async _loadBook(filePath: string): Promise<Chapter[]> {
     const buffer = this.binaryStringToArrayBuffer(filePath)
     const zip = await JSZip.loadAsync(buffer)
 
@@ -185,24 +185,32 @@ class EpubApiClientProvider {
 
     const containerDoc = new DOMParser().parseFromString(containerXml, 'application/xml')
     const rootfilePath = containerDoc.querySelector('rootfile')?.getAttribute('full-path')
-
     if (!rootfilePath) throw new Error('OPF path not found')
 
     const basePath = rootfilePath.substring(0, rootfilePath.lastIndexOf('/') + 1)
-
     const opfXml = await zip.file(rootfilePath)?.async('text')
     if (!opfXml) throw new Error('OPF file missing')
 
     const opfDoc = new DOMParser().parseFromString(opfXml, 'application/xml')
-
     const manifestItems = new Map(
       Array.from(opfDoc.querySelectorAll('manifest > item')).map((item) => [
         item.getAttribute('id'),
         item.getAttribute('href'),
       ])
     )
-
     const spineItems = Array.from(opfDoc.querySelectorAll('spine > itemref'))
+
+    const fileMap = new Map<string, string>()
+
+    for (const [_, href] of manifestItems.entries()) {
+      const filePath = (basePath + href).replace(/\\/g, '/')
+      const file = zip.file(filePath)
+      if (file) {
+        const blob = await file.async('blob')
+        const url = URL.createObjectURL(blob)
+        fileMap.set(filePath, url)
+      }
+    }
 
     const chapterList: Chapter[] = []
 
@@ -213,10 +221,30 @@ class EpubApiClientProvider {
 
       const normalizedPath = (basePath + href).replace(/\\/g, '/')
       const html = await zip.file(normalizedPath)?.async('text')
-      if (html) chapterList.push({ id: idref ?? '----', content: html })
+
+      if (html && idref) {
+        const doc = new DOMParser().parseFromString(html, 'text/html')
+
+        doc.querySelectorAll('img').forEach((img) => {
+          const src = img.getAttribute('src')
+          if (src && fileMap.has(basePath + src)) {
+            img.src = fileMap.get(basePath + src)!
+          }
+        })
+
+        doc.querySelectorAll('link[rel=stylesheet]').forEach((link) => {
+          const href = link.getAttribute('href')
+          if (href && fileMap.has(basePath + href)) {
+            link.href = fileMap.get(basePath + href)!
+          }
+        })
+
+        const fixedHtml = doc.documentElement.outerHTML
+        chapterList.push({ id: idref, content: fixedHtml })
+      }
     }
 
-    console.log(chapterList)
+    return chapterList
   }
 }
 

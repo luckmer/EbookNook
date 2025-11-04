@@ -1,15 +1,19 @@
-import { IBook } from '@interfaces/book/interfaces'
+import { Chapter, IBook } from '@interfaces/book/interfaces'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { PayloadType } from '@store/helper'
 
 export const booksStore = 'booksStore'
 
+type Hash = string
+
 export interface IBookState {
   books: IBook[]
+  chapters: Record<Hash, Chapter[]>
 }
 
 const defaultState: IBookState = {
   books: [],
+  chapters: {},
 }
 
 export const store = createSlice({
@@ -30,6 +34,14 @@ export const store = createSlice({
 
     setBook(state, action: PayloadAction<IBook>) {
       state.books.push(action.payload)
+      return state
+    },
+    setChapters(state, action: PayloadAction<{ hash: Hash; chapters: Chapter[] }>) {
+      if (!state.chapters[action.payload.hash]) {
+        state.chapters[action.payload.hash] = []
+      }
+
+      state.chapters[action.payload.hash] = action.payload.chapters
       return state
     },
   },

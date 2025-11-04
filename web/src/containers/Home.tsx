@@ -17,7 +17,7 @@ const HomeRoot = () => {
         dispatch(actions.importBook(file))
       }}
       onClickBook={(hash) => {
-        navigate(`/reader/${hash}`)
+        navigate('reader', { state: { id: hash } })
         dispatch(actions.loadBook(hash))
       }}
     />
