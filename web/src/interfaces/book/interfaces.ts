@@ -20,6 +20,13 @@ export interface Chapter {
   content: string
 }
 
+export interface IToc {
+  id: string
+  href: string
+  label: string
+  subitems: IToc[]
+}
+
 export interface IBook {
   url?: string
   hash: string

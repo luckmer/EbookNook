@@ -1,7 +1,7 @@
+import { Chapter, IBook, IToc } from '@interfaces/book/interfaces'
 import { BookFormat } from '@interfaces/book/types'
 import { getEpub } from '../epub'
 import { FORMAT } from './static'
-import { Chapter, IBook } from '@interfaces/book/interfaces'
 
 class DocumentApiCore {
   isEpub(file: File): boolean {
@@ -28,7 +28,7 @@ class DocumentApiCore {
     return { book, format }
   }
 
-  async _loadBook(filePath: string): Promise<Chapter[]> {
+  async _loadBook(filePath: string): Promise<{ chapters: Chapter[]; toc: IToc[] }> {
     let book = null
 
     book = await getEpub().loadBook(filePath)

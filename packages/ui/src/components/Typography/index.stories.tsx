@@ -13,7 +13,7 @@ export const BannersStory: Story = {
   render: () => {
     return (
       <div className="bg-red-100 p-16">
-        <Typography>Typography example </Typography>
+        <Typography>Typography example</Typography>
       </div>
     )
   },

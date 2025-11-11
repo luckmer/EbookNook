@@ -11,7 +11,7 @@ const ReaderRoot = () => {
 
   const hash = useMemo(() => location?.state?.id, [location])
 
-  const chapters = useMemo(() => chaptersMap[hash], [hash, chaptersMap])
+  const chapters = useMemo(() => chaptersMap[hash] ?? [], [hash, chaptersMap])
 
   useEffect(() => {
     if (!chapters) {
@@ -19,7 +19,7 @@ const ReaderRoot = () => {
     }
   }, [chapters])
 
-  return <Reader chapters={chapters ?? []} onClickBack={() => navigate('/')} />
+  return <Reader chapters={chapters} onClickBack={() => navigate('/')} />
 }
 
 export default ReaderRoot

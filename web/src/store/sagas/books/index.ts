@@ -41,11 +41,12 @@ export function* loadBook(action: PayloadAction<PayloadTypes['loadBook']>) {
     }
 
     const core = yield* call(getDocumentLoader)
-    const chapters = yield* call([core, core.loadBook], filePath)
+    const { chapters, toc } = yield* call([core, core.loadBook], filePath)
 
     yield* put(actions.setChapters({ hash, chapters }))
+    yield* put(actions.setToc({ hash, toc }))
   } catch (err) {
-    console.log('failed to load book')
+    console.log('failed to load book', err)
   }
 }
 

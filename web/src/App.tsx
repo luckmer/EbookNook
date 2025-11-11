@@ -1,19 +1,27 @@
+import Header from '@pages/Header'
+import { actions } from '@store/reducers/search'
+import { actions as uiActions } from '@store/reducers/ui'
+
+import { searchSelector } from '@store/selectors/search'
+import { uiSelector } from '@store/selectors/ui'
 import '@styles/import.css'
 import { getCurrentWindow } from '@tauri-apps/api/window'
+import { useDispatch, useSelector } from 'react-redux'
 import { Route, Routes } from 'react-router-dom'
 import { routes } from './routes'
-import Header from '@pages/Header'
-import { useDispatch, useSelector } from 'react-redux'
-import { searchSelector } from '@store/selectors/search'
-import { actions } from '@store/reducers/search'
 
 function App() {
   const searchValue = useSelector(searchSelector.value)
+  const isSidebarOpen = useSelector(uiSelector.openChaptersDrawer)
   const dispatch = useDispatch()
 
   return (
     <div className="w-full h-full flex flex-col gap-4">
       <Header
+        location={location.pathname}
+        onClickOpenSidebar={() => {
+          dispatch(uiActions.setOpenChaptersDrawer(!isSidebarOpen))
+        }}
         value={searchValue}
         onChange={(value) => {
           dispatch(actions.setValue(value))
