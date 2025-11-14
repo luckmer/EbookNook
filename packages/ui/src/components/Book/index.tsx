@@ -16,7 +16,7 @@ const Book: FC<IProps> = ({ img, title, onClick }) => {
         e.stopPropagation()
         onClick()
       }}>
-      <img className="  rounded-6" src={img} />
+      <img className="rounded-6 h-full" src={img} />
       <div className="max-w-[140px]">
         <Typography text="small" ellipsis left>
           {title}

@@ -1,4 +1,5 @@
 import { BookFormat } from './types'
+import type JSZip from 'jszip'
 
 export interface IMetadata {
   identifier?: string
@@ -17,6 +18,9 @@ export interface IMetadata {
 
 export interface Chapter {
   id: string
+  title: string
+  href: string
+  index: number
   content: string
 }
 
@@ -24,6 +28,7 @@ export interface IToc {
   id: string
   href: string
   label: string
+  parent?: string | null
   subitems: IToc[]
 }
 
@@ -50,4 +55,12 @@ export interface IBook {
   progress?: [number, number]
   primaryLanguage?: string
   metadata: IMetadata
+}
+
+export interface IXML {
+  rootFilePath: string
+  basePath: string
+  filePath: string
+  doc: Document
+  zip: JSZip
 }
