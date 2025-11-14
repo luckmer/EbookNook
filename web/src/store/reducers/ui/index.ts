@@ -1,10 +1,14 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 export const uiStore = 'uiStore'
 
-export interface IUiState {}
+export interface IUiState {
+  openChaptersDrawer: boolean
+}
 
-const defaultState: IUiState = {}
+const defaultState: IUiState = {
+  openChaptersDrawer: false,
+}
 
 export const store = createSlice({
   name: uiStore,
@@ -13,10 +17,10 @@ export const store = createSlice({
     load(state) {
       return state
     },
-    // setValue(state, action: PayloadAction<number>) {
-    //   state.increase = ++action.payload
-    //   return state
-    // },
+    setOpenChaptersDrawer(state, action: PayloadAction<boolean>) {
+      state.openChaptersDrawer = action.payload
+      return state
+    },
   },
 })
 

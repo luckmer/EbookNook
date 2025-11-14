@@ -35,6 +35,9 @@
       "@components/*": [
         "./src/components/*"
       ],
+      "@libs/*": [
+        "../../web/src/libs/*"
+      ],
       "@pages/*": [
         "./src/pages/*"
       ],

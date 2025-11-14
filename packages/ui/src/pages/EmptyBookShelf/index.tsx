@@ -6,9 +6,9 @@ export interface IProps {
   onClick: (file: File) => void
 }
 
-const EmptyLibrary: FC<IProps> = ({ onClick }) => {
+const EmptyBookShelf: FC<IProps> = ({ onClick }) => {
   return (
-    <div className="w-full h-full flex items-center justify-center flex-col gap-32 max-w-[600px] mx-auto">
+    <div className="w-full h-full flex items-center justify-center flex-col gap-32 max-w-[600px] mx-auto px-12">
       <Typography text="h1" class="text-[48px]! leading-[50px]">
         Your library
       </Typography>
@@ -23,4 +23,4 @@ const EmptyLibrary: FC<IProps> = ({ onClick }) => {
   )
 }
 
-export default memo(EmptyLibrary)
+export default memo(EmptyBookShelf)

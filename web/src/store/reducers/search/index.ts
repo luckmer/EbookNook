@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { PayloadType } from '@store/helper'
 
 export const searchStore = 'searchStore'
 
@@ -26,3 +27,4 @@ export const store = createSlice({
 
 export const reducers = store.reducer
 export const actions = store.actions
+export type PayloadTypes = PayloadType<typeof actions>

@@ -13,6 +13,8 @@ export const BannersStory: Story = {
   render: () => {
     return (
       <Header
+        location="/"
+        onClickOpenSidebar={() => {}}
         onClickClose={() => {}}
         onClickMaximize={() => {}}
         onClickMinimize={() => {}}

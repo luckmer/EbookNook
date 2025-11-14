@@ -11,9 +11,9 @@ export const typography = cva('not-italic select-none', {
       captionMedium: 'text-caption font-[700] leading-[14px] tracking-[0.02em]',
       body: 'text-body font-[400] leading-[16px] tracking-[0.02em]',
       bodyBold: 'text-body font-bold leading-[16px] tracking-[0.02em]',
-      small: 'text-smallText font-[400] leading-[14px] tracking-[0.02em]',
+      small: 'text-[12px] font-[400] leading-[14px] tracking-[0.02em]',
       smallBold: 'text-smallText font-bold leading-[14px] tracking-[0.02em]',
-      tiny: 'text-textXs leading-[12px] tracking-[0.02em]',
+      tiny: 'text-[10px] leading-[12px] tracking-[0.02em]',
       tinyBold: 'text-textXs font-bold leading-[12px] tracking-[0.02em]',
     },
     color: {
@@ -46,6 +46,7 @@ export const typography = cva('not-italic select-none', {
   },
   defaultVariants: {
     font: 'default',
+    text: 'caption',
     color: 'white',
   },
 })
