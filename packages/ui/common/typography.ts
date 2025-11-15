@@ -18,9 +18,13 @@ export const typography = cva('not-italic select-none', {
     },
     color: {
       white: 'text-white-100',
+      lightWhite: 'text-white-200',
     },
     ellipsis: {
       true: 'text-ellipsis overflow-hidden whitespace-nowrap',
+    },
+    nowrap: {
+      true: 'whitespace-nowrap',
     },
     center: {
       true: 'text-center',
