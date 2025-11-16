@@ -10,12 +10,14 @@ export interface IBookState {
   books: IBook[]
   chapters: Record<Hash, Chapter[]>
   toc: Record<Hash, IToc[]>
+  selectedChapter: string
 }
 
 const defaultState: IBookState = {
   books: [],
   toc: {},
   chapters: {},
+  selectedChapter: '',
 }
 
 export const store = createSlice({
@@ -31,6 +33,11 @@ export const store = createSlice({
     },
 
     loadBook(state, _: PayloadAction<string>) {
+      return state
+    },
+
+    setSelectedChapter(state, action: PayloadAction<string>) {
+      state.selectedChapter = action.payload
       return state
     },
 

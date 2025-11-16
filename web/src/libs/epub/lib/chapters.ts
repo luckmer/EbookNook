@@ -48,10 +48,40 @@ export class EpubContentParser {
         title,
         index,
         content: chapterDoc.documentElement.outerHTML,
+        resolveHref: (target: string) => this.resolveHref(target),
       })
     }
 
     return { chapters }
+  }
+
+  getHTMLFragment = (doc: Document, id: string) =>
+    doc.querySelector(`#${CSS.escape(id)}`) || doc.querySelector(`[name="${CSS.escape(id)}"]`)
+
+  resolveHref(href: string) {
+    const [path, hash] = href.split('#')
+
+    let page = 0
+
+    const anchor = hash ? (doc: Document) => this.getHTMLFragment(doc, hash) : undefined
+
+    return { page, anchor }
+  }
+
+  private replaceAssets(doc: Document, base: string, blobs: Map<string, string>) {
+    doc.querySelectorAll('img').forEach((img) => {
+      const src = img.getAttribute('src')
+      if (!src) return
+      const path = (base + src).replace(/\\/g, '/')
+      if (blobs.has(path)) img.src = blobs.get(path)!
+    })
+
+    doc.querySelectorAll<HTMLLinkElement>("link[rel='stylesheet']").forEach((link) => {
+      const href = link.getAttribute('href')
+      if (!href) return
+      const path = (base + href).replace(/\\/g, '/')
+      if (blobs.has(path)) link.href = blobs.get(path)!
+    })
   }
 
   private async buildBlobMap(xml: IXML, manifest: Record<string, { href: string; type?: string }>) {
@@ -70,21 +100,5 @@ export class EpubContentParser {
     }
 
     return map
-  }
-
-  private replaceAssets(doc: Document, base: string, blobs: Map<string, string>) {
-    doc.querySelectorAll('img').forEach((img) => {
-      const src = img.getAttribute('src')
-      if (!src) return
-      const path = (base + src).replace(/\\/g, '/')
-      if (blobs.has(path)) img.src = blobs.get(path)!
-    })
-
-    doc.querySelectorAll<HTMLLinkElement>("link[rel='stylesheet']").forEach((link) => {
-      const href = link.getAttribute('href')
-      if (!href) return
-      const path = (base + href).replace(/\\/g, '/')
-      if (blobs.has(path)) link.href = blobs.get(path)!
-    })
   }
 }
