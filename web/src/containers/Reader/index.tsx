@@ -1,11 +1,12 @@
 import Reader from '@pages/Reader'
 import { bookSelector } from '@store/selectors/books'
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 const ReaderRoot = () => {
   const chaptersMap = useSelector(bookSelector.chapters)
+  const selectedChapter = useSelector(bookSelector.selectedChapter)
   const location = useLocation()
   const navigate = useNavigate()
 
@@ -13,13 +14,13 @@ const ReaderRoot = () => {
 
   const chapters = useMemo(() => chaptersMap[hash] ?? [], [hash, chaptersMap])
 
-  useEffect(() => {
-    if (!chapters) {
-      navigate('/')
-    }
-  }, [chapters])
-
-  return <Reader chapters={chapters} onClickBack={() => navigate('/')} />
+  return (
+    <Reader
+      selectedChapter={selectedChapter}
+      chapters={chapters}
+      onClickBack={() => navigate('/')}
+    />
+  )
 }
 
 export default ReaderRoot

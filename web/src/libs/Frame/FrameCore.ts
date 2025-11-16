@@ -1,6 +1,9 @@
+import { Chapter } from '@interfaces/book/interfaces'
 import { setStylesImportant } from './utils'
 
 export class Frame {
+  private chapter: Chapter | undefined
+  private selectedChapter: string = ''
   private observer: ResizeObserver
   private element: HTMLDivElement
   private iframe: HTMLIFrameElement
@@ -51,7 +54,11 @@ export class Frame {
     return this.iframe.contentDocument!
   }
 
-  async load(srcDoc: string) {
+  async load(chapter: Chapter, selectedChapter: string) {
+    this.chapter = chapter
+    this.selectedChapter = selectedChapter
+
+    const srcDoc = chapter.content
     const blob = new Blob([srcDoc], { type: 'text/html' })
     this.iframe.src = URL.createObjectURL(blob)
 
@@ -64,6 +71,7 @@ export class Frame {
           'column-gap': '40px',
           'column-fill': 'auto',
           padding: '20px',
+          color: '#fff',
           overflow: 'hidden',
         })
         setStylesImportant(doc.body, { margin: '0' })
@@ -71,9 +79,40 @@ export class Frame {
         this.observer.observe(doc.body)
         await doc.fonts.ready
         this.expand()
+        this.goTo(this.selectedChapter)
         resolve()
       }
     })
+  }
+
+  resolveNavigation(href: string) {
+    const chapter = this.chapter
+    if (!chapter) return
+
+    return chapter.resolveHref(href)
+  }
+
+  goTo(href: string) {
+    if (!this.chapter) return
+
+    const resolved = this.resolveNavigation(href)
+    if (!resolved) return
+
+    const iframeDoc = this.iframe.contentDocument || this.iframe.contentWindow?.document
+
+    if (!iframeDoc) return
+
+    const anchor = resolved.anchor?.(iframeDoc)
+
+    if (anchor) {
+      anchor.scrollIntoView({
+        behavior: 'instant',
+        block: 'center',
+      })
+      return
+    }
+
+    this.scrollToPage(resolved.page)
   }
 
   expand() {

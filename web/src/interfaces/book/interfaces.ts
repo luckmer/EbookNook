@@ -16,12 +16,18 @@ export interface IMetadata {
   series?: { name: string; position?: number } | null
 }
 
+export interface IResolveHref {
+  page: number
+  anchor?: (doc: Document) => Element | null
+}
+
 export interface Chapter {
   id: string
   title: string
   href: string
   index: number
   content: string
+  resolveHref: (href: string) => IResolveHref
 }
 
 export interface IToc {

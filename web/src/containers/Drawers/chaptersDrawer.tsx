@@ -1,5 +1,6 @@
 import ChaptersDrawer from '@pages/chaptersDrawer'
 import { actions as uiActions } from '@store/reducers/ui'
+import { actions as bookActions } from '@store/reducers/books'
 import { bookSelector, booksMapSelector } from '@store/selectors/books'
 import { uiSelector } from '@store/selectors/ui'
 import { useMemo } from 'react'
@@ -29,7 +30,9 @@ const ChaptersDrawerRoot = () => {
       onClickClose={() => {
         dispatch(uiActions.setOpenChaptersDrawer(false))
       }}
-      onClick={() => {}}
+      onClick={(href) => {
+        dispatch(bookActions.setSelectedChapter(href))
+      }}
     />
   )
 }
