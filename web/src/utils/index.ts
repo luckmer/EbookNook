@@ -7,3 +7,5 @@ export const rstr2hex = (input: string) => {
   }
   return output
 }
+
+export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
