@@ -1,6 +1,6 @@
 import { PayloadAction } from '@reduxjs/toolkit'
 import { actions, PayloadTypes } from '@store/reducers/books'
-import { bookSelector, booksMapSelector } from '@store/selectors/books'
+import { booksMapSelector } from '@store/selectors/books'
 import { getDocumentLoader } from 'src/libs/document'
 import { all, call, put, select, takeEvery, takeLatest } from 'typed-redux-saga'
 
@@ -34,16 +34,11 @@ export function* loadBook(action: PayloadAction<PayloadTypes['loadBook']>) {
     }
 
     const filePath = book.rootFilePath
-    const chaptersCache = yield* select(bookSelector.chapters)
-
-    if (chaptersCache[hash]) {
-      return
-    }
 
     const core = yield* call(getDocumentLoader)
-    const { chapters, toc } = yield* call([core, core.loadBook], filePath)
+    const toc = yield* call([core, core.loadBook], filePath)
 
-    yield* put(actions.setChapters({ hash, chapters }))
+    yield* put(actions.setEpubCodeSearch(filePath))
     yield* put(actions.setToc({ hash, toc }))
   } catch (err) {
     console.log('failed to load book', err)

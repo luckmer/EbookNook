@@ -1,60 +1,61 @@
-import { FC, useEffect, useRef, useState } from 'react'
-import { Chapter } from '@interfaces/book/interfaces'
-import { Frame } from '@libs/Frame/FrameCore'
-import { Typography } from '@components/Typography'
+import EpubNavigation from '@components/EpubNavigation'
+import { Epub } from '@libs/epub/epub'
+import { FC, memo, useEffect, useRef, useState } from 'react'
 
 export interface IProps {
-  chapters: Chapter[]
+  epubCodeSearch: string
   selectedChapter: string
-  onClickBack: () => void
 }
 
-const Reader: FC<IProps> = ({ chapters, onClickBack, selectedChapter }) => {
+const Reader: FC<IProps> = ({ epubCodeSearch, selectedChapter }) => {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const [pageInfo, setPageInfo] = useState({ current: 1, total: 1 })
-  const viewRef = useRef<Frame | null>(null)
+  const viewRef = useRef<Epub | null>(null)
 
   useEffect(() => {
-    const container = containerRef.current
-    if (!container) return
+    if (!viewRef.current && epubCodeSearch.length > 0) {
+      const book_epub = new Epub(epubCodeSearch)
 
-    const chapter =
-      chapters.find((c) => c.href.endsWith(selectedChapter.split('#')[0])) ?? chapters[0]
+      book_epub.renderTo('.book-content')
 
-    if (!chapter) return
+      viewRef.current = book_epub
+    }
 
-    if (viewRef.current) viewRef.current.destroy()
-
-    const view = new Frame({
-      container,
-      onExpand: (current, total) => setPageInfo({ current, total }),
+    viewRef.current?.display(selectedChapter)
+    viewRef.current?.progress((current, total) => {
+      setPageInfo({ current, total })
     })
-    viewRef.current = view
 
-    view.load(chapter, selectedChapter)
-
-    return () => view.destroy()
-  }, [selectedChapter, chapters])
+    return () => {
+      viewRef.current?.destroyFrameCore()
+      viewRef.current = null
+    }
+  }, [epubCodeSearch, selectedChapter])
 
   return (
-    <div className="reader-wrapper">
-      <Typography>
-        {pageInfo.current} / {pageInfo.total}
-      </Typography>
-      <div
-        onClick={() => {
-          onClickBack()
+    <main className="w-full h-full p-24 flex flex-col">
+      <EpubNavigation
+        currentPage={pageInfo.current}
+        totalPage={pageInfo.total}
+        onClickNextChapter={() => {
+          viewRef.current?.nextChapter()
         }}
-        className="cursor-pointer text-blue-600 my-2">
-        ← Back
-      </div>
-      <div
-        ref={containerRef}
-        className="border rounded bg-white shadow-inner relative"
-        style={{ width: '100%', height: '80vh', overflow: 'hidden' }}
-      />
-    </div>
+        onClickPrevChapter={() => {
+          viewRef.current?.prevChapter()
+        }}
+        onClickPrevPage={() => {
+          viewRef.current?.prevPage()
+        }}
+        onClickNextPage={() => {
+          viewRef.current?.nextPage()
+        }}>
+        <div
+          ref={containerRef}
+          className="book-content rounded bg-white shadow-inner relative w-full h-full overflow-hidden"
+        />
+      </EpubNavigation>
+    </main>
   )
 }
 
-export default Reader
+export default memo(Reader)

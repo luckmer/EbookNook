@@ -1,4 +1,5 @@
-import { Chapter, IBook, IToc } from '@interfaces/book/interfaces'
+import { IBook, IToc } from '@interfaces/book/interfaces'
+import { IProgress } from '@interfaces/book/types'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { PayloadType } from '@store/helper'
 
@@ -8,7 +9,7 @@ type Hash = string
 
 export interface IBookState {
   books: IBook[]
-  chapters: Record<Hash, Chapter[]>
+  epubCodeSearch: string
   toc: Record<Hash, IToc[]>
   selectedChapter: string
 }
@@ -16,7 +17,7 @@ export interface IBookState {
 const defaultState: IBookState = {
   books: [],
   toc: {},
-  chapters: {},
+  epubCodeSearch: '',
   selectedChapter: '',
 }
 
@@ -45,14 +46,20 @@ export const store = createSlice({
       state.books.push(action.payload)
       return state
     },
-    setChapters(state, action: PayloadAction<{ hash: Hash; chapters: Chapter[] }>) {
-      if (!state.chapters[action.payload.hash]) {
-        state.chapters[action.payload.hash] = []
-      }
 
-      state.chapters[action.payload.hash] = action.payload.chapters
+    setBookProgress(state, action: PayloadAction<{ hash: Hash; progress: IProgress }>) {
+      const book = state.books.find((b) => b.hash === action.payload.hash)
+      if (book) {
+        book.progress = action.payload.progress
+      }
       return state
     },
+
+    setEpubCodeSearch(state, action: PayloadAction<string>) {
+      state.epubCodeSearch = action.payload
+      return state
+    },
+
     setToc: (state, action: PayloadAction<{ hash: Hash; toc: IToc[] }>) => {
       if (!state.toc[action.payload.hash]) {
         state.toc[action.payload.hash] = []

@@ -5,12 +5,14 @@ import { bookSelector, booksMapSelector } from '@store/selectors/books'
 import { uiSelector } from '@store/selectors/ui'
 import { useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { sleep } from '@utils/index'
 
 const ChaptersDrawerRoot = () => {
   const booksMap = useSelector(booksMapSelector)
   const isOpen = useSelector(uiSelector.openChaptersDrawer)
   const tocMap = useSelector(bookSelector.toc)
+  const navigate = useNavigate()
 
   const location = useLocation()
   const dispatch = useDispatch()
@@ -27,6 +29,12 @@ const ChaptersDrawerRoot = () => {
       title={book?.title ?? '--'}
       toc={toc}
       isOpen={isOpen}
+      onClickBack={() => {
+        dispatch(uiActions.setOpenChaptersDrawer(false))
+        dispatch(bookActions.setSelectedChapter(''))
+        dispatch(bookActions.setEpubCodeSearch(''))
+        sleep(300).then(() => navigate('/'))
+      }}
       onClickClose={() => {
         dispatch(uiActions.setOpenChaptersDrawer(false))
       }}

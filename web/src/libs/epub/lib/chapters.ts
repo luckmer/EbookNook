@@ -1,7 +1,7 @@
-import { Chapter, IToc, IXML } from '@interfaces/book/interfaces'
+import { Chapter, IXML } from '@interfaces/book/interfaces'
 
 export class EpubContentParser {
-  async parse(xml: IXML, toc: IToc[]): Promise<{ chapters: Chapter[] }> {
+  async parse(xml: IXML): Promise<{ chapters: Chapter[] }> {
     const doc = xml.doc
 
     const manifest: Record<string, { href: string; type?: string }> = {}
@@ -13,11 +13,6 @@ export class EpubContentParser {
     })
 
     const spine = Array.from(doc.querySelectorAll('spine > itemref'))
-
-    const tocMap: Record<string, IToc> = {}
-    toc.forEach((t) => {
-      tocMap[t.href] = t
-    })
 
     const blobMap = await this.buildBlobMap(xml, manifest)
 
@@ -36,36 +31,15 @@ export class EpubContentParser {
 
       this.replaceAssets(chapterDoc, xml.basePath, blobMap)
 
-      const title =
-        tocMap[href]?.label ||
-        chapterDoc.querySelector('title')?.textContent?.trim() ||
-        chapterDoc.querySelector('h1, h2')?.textContent?.trim() ||
-        `Chapter ${index + 1}`
-
       chapters.push({
         id: idref,
-        href: fullPath,
-        title,
+        href,
         index,
         content: chapterDoc.documentElement.outerHTML,
-        resolveHref: (target: string) => this.resolveHref(target),
       })
     }
 
     return { chapters }
-  }
-
-  getHTMLFragment = (doc: Document, id: string) =>
-    doc.querySelector(`#${CSS.escape(id)}`) || doc.querySelector(`[name="${CSS.escape(id)}"]`)
-
-  resolveHref(href: string) {
-    const [path, hash] = href.split('#')
-
-    let page = 0
-
-    const anchor = hash ? (doc: Document) => this.getHTMLFragment(doc, hash) : undefined
-
-    return { page, anchor }
   }
 
   private replaceAssets(doc: Document, base: string, blobs: Map<string, string>) {
