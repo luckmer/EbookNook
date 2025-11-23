@@ -31,6 +31,8 @@ const ChaptersDrawerRoot = () => {
       isOpen={isOpen}
       onClickBack={() => {
         dispatch(uiActions.setOpenChaptersDrawer(false))
+        dispatch(bookActions.setSelectedChapter(''))
+        dispatch(bookActions.setEpubCodeSearch(''))
         sleep(300).then(() => navigate('/'))
       }}
       onClickClose={() => {

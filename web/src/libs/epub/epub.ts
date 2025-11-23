@@ -86,8 +86,8 @@ export class Epub {
     return anchor.getBoundingClientRect().left
   }
 
-  isContentEmpty(href: string) {
-    return !href.trim().length
+  isContentEmpty(href?: string) {
+    return !(href ?? '').trim().length
   }
 
   loadNextChapter(href: string) {
@@ -125,13 +125,15 @@ export class Epub {
     })
   }
 
-  display(href: string) {
+  display(href?: string) {
     if (this.isContentEmpty(href)) {
       this.loadFirstChapter()
       return
     }
 
-    this.loadNextChapter(href)
+    if (typeof href !== 'undefined') {
+      this.loadNextChapter(href)
+    }
   }
 
   nextPage() {
