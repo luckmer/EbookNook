@@ -1,7 +1,6 @@
 import Header from '@pages/Header'
 import { actions } from '@store/reducers/search'
 import { actions as uiActions } from '@store/reducers/ui'
-
 import { searchSelector } from '@store/selectors/search'
 import { uiSelector } from '@store/selectors/ui'
 import '@styles/import.css'
@@ -11,13 +10,18 @@ import { Route, Routes } from 'react-router-dom'
 import { routes } from './routes'
 
 function App() {
-  const searchValue = useSelector(searchSelector.value)
+  const isSettingsOpen = useSelector(uiSelector.openSettingsModal)
   const isSidebarOpen = useSelector(uiSelector.openChaptersDrawer)
+  const searchValue = useSelector(searchSelector.value)
+
   const dispatch = useDispatch()
 
   return (
     <div className="w-full h-full flex flex-col gap-4">
       <Header
+        onClickSettings={() => {
+          dispatch(uiActions.setOpenSettingsModal(!isSettingsOpen))
+        }}
         location={location.pathname}
         onClickOpenSidebar={() => {
           dispatch(uiActions.setOpenChaptersDrawer(!isSidebarOpen))

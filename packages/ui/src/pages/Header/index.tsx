@@ -4,11 +4,13 @@ import Show from '@components/Show'
 import { NAVIGATION } from '@interfaces/routes/enums'
 import { FC, memo } from 'react'
 import { BsLayoutSidebarInset } from 'react-icons/bs'
+import { CiSettings } from 'react-icons/ci'
 
 export interface IProps {
   onClickClose: () => void
   onClickMaximize: () => void
   onClickMinimize: () => void
+  onClickSettings: () => void
   onClickOpenSidebar: () => void
   onChange: (value: string) => void
   location: string
@@ -20,6 +22,7 @@ export const Header: FC<IProps> = ({
   onClickMaximize,
   onClickMinimize,
   onClickOpenSidebar,
+  onClickSettings,
   value,
   location,
   onChange,
@@ -34,7 +37,7 @@ export const Header: FC<IProps> = ({
         <DefaultButton
           onClick={onClickOpenSidebar}
           className="transition-colors hover:bg-black-300 hover:text-white-100 text-white-200 duration-300 rounded-4 px-6 py-6">
-          <BsLayoutSidebarInset className=" fill-white-100 w-18 h-18 group-hover:fill-hover-grey-blue-200 transition-colors duration-200" />
+          <BsLayoutSidebarInset className="fill-white-100 w-18 h-18 group-hover:fill-hover-grey-blue-200 transition-colors duration-200" />
         </DefaultButton>
       </Show>
       <Show when={!isReader}>
@@ -50,6 +53,11 @@ export const Header: FC<IProps> = ({
         </div>
       </Show>
       <div className="flex flex-row gap-4 ml-auto" data-tauri-drag-region="false">
+        <DefaultButton
+          onClick={onClickSettings}
+          className="transition-colors hover:bg-black-300 hover:text-white-100 text-white-200 duration-300 rounded-4 px-6 py-6">
+          <CiSettings className=" fill-white-100 w-18 h-18 group-hover:fill-hover-grey-blue-200 transition-colors duration-200" />
+        </DefaultButton>
         <DefaultButton
           onClick={onClickMinimize}
           className="transition-colors hover:bg-black-300 hover:text-white-100 duration-300 text-white-200 rounded-4 px-6 py-6">

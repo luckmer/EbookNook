@@ -1,9 +1,11 @@
 import { combineReducers } from '@reduxjs/toolkit'
+import { reducers as bookReducers, booksStore } from './books'
+import { reducers as searchReducers, searchStore } from './search'
+import { reducers as settingsReducers, settingsStore } from './settings'
 import { reducers as uiReducers, uiStore } from './ui'
-import { searchStore, reducers as searchReducers } from './search'
-import { booksStore, reducers as bookReducers } from './books'
 
 const Index = combineReducers({
+  [settingsStore]: settingsReducers,
   [searchStore]: searchReducers,
   [booksStore]: bookReducers,
   [uiStore]: uiReducers,
