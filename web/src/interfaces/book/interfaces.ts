@@ -1,4 +1,4 @@
-import { BookFormat } from './types'
+import { BookFormat, IProgress } from './types'
 import type JSZip from 'jszip'
 
 export interface IMetadata {
@@ -23,11 +23,9 @@ export interface IResolveHref {
 
 export interface Chapter {
   id: string
-  title: string
   href: string
   index: number
   content: string
-  resolveHref: (href: string) => IResolveHref
 }
 
 export interface IToc {
@@ -58,7 +56,7 @@ export interface IBook {
   downloadedAt?: number | null
   coverDownloadedAt?: number | null
   lastUpdated?: number
-  progress?: [number, number]
+  progress: IProgress
   primaryLanguage?: string
   metadata: IMetadata
 }

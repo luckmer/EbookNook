@@ -1,5 +1,5 @@
 import { IToc, IXML } from '@interfaces/book/interfaces'
-import { EpubUtils } from './utils'
+import { EpubUtils } from '../utils'
 import { MIME } from './static'
 
 export class EpubTocParser {
