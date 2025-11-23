@@ -25,6 +25,11 @@ const Reader: FC<IProps> = ({ epubCodeSearch, selectedChapter }) => {
     viewRef.current?.progress((current, total) => {
       setPageInfo({ current, total })
     })
+
+    return () => {
+      viewRef.current?.destroyFrameCore()
+      viewRef.current = null
+    }
   }, [epubCodeSearch, selectedChapter])
 
   return (

@@ -176,4 +176,8 @@ export class Epub {
       })
     })
   }
+
+  destroyFrameCore() {
+    this.frame.destroy()
+  }
 }
