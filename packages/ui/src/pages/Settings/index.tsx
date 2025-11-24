@@ -5,9 +5,13 @@ import Switch from '@components/Switch'
 import { FC, memo, useState } from 'react'
 import FontSettings from './FontSettings'
 import LayoutSettings from './LayoutSettings'
+import { SETTINGS } from '@interfaces/settings/enums'
 
 export interface IProps {
   onClickClose: () => void
+  onClick: (action: SETTINGS, value: number) => void
+  defaultFontSize: number
+  fontWeight: number
   isOpen: boolean
 }
 
@@ -16,7 +20,7 @@ enum Options {
   LAYOUT = 'layout',
 }
 
-const Settings: FC<IProps> = ({ isOpen, onClickClose }) => {
+const Settings: FC<IProps> = ({ isOpen, onClickClose, defaultFontSize, fontWeight, onClick }) => {
   const [option, SetOption] = useState<Options>(Options.FONT)
 
   return (
@@ -28,14 +32,20 @@ const Settings: FC<IProps> = ({ isOpen, onClickClose }) => {
           SetOption(value)
         }}
       />
-      <Switch>
-        <Match when={option === Options.FONT}>
-          <FontSettings />
-        </Match>
-        <Match when={option === Options.LAYOUT}>
-          <LayoutSettings />
-        </Match>
-      </Switch>
+      <div className="h-[400px] overflow-y-auto">
+        <Switch>
+          <Match when={option === Options.FONT}>
+            <FontSettings
+              onClick={onClick}
+              defaultFontSize={defaultFontSize}
+              fontWeight={fontWeight}
+            />
+          </Match>
+          <Match when={option === Options.LAYOUT}>
+            <LayoutSettings />
+          </Match>
+        </Switch>
+      </div>
     </Modal>
   )
 }

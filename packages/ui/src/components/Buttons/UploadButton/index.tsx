@@ -13,13 +13,10 @@ export interface IProps {
 
 const UploadButton: React.FC<IProps> = ({ label, onClick, className, labelClassName, icon }) => {
   return (
-    <div className={clsx('flex flex-col', className)}>
+    <div className={clsx('flex flex-col ', className)}>
       <label
         htmlFor="epubUpload"
-        className={clsx(
-          'cursor-pointer h-full text-white-100 px-48 py-13 bg-black-200 rounded-9 transition-colors duration-300 hover:bg-hover-black-200',
-          labelClassName
-        )}>
+        className={clsx('cursor-pointer h-full px-48 py-13', labelClassName)}>
         <Show when={typeof label !== 'undefined'} fallback={<>{icon}</>}>
           <Typography>{label}</Typography>
         </Show>

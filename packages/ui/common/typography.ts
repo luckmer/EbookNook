@@ -17,8 +17,9 @@ export const typography = cva('not-italic select-none', {
       tinyBold: 'text-textXs font-bold leading-[12px] tracking-[0.02em]',
     },
     color: {
-      white: 'text-white-100',
-      lightWhite: 'text-white-200',
+      white: 'text-text-primary',
+      secondary: 'text-text-secondary',
+      muted: 'text-text-muted',
     },
     ellipsis: {
       true: 'text-ellipsis overflow-hidden whitespace-nowrap',

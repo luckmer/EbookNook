@@ -4,7 +4,9 @@ import Show from '@components/Show'
 import { NAVIGATION } from '@interfaces/routes/enums'
 import { FC, memo } from 'react'
 import { BsLayoutSidebarInset } from 'react-icons/bs'
-import { CiSettings } from 'react-icons/ci'
+import { GiHamburgerMenu } from 'react-icons/gi'
+import { CgMenuRound } from 'react-icons/cg'
+import clsx from 'clsx'
 
 export interface IProps {
   onClickClose: () => void
@@ -13,6 +15,7 @@ export interface IProps {
   onClickSettings: () => void
   onClickOpenSidebar: () => void
   onChange: (value: string) => void
+  hideHeader: boolean
   location: string
   value: string
 }
@@ -25,6 +28,7 @@ export const Header: FC<IProps> = ({
   onClickSettings,
   value,
   location,
+  hideHeader,
   onChange,
 }) => {
   const isReader = location.match(NAVIGATION.READER)
@@ -32,12 +36,15 @@ export const Header: FC<IProps> = ({
   return (
     <div
       data-tauri-drag-region
-      className="relative flex flex-row items-center justify-between gap-48 p-12 rounded-8 transition-opacity duration-300 h-[70px]">
+      className={clsx(
+        hideHeader ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-auto',
+        'relative flex flex-row items-center justify-between gap-48 p-12 rounded-8 transition-opacity duration-300 h-[70px]'
+      )}>
       <Show when={isReader !== null}>
         <DefaultButton
           onClick={onClickOpenSidebar}
-          className="transition-colors hover:bg-black-300 hover:text-white-100 text-white-200 duration-300 rounded-4 px-6 py-6">
-          <BsLayoutSidebarInset className="fill-white-100 w-18 h-18 group-hover:fill-hover-grey-blue-200 transition-colors duration-200" />
+          className="transition-colors hover:bg-button-primary-hover hover:text-text-primary text-text-secondary duration-300 rounded-4 px-6 py-6">
+          <BsLayoutSidebarInset className="w-18 h-18 transition-colors duration-200" />
         </DefaultButton>
       </Show>
       <Show when={!isReader}>
@@ -47,20 +54,28 @@ export const Header: FC<IProps> = ({
             placeholder="Search"
             value={value}
             onChange={onChange}
-            className="bg-black-800 h-full rounded-6 px-12  text-white-100 border-black-800 focus:border-black-300 border hover:border-black-300 font-ubuntu"
+            className="bg-surface-200/30 h-full rounded-6 px-12 font-ubuntu"
             id="search_input"
           />
         </div>
       </Show>
       <div className="flex flex-row gap-4 ml-auto" data-tauri-drag-region="false">
         <DefaultButton
-          onClick={onClickSettings}
-          className="transition-colors hover:bg-black-300 hover:text-white-100 text-white-200 duration-300 rounded-4 px-6 py-6">
-          <CiSettings className=" fill-white-100 w-18 h-18 group-hover:fill-hover-grey-blue-200 transition-colors duration-200" />
+          disabled
+          onClick={() => {}}
+          className="transition-colors hover:bg-button-primary-hover hover:text-text-primary text-text-secondary duration-300 rounded-4 px-6 py-6">
+          <CgMenuRound className="w-18 h-18 transition-colors duration-200" />
         </DefaultButton>
+
+        <DefaultButton
+          onClick={onClickSettings}
+          className="transition-colors hover:bg-button-primary-hover hover:text-text-primary text-text-secondary duration-300 rounded-4 px-6 py-6">
+          <GiHamburgerMenu className="w-18 h-18 transition-colors duration-200" />
+        </DefaultButton>
+
         <DefaultButton
           onClick={onClickMinimize}
-          className="transition-colors hover:bg-black-300 hover:text-white-100 duration-300 text-white-200 rounded-4 px-6 py-6">
+          className="transition-colors hover:bg-button-primary-hover hover:text-text-primary duration-300 text-text-secondary rounded-4 px-6 py-6">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
             <path fill="currentColor" d="M19 13H5v-2h14z" />
           </svg>
@@ -68,7 +83,7 @@ export const Header: FC<IProps> = ({
 
         <DefaultButton
           onClick={onClickMaximize}
-          className="transition-colors hover:bg-black-300 hover:text-white-100 text-white-200 duration-300 rounded-4 px-6 py-6">
+          className="transition-colors hover:bg-button-primary-hover hover:text-text-primary text-text-secondary duration-300 rounded-4 px-6 py-6">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
             <path fill="currentColor" d="M4 4h16v16H4zm2 4v10h12V8z" />
           </svg>
@@ -76,7 +91,7 @@ export const Header: FC<IProps> = ({
 
         <DefaultButton
           onClick={onClickClose}
-          className="hover:bg-red-200 hover:text-white-100 text-white-200 transition-colors duration-300 rounded-4 px-6 py-6">
+          className="hover:bg-accent-red hover:text-text-primary text-text-secondary transition-colors duration-300 rounded-4 px-6 py-6">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
             <path
               fill="currentColor"

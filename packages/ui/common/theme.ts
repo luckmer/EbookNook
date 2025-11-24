@@ -18,31 +18,61 @@ const theme = {
     textXs: '10px',
   },
   colors: {
-    white: {
-      200: '#CFD7D7',
-      100: '#FFFFFF',
-    },
-    red: {
-      200: '#B36A6B',
-    },
-    black: {
-      900: '#0B161A',
-      800: '#111A1F',
-      300: '#1B2830',
-      200: '#152A31',
+    base: '#222222',
+    deep: '#181818',
+
+    surface: {
+      100: '#2A2A2A',
+      200: '#333333',
+      modal: '#2E2E2E',
+      drawer: '#242424',
+      popover: '#2D2D2D',
     },
 
-    greyBlue: {
-      200: '#2D3B40',
+    border: {
+      subtle: '#303030',
+      strong: '#474747',
+      modal: '#3F3F3F',
+      drawer: '#373737',
+      popover: '#424242',
     },
 
-    hover: {
-      greyBlue: {
-        200: '#3E5158',
+    text: {
+      primary: '#FFFFFF',
+      secondary: '#C9C9C9',
+      muted: '#9A9A9A',
+      disabled: '#6D6D6D',
+      inverse: '#000000',
+    },
+
+    accent: {
+      blue: '#4DA3FF',
+      purple: '#B58AFF',
+      green: '#58D39B',
+      orange: '#FFAE57',
+      pink: '#FF7FAE',
+      red: '#E45C5C',
+    },
+
+    status: {
+      success: '#4CAF50',
+      warning: '#F0C24D',
+      error: '#E54848',
+      info: '#52A8FF',
+    },
+
+    button: {
+      primary: {
+        background: '#2E2E2E',
+        hover: '#3A3A3A',
+        active: '#242424',
+        text: '#FFFFFF',
       },
-      black: {
-        800: '#141F25',
-        200: '#1B3741',
+      secondary: {
+        background: '#333333',
+        hover: '#3D3D3D',
+        active: '#292929',
+        text: '#FFFFFF',
       },
     },
 

@@ -25,7 +25,7 @@ const Toc: FC<IProps> = ({ item, level, onClick }) => {
       <DefaultButton
         className={clsx(
           'pl-6 group h-[35px] w-full flex items-center ',
-          'hover:bg-hover-greyBlue-200 transition-colors duration-300 opacity-80 hover:bg-black-300 rounded-6'
+          'hover:bg-hover-greyBlue-200 transition-colors duration-300 opacity-80 hover:bg-button-primary-hover rounded-6'
         )}
         onClick={() => {
           onClick(item.href)

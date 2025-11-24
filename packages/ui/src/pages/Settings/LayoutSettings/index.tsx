@@ -1,5 +1,5 @@
 const LayoutSettings = () => {
-  return <div>LayoutSettings</div>
+  return <div className="h-full">LayoutSettings</div>
 }
 
 export default LayoutSettings

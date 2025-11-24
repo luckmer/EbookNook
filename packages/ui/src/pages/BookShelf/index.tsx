@@ -25,11 +25,9 @@ const BookShelf: FC<IProps> = ({ books, onClickBook, onClickImportBook }) => {
       ))}
       <UploadButton
         onClick={onClickImportBook}
-        className="group p-12"
-        icon={
-          <MdAddToPhotos className="fill-grey-blue-200 group-hover:fill-hover-grey-blue-200 transition-colors duration-200 w-[80%] h-[80%] " />
-        }
-        labelClassName="bg-black-800 hover:bg-hover-black-800! flex items-center justify-center"
+        className="group flex items-center justify-center transition-colors duration-300 w-full h-full"
+        icon={<MdAddToPhotos className="fill-text-disabled w-[80%] h-full " />}
+        labelClassName="bg-base hover:bg-surface-drawer w-full"
       />
     </div>
   )

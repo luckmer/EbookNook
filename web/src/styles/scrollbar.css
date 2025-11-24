@@ -1,19 +1,17 @@
 ::-webkit-scrollbar {
-  width: 2px;
+  width: 2px !important;
 }
 
-/* Track */
 ::-webkit-scrollbar-track {
-  border-radius: 10px;
+  border-radius: 10px !important;
 }
 
-/* Handle */
 ::-webkit-scrollbar-thumb {
-  margin-left: 2px;
-  background: #1b2830;
-  border-radius: 12px;
+  margin-left: 2px !important;
+  background: #242424 !important;
+  border-radius: 12px !important;
 }
 
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 6px !important;
 }

@@ -10,7 +10,7 @@ export interface IProps {
 const Book: FC<IProps> = ({ img, title, onClick }) => {
   return (
     <div
-      className="flex flex-col gap-12 object-cover w-fit p-12 hover:bg-black-300 rounded-6 transition-colors duration-300 cursor-pointer"
+      className="flex flex-col gap-12 object-cover w-fit p-12 hover:bg-button-primary-hover/40 rounded-6 transition-colors duration-300 cursor-pointer"
       onClick={(e) => {
         e.preventDefault()
         e.stopPropagation()

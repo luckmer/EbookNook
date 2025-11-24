@@ -1,5 +1,6 @@
 import DefaultButton from '@components/Buttons/DefaultButton'
 import { Typography } from '@components/Typography'
+import clsx from 'clsx'
 import { FC, memo, ReactNode } from 'react'
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa6'
 import { TbPlayerTrackNextFilled, TbPlayerTrackPrevFilled } from 'react-icons/tb'
@@ -11,6 +12,7 @@ export interface IProps {
   onClickPrevChapter: () => void
   currentPage: number
   totalPage: number
+  hideContent: boolean
 }
 
 const EpubNavigation: FC<IProps> = ({
@@ -20,22 +22,27 @@ const EpubNavigation: FC<IProps> = ({
   onClickPrevChapter,
   onClickPrevPage,
   currentPage,
+  hideContent,
   totalPage,
 }) => {
   return (
     <div className="w-full h-full flex flex-col">
       {children}
-      <div className="flex flex-row justify-between w-full">
+      <div
+        className={clsx(
+          'flex flex-row justify-between items-center w-full transition-opacity duration-300 px-12 pb-12',
+          hideContent ? 'opacity-0' : 'opacity-100'
+        )}>
         <div className="flex flex-row gap-6">
           <DefaultButton
             onClick={onClickPrevChapter}
-            className="transition-colors hover:bg-black-300 hover:text-white-100 text-white-200 duration-300 rounded-4 px-6 py-6">
-            <TbPlayerTrackPrevFilled className=" fill-white-100 w-18 h-18 group-hover:fill-hover-grey-blue-200 transition-colors duration-200" />
+            className="transition-colors hover:bg-button-primary-hover hover:text-text-primary text-text-secondary duration-300 rounded-4 px-6 py-6">
+            <TbPlayerTrackPrevFilled className="w-18 h-18 transition-colors duration-200" />
           </DefaultButton>
           <DefaultButton
             onClick={onClickPrevPage}
-            className="transition-colors hover:bg-black-300 hover:text-white-100 text-white-200 duration-300 rounded-4 px-6 py-6">
-            <FaChevronLeft className=" fill-white-100 w-18 h-18 group-hover:fill-hover-grey-blue-200 transition-colors duration-200" />
+            className="transition-colors hover:bg-button-primary-hover hover:text-text-primary text-text-secondary duration-300 rounded-4 px-6 py-6">
+            <FaChevronLeft className="w-18 h-18 transition-colors duration-200" />
           </DefaultButton>
         </div>
         <Typography>
@@ -44,13 +51,13 @@ const EpubNavigation: FC<IProps> = ({
         <div className="flex flex-row gap-6">
           <DefaultButton
             onClick={onClickNextPage}
-            className="transition-colors hover:bg-black-300 hover:text-white-100 text-white-200 duration-300 rounded-4 px-6 py-6">
-            <FaChevronRight className=" fill-white-100 w-18 h-18 group-hover:fill-hover-grey-blue-200 transition-colors duration-200" />
+            className="transition-colors hover:bg-button-primary-hover hover:text-text-primary text-text-secondary duration-300 rounded-4 px-6 py-6">
+            <FaChevronRight className="w-18 h-18 transition-colors duration-200" />
           </DefaultButton>
           <DefaultButton
             onClick={onClickNextChapter}
-            className="transition-colors hover:bg-black-300 hover:text-white-100 text-white-200 duration-300 rounded-4 px-6 py-6">
-            <TbPlayerTrackNextFilled className=" fill-white-100 w-18 h-18 group-hover:fill-hover-grey-blue-200 transition-colors duration-200" />
+            className="transition-colors hover:bg-button-primary-hover hover:text-text-primary text-text-secondary duration-300 rounded-4 px-6 py-6">
+            <TbPlayerTrackNextFilled className="w-18 h-18 transition-colors duration-200" />
           </DefaultButton>
         </div>
       </div>

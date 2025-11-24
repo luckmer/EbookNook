@@ -1,5 +1,6 @@
 import Home from '@pages/Home'
 import { actions } from '@store/reducers/books'
+import { actions as uiActions } from '@store/reducers/ui'
 import { bookSelector } from '@store/selectors/books'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
@@ -19,6 +20,7 @@ const HomeRoot = () => {
       onClickBook={(hash) => {
         navigate('reader', { state: { id: hash } })
         dispatch(actions.loadBook(hash))
+        dispatch(uiActions.setHideHeader(true))
       }}
     />
   )
