@@ -1,10 +1,11 @@
-import { Chapter } from '@interfaces/book/interfaces'
+import { Chapter, IToc } from '@interfaces/book/interfaces'
 import { Frame } from '@libs/Frame/FrameCore'
 import { EpubContentParser } from './lib/chapters'
 import { EpubUtils } from './utils'
 import { ZipParser } from './lib/zipParser'
 import { ISettingsState } from '@interfaces/settings/interfaces'
-
+import { EpubTocParser } from './lib/toc'
+import { flatData } from '@utils/index'
 export interface IEpubChapter extends Chapter {
   index: number
 }
@@ -12,6 +13,7 @@ export interface IEpubChapter extends Chapter {
 export class Epub {
   contentParser = new EpubContentParser()
   zipParser = new ZipParser()
+  EpubTocParser = new EpubTocParser()
   frame = new Frame()
   url: string = ''
   currentPage: string = ''
@@ -20,7 +22,7 @@ export class Epub {
   chapterByIndex: Record<string, number> = {}
   lastSelectedPath: string = ''
   isLoading: boolean = false
-
+  toc: IToc[] = []
   private queue: Promise<void>
 
   private enqueue(action: () => Promise<void>) {
@@ -36,6 +38,20 @@ export class Epub {
     this.queue = Promise.resolve()
 
     this.enqueue(() => this.loadChapters())
+    this.frame.onLinkClick((href) => this.handleFrameLink(href))
+  }
+
+  private handleFrameLink(href: string) {
+    let path: string | undefined = undefined
+    for (let toc of this.toc) {
+      if (toc.href.endsWith(href)) {
+        path = toc.href
+        break
+      }
+    }
+
+    if (!path) return
+    this.loadNextChapter(path)
   }
 
   renderTo(element: string) {
@@ -55,31 +71,38 @@ export class Epub {
     return base[base.length - 1]
   }
 
-  loadChapters() {
-    return new Promise<void>(async (resolve, reject) => {
-      this.isLoading = true
+  async loadChapters() {
+    this.isLoading = true
 
-      try {
-        const buffer = EpubUtils.binaryStringToArrayBuffer(this.url)
-        const xml = await this.zipParser.load(buffer)
-        const { chapters } = await this.contentParser.parse(xml)
-        this.chapters = chapters.map((chapter, index) => ({
-          ...chapter,
-          index,
-        }))
+    try {
+      const buffer = EpubUtils.binaryStringToArrayBuffer(this.url)
 
-        for (let chapter of this.chapters) {
-          const href = this.formatChapterHref(chapter.href)
-          this.chapterByHref[href] = chapter
-          this.chapterByIndex[href] = chapter.index
-        }
+      const xml = await this.zipParser.load(buffer)
+      // Run these in parallel
+      const [tocData, contentData] = await Promise.all([
+        this.EpubTocParser.parse(xml),
+        this.contentParser.parse(xml),
+      ])
 
-        resolve()
-      } catch (err) {
-        reject(err)
+      const { chapters } = contentData
+
+      this.chapters = chapters.map((chapter, index) => ({
+        ...chapter,
+        index,
+      }))
+
+      for (let chapter of this.chapters) {
+        const href = this.formatChapterHref(chapter.href)
+        this.chapterByHref[href] = chapter
+        this.chapterByIndex[href] = chapter.index
       }
+
+      this.toc = flatData(tocData)
+    } catch (err) {
+      throw err
+    } finally {
       this.isLoading = false
-    })
+    }
   }
 
   getHTMLFragment = (doc: Document, id: string) => {

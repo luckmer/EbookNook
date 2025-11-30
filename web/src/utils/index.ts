@@ -1,3 +1,5 @@
+import { IToc } from '@interfaces/book/interfaces'
+
 export const rstr2hex = (input: string) => {
   const hex_tab = '0123456789abcdef'
   let output = ''
@@ -9,3 +11,13 @@ export const rstr2hex = (input: string) => {
 }
 
 export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
+export const flatData = (data: IToc[], level = 0, el: IToc[] = []): IToc[] => {
+  for (let item of data) {
+    el.push(item)
+    if (item.subitems.length > 0) {
+      flatData(item.subitems, level + 1, el)
+    }
+  }
+  return el
+}

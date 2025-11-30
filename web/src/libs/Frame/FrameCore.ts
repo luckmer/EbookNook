@@ -11,6 +11,7 @@ export class Frame {
   private totalPages = 1
   private queue: Promise<void> = Promise.resolve()
   private progressCallback?: (current: number, total: number) => void
+  private linkClickCallback?: (href: string) => void
   private onIframeScroll?: EventListener
   private blobUrl?: string
   private orientationTimeout?: number
@@ -121,6 +122,28 @@ export class Frame {
     setStylesImportant(doc.body, { margin: '0' })
   }
 
+  onLinkClick(callback: (href: string) => void) {
+    this.linkClickCallback = callback
+  }
+
+  attachLinkHandler() {
+    const doc = this.document
+    if (!doc) return
+
+    doc.addEventListener('click', (e) => {
+      e.preventDefault()
+      const target = e.target as HTMLElement
+      if (!target) return
+
+      const anchor = target.closest('a') as HTMLAnchorElement | null
+      if (!anchor || !anchor.href) return
+
+      e.preventDefault()
+      const href = anchor.getAttribute('href')!
+      this.linkClickCallback?.(href)
+    })
+  }
+
   async loadChapter(content: string) {
     return this.enqueue(async () => {
       this.removeIframeScrollListener()
@@ -140,6 +163,7 @@ export class Frame {
           this.observer.observe(doc.body)
           await doc.fonts.ready
           this.attachIframeScrollListener()
+          this.attachLinkHandler()
           this.expand()
           this.goTo(0)
           this.iframe.style.opacity = '1'
