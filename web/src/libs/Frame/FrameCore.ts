@@ -1,3 +1,4 @@
+import { ISettingsState } from '@interfaces/settings/interfaces'
 import { setStylesImportant } from './utils'
 
 export class Frame {
@@ -13,6 +14,7 @@ export class Frame {
   private onIframeScroll?: EventListener
   private blobUrl?: string
   private orientationTimeout?: number
+  private chapterStyles: Partial<ISettingsState> = {}
 
   constructor() {
     this.element = document.createElement('div')
@@ -44,7 +46,7 @@ export class Frame {
       &::-webkit-scrollbar {
         width: 0px;
         height: 0px;
-    }
+      }
     `
     this.element.appendChild(this.iframe)
 
@@ -58,7 +60,6 @@ export class Frame {
 
   progress(callback: (current: number, total: number) => void) {
     this.progressCallback = callback
-
     this.progressCallback(this.currentPage, this.totalPages)
   }
 
@@ -79,6 +80,47 @@ export class Frame {
     return this.iframe.contentDocument!
   }
 
+  setStyles(styles: ISettingsState) {
+    const win = this.iframe.contentWindow
+    if (!win || !this.document) {
+      this.chapterStyles = { ...this.chapterStyles, ...styles }
+      this.applyStyles()
+      return
+    }
+
+    this.chapterStyles = { ...this.chapterStyles, ...styles }
+    this.applyStyles()
+  }
+
+  private applyStyles() {
+    const doc = this.document
+    if (!doc) return
+
+    const defaultStyles = {
+      'font-size': `${this.chapterStyles.defaultFontSize ?? 16}px`,
+      'font-weight': `${this.chapterStyles.fontWeight ?? 400}`,
+      'line-height': this.chapterStyles.lineHeight ? `${this.chapterStyles.lineHeight}` : '1.5',
+      'word-spacing': this.chapterStyles.wordSpacing
+        ? `${this.chapterStyles.wordSpacing}px`
+        : 'normal',
+      'letter-spacing': this.chapterStyles.letterSpacing
+        ? `${this.chapterStyles.letterSpacing}px`
+        : 'normal',
+      'text-indent': this.chapterStyles.textIndent ? `${this.chapterStyles.textIndent}px` : '0px',
+      'box-sizing': 'border-box',
+      'column-width': '600px',
+      'column-gap': '40px',
+      'column-fill': 'auto',
+      'word-wrap': 'break-word',
+      padding: '20px',
+      color: '#fff',
+      overflow: 'hidden',
+    }
+
+    setStylesImportant(doc.documentElement, defaultStyles)
+    setStylesImportant(doc.body, { margin: '0' })
+  }
+
   async loadChapter(content: string) {
     return this.enqueue(async () => {
       this.removeIframeScrollListener()
@@ -94,17 +136,7 @@ export class Frame {
       await new Promise<void>((resolve) => {
         this.iframe.onload = async () => {
           const doc = this.document
-          setStylesImportant(doc.documentElement, {
-            'box-sizing': 'border-box',
-            'column-width': '600px',
-            'column-gap': '40px',
-            'column-fill': 'auto',
-            padding: '20px',
-            color: '#fff',
-            overflow: 'hidden',
-          })
-          setStylesImportant(doc.body, { margin: '0' })
-
+          this.applyStyles()
           this.observer.observe(doc.body)
           await doc.fonts.ready
           this.attachIframeScrollListener()
@@ -136,7 +168,6 @@ export class Frame {
   private updateCurrentPageFromScroll() {
     const doc = this.document
     if (!doc) return
-
     const win = this.iframe.contentWindow
     const scrollLeft = win?.scrollX ?? 0
 
@@ -176,14 +207,12 @@ export class Frame {
     if (!doc) return
 
     this.observer.disconnect()
-
     this.totalWidth = doc.documentElement.scrollWidth
     this.viewportWidth = this.iframe.clientWidth ?? 1
     this.totalPages = Math.max(1, Math.ceil(this.totalWidth / this.viewportWidth))
     this.currentPage = Math.min(this.currentPage, this.totalPages)
 
     this.scrollToPage(this.currentPage)
-
     this.observer.observe(doc.body)
   }
 
@@ -203,13 +232,11 @@ export class Frame {
         : this.viewportWidth * (this.currentPage - 1)
 
     this.iframe.contentWindow?.scrollTo({ left: scrollPosition, top: 0, behavior: 'instant' })
-
     this.progressCallback?.(this.currentPage, this.totalPages)
   }
 
   nextPage() {
     const { page, totalPages, scrollLeft } = this.currentLocation()
-
     if (this.canGoNext()) {
       this.scrollToPage(page + 1)
     } else {
@@ -224,7 +251,6 @@ export class Frame {
 
   prevPage() {
     const { page } = this.currentLocation()
-
     if (this.canGoPrev()) {
       this.scrollToPage(page - 1)
     }

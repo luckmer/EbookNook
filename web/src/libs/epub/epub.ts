@@ -3,6 +3,7 @@ import { Frame } from '@libs/Frame/FrameCore'
 import { EpubContentParser } from './lib/chapters'
 import { EpubUtils } from './utils'
 import { ZipParser } from './lib/zipParser'
+import { ISettingsState } from '@interfaces/settings/interfaces'
 
 export interface IEpubChapter extends Chapter {
   index: number
@@ -40,6 +41,12 @@ export class Epub {
   renderTo(element: string) {
     return this.enqueue(async () => {
       await this.frame.attachTo(element)
+    })
+  }
+
+  setStyles(settings: ISettingsState) {
+    return this.enqueue(async () => {
+      return this.frame.setStyles(settings)
     })
   }
 

@@ -1,6 +1,7 @@
 import EpubNavigation from '@components/EpubNavigation'
 import { Epub } from '@libs/epub/epub'
 import { FC, memo, useEffect, useRef, useState } from 'react'
+import { ISettingsState } from '@interfaces/settings/interfaces'
 
 export interface IProps {
   epubCodeSearch: string
@@ -8,6 +9,7 @@ export interface IProps {
   onHideHeader: () => void
   onShowHeader: () => void
   hideContent: boolean
+  settings: ISettingsState
 }
 
 const Reader: FC<IProps> = ({
@@ -16,6 +18,7 @@ const Reader: FC<IProps> = ({
   hideContent,
   onHideHeader,
   onShowHeader,
+  settings,
 }) => {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const [pageInfo, setPageInfo] = useState({ current: 1, total: 1 })
@@ -35,6 +38,10 @@ const Reader: FC<IProps> = ({
       setPageInfo({ current, total })
     })
   }, [epubCodeSearch, selectedChapter])
+
+  useEffect(() => {
+    viewRef?.current?.setStyles(settings)
+  }, [settings, epubCodeSearch, selectedChapter])
 
   return (
     <main className="w-full h-full  flex flex-col">
