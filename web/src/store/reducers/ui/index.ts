@@ -4,10 +4,14 @@ export const uiStore = 'uiStore'
 
 export interface IUiState {
   openChaptersDrawer: boolean
+  openSettingsModal: boolean
+  hideHeader: boolean
 }
 
 const defaultState: IUiState = {
   openChaptersDrawer: false,
+  openSettingsModal: false,
+  hideHeader: false,
 }
 
 export const store = createSlice({
@@ -19,6 +23,14 @@ export const store = createSlice({
     },
     setOpenChaptersDrawer(state, action: PayloadAction<boolean>) {
       state.openChaptersDrawer = action.payload
+      return state
+    },
+    setOpenSettingsModal(state, action: PayloadAction<boolean>) {
+      state.openSettingsModal = action.payload
+      return state
+    },
+    setHideHeader(state, action: PayloadAction<boolean>) {
+      state.hideHeader = action.payload
       return state
     },
   },

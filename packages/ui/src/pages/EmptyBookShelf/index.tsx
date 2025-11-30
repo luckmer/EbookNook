@@ -13,11 +13,14 @@ const EmptyBookShelf: FC<IProps> = ({ onClick }) => {
         Your library
       </Typography>
       <Typography text="body" center>
-        Step into your library, where every book is a friend waiting to be discovered, any time you
-        wish.
+        Welcome to your library! Import your books and start reading anytime.
       </Typography>
       <div className="flex">
-        <UploadButton label="Import books" onClick={onClick} />
+        <UploadButton
+          label="Import books"
+          onClick={onClick}
+          className="bg-button-primary-background rounded-6 hover:bg-button-primary-hover transition-colors duration-300"
+        />
       </div>
     </div>
   )

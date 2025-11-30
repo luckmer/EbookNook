@@ -1,6 +1,6 @@
+import { Typography } from '@components/Typography'
 import { Meta, StoryObj } from '@storybook/react-vite'
 import DefaultButton from './index'
-import { Typography } from '@components/Typography'
 
 const meta: Meta<typeof DefaultButton> = {
   component: DefaultButton,
