@@ -78,7 +78,6 @@ export class Epub {
       const buffer = EpubUtils.binaryStringToArrayBuffer(this.url)
 
       const xml = await this.zipParser.load(buffer)
-      // Run these in parallel
       const [tocData, contentData] = await Promise.all([
         this.EpubTocParser.parse(xml),
         this.contentParser.parse(xml),
