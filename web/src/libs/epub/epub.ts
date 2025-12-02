@@ -154,14 +154,14 @@ export class Epub {
     })
   }
 
-  display(href?: string) {
+  async display(href?: string) {
     if (this.isContentEmpty(href)) {
-      this.loadFirstChapter()
+      await this.loadFirstChapter()
       return
     }
 
     if (typeof href !== 'undefined') {
-      this.loadNextChapter(href)
+      await this.loadNextChapter(href)
     }
   }
 
