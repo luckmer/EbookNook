@@ -5,16 +5,18 @@ export class Frame {
   private observer: ResizeObserver
   element: HTMLDivElement
   private iframe: HTMLIFrameElement
+  private contentRange = document.createRange()
+  private spacer: HTMLDivElement
   private totalWidth = 0
   private viewportWidth = 0
   private currentPage = 1
   private totalPages = 1
+  private padding = 20
   private queue: Promise<void> = Promise.resolve()
   private progressCallback?: (current: number, total: number) => void
   private linkClickCallback?: (href: string) => void
   private onIframeScroll?: EventListener
   private blobUrl?: string
-  private orientationTimeout?: number
   private chapterStyles: Partial<ISettingsState> = {}
 
   constructor() {
@@ -43,25 +45,22 @@ export class Frame {
       scrollbarWidth: 'none',
     })
 
-    this.iframe.style.cssText += `
-      &::-webkit-scrollbar {
-        width: 0px;
-        height: 0px;
-      }
-    `
     this.element.appendChild(this.iframe)
 
-    this.observer = new ResizeObserver(() => this.expand())
-
-    window.addEventListener('orientationchange', () => {
-      clearTimeout(this.orientationTimeout)
-      this.orientationTimeout = window.setTimeout(() => this.expand(), 500)
+    this.spacer = document.createElement('div')
+    Object.assign(this.spacer.style, {
+      width: '0px',
+      height: '1px',
+      breakBefore: 'column',
+      breakInside: 'avoid',
     })
+
+    this.observer = new ResizeObserver(() => this.expand())
   }
 
   progress(callback: (current: number, total: number) => void) {
     this.progressCallback = callback
-    this.progressCallback(this.currentPage, this.totalPages)
+    callback(this.currentPage, this.totalPages)
   }
 
   private enqueue(action: () => Promise<void>) {
@@ -82,13 +81,6 @@ export class Frame {
   }
 
   setStyles(styles: ISettingsState) {
-    const win = this.iframe.contentWindow
-    if (!win || !this.document) {
-      this.chapterStyles = { ...this.chapterStyles, ...styles }
-      this.applyStyles()
-      return
-    }
-
     this.chapterStyles = { ...this.chapterStyles, ...styles }
     this.applyStyles()
   }
@@ -109,17 +101,22 @@ export class Frame {
         : 'normal',
       'text-indent': this.chapterStyles.textIndent ? `${this.chapterStyles.textIndent}px` : '0px',
       'box-sizing': 'border-box',
+      overflow: 'hidden',
+      padding: `0px ${this.padding}px`,
+    }
+
+    const bodyStyles = {
+      margin: '0',
+      color: '#fff',
       'column-width': '600px',
       'column-gap': '40px',
       'column-fill': 'auto',
       'word-wrap': 'break-word',
-      padding: '20px',
-      color: '#fff',
-      overflow: 'hidden',
+      'box-sizing': 'border-box',
     }
 
     setStylesImportant(doc.documentElement, defaultStyles)
-    setStylesImportant(doc.body, { margin: '0' })
+    setStylesImportant(doc.body, bodyStyles)
   }
 
   onLinkClick(callback: (href: string) => void) {
@@ -160,6 +157,8 @@ export class Frame {
         this.iframe.onload = async () => {
           const doc = this.document
           this.applyStyles()
+          doc.body.appendChild(this.spacer)
+          this.contentRange.selectNodeContents(doc.body)
           this.observer.observe(doc.body)
           await doc.fonts.ready
           this.attachIframeScrollListener()
@@ -174,10 +173,9 @@ export class Frame {
   }
 
   private attachIframeScrollListener() {
-    this.removeIframeScrollListener()
     const win = this.iframe.contentWindow
     if (!win) return
-    this.onIframeScroll = () => this.updateCurrentPageFromScroll()
+    this.onIframeScroll = () => this.updatePageFromScroll()
     win.addEventListener('scroll', this.onIframeScroll, { passive: true })
   }
 
@@ -189,64 +187,56 @@ export class Frame {
     }
   }
 
-  private updateCurrentPageFromScroll() {
+  private calculatePagination() {
     const doc = this.document
     if (!doc) return
+
+    const contentRect = this.contentRange.getBoundingClientRect()
+    const rootRect = doc.documentElement.getBoundingClientRect()
+
+    const contentStart = Math.max(0, contentRect.left - rootRect.left)
+    const contentWidth = contentRect.width
+
+    let realWidth = contentStart + contentWidth
+    realWidth += this.padding
+
+    this.viewportWidth = this.iframe.clientWidth || 1
+    this.totalPages = Math.max(1, Math.ceil(realWidth / this.viewportWidth))
+    this.totalWidth = this.totalPages * this.viewportWidth
+  }
+
+  private updatePageFromScroll() {
     const win = this.iframe.contentWindow
-    const scrollLeft = win?.scrollX ?? 0
+    if (!win) return
 
-    this.totalWidth = doc.documentElement.scrollWidth
-    this.viewportWidth = this.iframe.clientWidth ?? 1
-    this.totalPages = Math.max(1, Math.ceil(this.totalWidth / this.viewportWidth))
+    const scrollLeft = win.scrollX
+    this.calculatePagination()
 
-    let page =
-      scrollLeft + this.viewportWidth >= this.totalWidth
-        ? this.totalPages
-        : Math.round(scrollLeft / this.viewportWidth) + 1
+    const maxScroll = this.totalWidth - this.viewportWidth
 
-    page = Math.max(1, Math.min(page, this.totalPages))
-
-    if (page !== this.currentPage) {
-      this.currentPage = page
-      this.progressCallback?.(this.currentPage, this.totalPages)
+    if (scrollLeft >= maxScroll - 1) {
+      this.currentPage = this.totalPages
+    } else {
+      this.currentPage = Math.floor(scrollLeft / this.viewportWidth) + 1
     }
+
+    this.progressCallback?.(this.currentPage, this.totalPages)
   }
 
   goTo(tocProgress: number) {
-    const doc = this.document
-    if (!doc) return
+    const win = this.iframe.contentWindow
+    if (!win) return
 
-    this.totalWidth = doc.documentElement.scrollWidth
-    this.viewportWidth = this.iframe.clientWidth ?? 1
-    this.totalPages = Math.max(1, Math.ceil(this.totalWidth / this.viewportWidth))
+    this.calculatePagination()
 
-    const anchorLeft = tocProgress + (this.iframe.contentWindow?.scrollX ?? 0)
+    const anchorLeft = tocProgress + win.scrollX
     const page = Math.floor(anchorLeft / this.viewportWidth)
-    this.currentPage = Math.min(page + 1, this.totalPages)
-    this.scrollToPage(this.currentPage)
-  }
 
-  expand() {
-    const doc = this.document
-    if (!doc) return
-
-    this.observer.disconnect()
-    this.totalWidth = doc.documentElement.scrollWidth
-    this.viewportWidth = this.iframe.clientWidth ?? 1
-    this.totalPages = Math.max(1, Math.ceil(this.totalWidth / this.viewportWidth))
-    this.currentPage = Math.min(this.currentPage, this.totalPages)
-
-    this.scrollToPage(this.currentPage)
-    this.observer.observe(doc.body)
+    this.goToPage(page + 1)
   }
 
   private scrollToPage(page: number) {
-    const doc = this.document
-    if (!doc) return
-
-    this.totalWidth = doc.documentElement.scrollWidth
-    this.viewportWidth = this.iframe.clientWidth ?? 1
-    this.totalPages = Math.max(1, Math.ceil(this.totalWidth / this.viewportWidth))
+    this.calculatePagination()
 
     this.currentPage = Math.max(1, Math.min(page, this.totalPages))
 
@@ -255,28 +245,33 @@ export class Frame {
         ? this.totalWidth - this.viewportWidth
         : this.viewportWidth * (this.currentPage - 1)
 
-    this.iframe.contentWindow?.scrollTo({ left: scrollPosition, top: 0, behavior: 'instant' })
+    this.iframe.contentWindow?.scrollTo({
+      left: scrollPosition,
+      top: 0,
+      behavior: 'instant',
+    })
+
     this.progressCallback?.(this.currentPage, this.totalPages)
   }
 
+  expand() {
+    this.calculatePagination()
+    this.scrollToPage(this.currentPage)
+  }
+
+  goToPage(page: number) {
+    this.scrollToPage(page)
+  }
+
   nextPage() {
-    const { page, totalPages, scrollLeft } = this.currentLocation()
     if (this.canGoNext()) {
-      this.scrollToPage(page + 1)
-    } else {
-      const doc = this.document
-      const totalWidth = doc.documentElement.scrollWidth
-      const viewportWidth = this.iframe.clientWidth ?? 1
-      if (scrollLeft + viewportWidth <= totalWidth) {
-        this.scrollToPage(totalPages)
-      }
+      this.scrollToPage(this.currentPage + 1)
     }
   }
 
   prevPage() {
-    const { page } = this.currentLocation()
     if (this.canGoPrev()) {
-      this.scrollToPage(page - 1)
+      this.scrollToPage(this.currentPage - 1)
     }
   }
 
@@ -288,25 +283,13 @@ export class Frame {
     return this.currentPage > 1
   }
 
-  currentLocation() {
-    const win = this.iframe.contentWindow
-    return {
-      page: this.currentPage,
-      totalPages: this.totalPages,
-      scrollLeft: win?.scrollX ?? 0,
-      scrollTop: win?.scrollY ?? 0,
-    }
-  }
-
   destroy() {
     try {
       if (this.document?.body) this.observer.unobserve(this.document.body)
     } catch {}
     this.removeIframeScrollListener()
     if (this.blobUrl) {
-      try {
-        URL.revokeObjectURL(this.blobUrl)
-      } catch {}
+      URL.revokeObjectURL(this.blobUrl)
       this.blobUrl = undefined
     }
     this.element.remove()
