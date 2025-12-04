@@ -7,7 +7,6 @@ export class Frame {
   private iframe: HTMLIFrameElement
   private contentRange = document.createRange()
   private spacer: HTMLDivElement
-  private totalWidth = 0
   private viewportWidth = 0
   private currentPage = 1
   private totalPages = 1
@@ -83,6 +82,7 @@ export class Frame {
   setStyles(styles: ISettingsState) {
     this.chapterStyles = { ...this.chapterStyles, ...styles }
     this.applyStyles()
+    this.calculatePagination()
   }
 
   private applyStyles() {
@@ -135,7 +135,6 @@ export class Frame {
       const anchor = target.closest('a') as HTMLAnchorElement | null
       if (!anchor || !anchor.href) return
 
-      e.preventDefault()
       const href = anchor.getAttribute('href')!
       this.linkClickCallback?.(href)
     })
@@ -163,7 +162,7 @@ export class Frame {
           await doc.fonts.ready
           this.attachIframeScrollListener()
           this.attachLinkHandler()
-          this.expand()
+          this.calculatePagination()
           this.goTo(0)
           this.iframe.style.opacity = '1'
           resolve()
@@ -189,20 +188,30 @@ export class Frame {
 
   private calculatePagination() {
     const doc = this.document
-    if (!doc) return
+    const win = this.iframe.contentWindow
+    if (!doc || !win) return
+
+    const currentScrollX = win.scrollX || 0
+    const maxScroll = doc.body.scrollWidth - (this.iframe.clientWidth || 1)
+    win.scrollTo({ left: maxScroll, top: 0, behavior: 'instant' })
 
     const contentRect = this.contentRange.getBoundingClientRect()
     const rootRect = doc.documentElement.getBoundingClientRect()
-
-    const contentStart = Math.max(0, contentRect.left - rootRect.left)
-    const contentWidth = contentRect.width
-
-    let realWidth = contentStart + contentWidth
-    realWidth += this.padding
+    const totalWidth = Math.max(0, contentRect.right - rootRect.left) + this.padding * 2
 
     this.viewportWidth = this.iframe.clientWidth || 1
-    this.totalPages = Math.max(1, Math.ceil(realWidth / this.viewportWidth))
-    this.totalWidth = this.totalPages * this.viewportWidth
+    const calculatedPages = totalWidth / this.viewportWidth
+    this.totalPages = Math.floor(calculatedPages)
+
+    if (calculatedPages - this.totalPages > 0.1) {
+      this.totalPages++
+    }
+
+    this.totalPages = Math.max(1, this.totalPages)
+
+    win.scrollTo({ left: currentScrollX, top: 0, behavior: 'instant' })
+
+    this.progressCallback?.(this.currentPage, this.totalPages)
   }
 
   private updatePageFromScroll() {
@@ -210,15 +219,8 @@ export class Frame {
     if (!win) return
 
     const scrollLeft = win.scrollX
-    this.calculatePagination()
-
-    const maxScroll = this.totalWidth - this.viewportWidth
-
-    if (scrollLeft >= maxScroll - 1) {
-      this.currentPage = this.totalPages
-    } else {
-      this.currentPage = Math.floor(scrollLeft / this.viewportWidth) + 1
-    }
+    const pageNumber = Math.round(scrollLeft / this.viewportWidth) + 1
+    this.currentPage = Math.max(1, Math.min(pageNumber, this.totalPages))
 
     this.progressCallback?.(this.currentPage, this.totalPages)
   }
@@ -240,10 +242,7 @@ export class Frame {
 
     this.currentPage = Math.max(1, Math.min(page, this.totalPages))
 
-    let scrollPosition =
-      this.currentPage === this.totalPages
-        ? this.totalWidth - this.viewportWidth
-        : this.viewportWidth * (this.currentPage - 1)
+    const scrollPosition = this.viewportWidth * (this.currentPage - 1)
 
     this.iframe.contentWindow?.scrollTo({
       left: scrollPosition,
@@ -255,8 +254,16 @@ export class Frame {
   }
 
   expand() {
-    this.calculatePagination()
-    this.scrollToPage(this.currentPage)
+    const clientWidth = this.iframe.clientWidth || 1
+    const widthChanged = Math.abs(clientWidth - this.viewportWidth) > 1
+
+    if (widthChanged) {
+      const savedPage = this.currentPage
+      this.calculatePagination()
+      this.scrollToPage(Math.min(savedPage, this.totalPages))
+    } else {
+      this.scrollToPage(this.currentPage)
+    }
   }
 
   goToPage(page: number) {
