@@ -2,6 +2,9 @@ import EpubNavigation from '@components/EpubNavigation'
 import { Epub } from '@libs/epub/epub'
 import { FC, memo, useEffect, useRef, useState } from 'react'
 import { ISettingsState } from '@interfaces/settings/interfaces'
+import Show from '@components/Show'
+import clsx from 'clsx'
+import Spin from '@components/Spin'
 
 export interface IProps {
   epubCodeSearch: string
@@ -21,6 +24,7 @@ const Reader: FC<IProps> = ({
   settings,
 }) => {
   const containerRef = useRef<HTMLDivElement | null>(null)
+  const [loading, setLoading] = useState(true)
   const [pageInfo, setPageInfo] = useState({ current: 1, total: 1 })
   const viewRef = useRef<Epub | null>(null)
 
@@ -33,7 +37,7 @@ const Reader: FC<IProps> = ({
       viewRef.current = book_epub
     }
 
-    viewRef.current?.display(selectedChapter)
+    viewRef.current?.display(selectedChapter)?.finally(() => setLoading(false))
     viewRef.current?.progress((current, total) => {
       setPageInfo({ current, total })
     })
@@ -61,20 +65,30 @@ const Reader: FC<IProps> = ({
         onClickNextPage={() => {
           viewRef.current?.nextPage()
         }}>
-        <div
-          onMouseLeave={(e) => {
-            e.stopPropagation()
-            e.preventDefault()
-            onShowHeader()
-          }}
-          onMouseEnter={(e) => {
-            e.stopPropagation()
-            e.preventDefault()
-            onHideHeader()
-          }}
-          ref={containerRef}
-          className="book-content rounded bg-white shadow-inner relative w-full h-full overflow-hidden"
-        />
+        <div className="h-full relative">
+          <Show when={loading}>
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+              <Spin />
+            </div>
+          </Show>
+          <div
+            onMouseLeave={(e) => {
+              e.stopPropagation()
+              e.preventDefault()
+              onShowHeader()
+            }}
+            onMouseEnter={(e) => {
+              e.stopPropagation()
+              e.preventDefault()
+              onHideHeader()
+            }}
+            ref={containerRef}
+            className={clsx(
+              loading && 'h-0',
+              'book-content rounded bg-white relative w-full h-full overflow-hidden'
+            )}
+          />
+        </div>
       </EpubNavigation>
     </main>
   )
