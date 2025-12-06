@@ -92,6 +92,7 @@ export class Frame {
     const defaultStyles = {
       'font-size': `${this.chapterStyles.defaultFontSize ?? 16}px`,
       'font-weight': `${this.chapterStyles.fontWeight ?? 400}`,
+      'font-family': 'arial, helvetica, sans-serif',
       'line-height': this.chapterStyles.lineHeight ? `${this.chapterStyles.lineHeight}` : '1.5',
       'word-spacing': this.chapterStyles.wordSpacing
         ? `${this.chapterStyles.wordSpacing}px`
@@ -113,7 +114,17 @@ export class Frame {
       'column-fill': 'auto',
       'word-wrap': 'break-word',
       'box-sizing': 'border-box',
+      'font-family': 'arial, helvetica, sans-serif',
     }
+
+    const linkStyles = {
+      color: '#fff',
+      'text-decoration': 'underline dotted',
+    }
+    const links = doc.querySelectorAll('a')
+    links.forEach((link) => {
+      setStylesImportant(link as HTMLElement, linkStyles)
+    })
 
     setStylesImportant(doc.documentElement, defaultStyles)
     setStylesImportant(doc.body, bodyStyles)
