@@ -54,7 +54,30 @@ export class Frame {
       breakInside: 'avoid',
     })
 
-    this.observer = new ResizeObserver(() => this.expand())
+    this.observer = new ResizeObserver(() => {
+      this.setImageSize()
+      this.expand()
+    })
+  }
+  get document() {
+    return this.iframe.contentDocument!
+  }
+
+  private setImageSize() {
+    const doc = this.document
+    if (!doc) return
+
+    for (const el of doc.body.querySelectorAll<HTMLElement>('img, svg, video')) {
+      const height = this.iframe.getBoundingClientRect().height
+      setStylesImportant(el, {
+        'max-height': `${height - this.padding * 2}px`,
+        'max-width': '100%',
+        'object-fit': 'contain',
+        'page-break-inside': 'avoid',
+        'break-inside': 'avoid',
+        'box-sizing': 'border-box',
+      })
+    }
   }
 
   progress(callback: (current: number, total: number) => void) {
@@ -75,14 +98,25 @@ export class Frame {
     })
   }
 
-  get document() {
-    return this.iframe.contentDocument!
-  }
-
   setStyles(styles: ISettingsState) {
     this.chapterStyles = { ...this.chapterStyles, ...styles }
     this.applyStyles()
     this.calculatePagination()
+  }
+
+  private applyLinkStyles() {
+    const doc = this.document
+    if (!doc) return
+
+    const links = doc.querySelectorAll('a')
+    links.forEach((link) => {
+      if (link.href.trim().length > 0) {
+        setStylesImportant(link as HTMLElement, {
+          color: '#fff',
+          'text-decoration': 'underline dotted',
+        })
+      }
+    })
   }
 
   private applyStyles() {
@@ -117,17 +151,9 @@ export class Frame {
       'font-family': 'arial, helvetica, sans-serif',
     }
 
-    const linkStyles = {
-      color: '#fff',
-      'text-decoration': 'underline dotted',
-    }
-    const links = doc.querySelectorAll('a')
-    links.forEach((link) => {
-      setStylesImportant(link as HTMLElement, linkStyles)
-    })
-
     setStylesImportant(doc.documentElement, defaultStyles)
     setStylesImportant(doc.body, bodyStyles)
+    this.applyLinkStyles()
   }
 
   onLinkClick(callback: (href: string) => void) {
