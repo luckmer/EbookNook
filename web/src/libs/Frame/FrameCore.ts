@@ -1,5 +1,5 @@
 import { ISettingsState } from '@interfaces/settings/interfaces'
-import { setStylesImportant } from './utils'
+import { getStyles, setStylesImportant } from './utils'
 
 export class Frame {
   private observer: ResizeObserver
@@ -104,24 +104,17 @@ export class Frame {
     this.calculatePagination()
   }
 
-  private applyLinkStyles() {
-    const doc = this.document
-    if (!doc) return
-
-    const links = doc.querySelectorAll('a')
-    links.forEach((link) => {
-      if (link.href.trim().length > 0) {
-        setStylesImportant(link as HTMLElement, {
-          color: '#fff',
-          'text-decoration': 'underline dotted',
-        })
-      }
-    })
-  }
-
   private applyStyles() {
     const doc = this.document
     if (!doc) return
+
+    const existingStyle = doc.getElementById('dynamic-styles')
+    if (existingStyle) existingStyle.remove()
+
+    const styleEl = doc.createElement('style')
+    styleEl.id = 'dynamic-styles'
+    styleEl.textContent = getStyles(String(this.chapterStyles.lineHeight ?? 1.5))
+    doc.head.appendChild(styleEl)
 
     const defaultStyles = {
       'font-size': `${this.chapterStyles.defaultFontSize ?? 16}px`,
@@ -153,7 +146,6 @@ export class Frame {
 
     setStylesImportant(doc.documentElement, defaultStyles)
     setStylesImportant(doc.body, bodyStyles)
-    this.applyLinkStyles()
   }
 
   onLinkClick(callback: (href: string) => void) {
