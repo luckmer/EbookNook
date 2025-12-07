@@ -12,7 +12,7 @@ export interface IProps {
 
 const BookShelf: FC<IProps> = ({ books, onClickBook, onClickImportBook }) => {
   return (
-    <div className="grid flex-1 grid-cols-3 px-4 sm:px-2 sm:grid-cols-4 md:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-12 gap-12">
+    <div className="grid flex-1 grid-cols-3 px-4 sm:px-2 sm:grid-cols-4 md:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-12 gap-12 ">
       {books.map((book, id) => (
         <Book
           key={id}
@@ -23,12 +23,14 @@ const BookShelf: FC<IProps> = ({ books, onClickBook, onClickImportBook }) => {
           }}
         />
       ))}
-      <UploadButton
-        onClick={onClickImportBook}
-        className="group flex items-center justify-center transition-colors duration-300 w-full h-full"
-        icon={<MdAddToPhotos className="fill-text-disabled w-[30%] h-full " />}
-        labelClassName="bg-base hover:bg-surface-drawer duration-300 transition-colors w-full flex items-center rounded-6 justify-center h-full"
-      />
+      <div className="aspect-3/5 h-full w-full">
+        <UploadButton
+          onClick={onClickImportBook}
+          className="group flex items-center justify-center w-full h-full"
+          icon={<MdAddToPhotos className="text-text-disabled w-1/3 h-auto" />}
+          labelClassName="bg-base hover:bg-surface-drawer w-full h-full flex items-center justify-center rounded-6"
+        />
+      </div>
     </div>
   )
 }

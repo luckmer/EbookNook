@@ -11,6 +11,6 @@ type Story = StoryObj<typeof Home>
 
 export const Default: Story = {
   render: () => {
-    return <Home onClick={() => {}} onClickBook={() => {}} books={[]} />
+    return <Home hasBooks={false} onClick={() => {}} onClickBook={() => {}} books={[]} />
   },
 }
