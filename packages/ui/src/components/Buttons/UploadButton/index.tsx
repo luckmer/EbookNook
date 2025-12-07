@@ -14,9 +14,7 @@ export interface IProps {
 const UploadButton: React.FC<IProps> = ({ label, onClick, className, labelClassName, icon }) => {
   return (
     <div className={clsx('flex flex-col ', className)}>
-      <label
-        htmlFor="epubUpload"
-        className={clsx('cursor-pointer h-full px-48 py-13', labelClassName)}>
+      <label htmlFor="epubUpload" className={clsx('cursor-pointer h-full ', labelClassName)}>
         <Show when={typeof label !== 'undefined'} fallback={<>{icon}</>}>
           <Typography>{label}</Typography>
         </Show>

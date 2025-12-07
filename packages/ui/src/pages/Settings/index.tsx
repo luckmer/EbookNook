@@ -82,7 +82,6 @@ const Settings: FC<IProps> = ({ isOpen, onClickClose, settings, onClick }) => {
           </div>
         </Dropdown>
       </div>
-
       <div className="h-[400px] overflow-y-auto">
         <Switch>
           <Match when={option === Options.FONT}>

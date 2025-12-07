@@ -24,7 +24,7 @@ const LayoutSettings: FC<IProps> = ({
     { label: 'Word spacing', value: wordSpacing, key: SETTINGS.WORD_SPACING, step: 0.5 },
     { label: 'Letter spacing', value: letterSpacing, key: SETTINGS.LETTER_SPACING, step: 0.5 },
     { label: 'Text indent', value: textIndent, key: SETTINGS.TEXT_INDENT, step: 1 },
-    { label: 'Line height', value: lineHeight, key: SETTINGS.LINE_HEIGHT, step: 1 },
+    { label: 'Line height', value: lineHeight, key: SETTINGS.LINE_HEIGHT, step: 0.5 },
   ]
 
   return (

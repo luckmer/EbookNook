@@ -19,6 +19,7 @@ const EmptyBookShelf: FC<IProps> = ({ onClick }) => {
         <UploadButton
           label="Import books"
           onClick={onClick}
+          labelClassName="px-48 py-13"
           className="bg-button-primary-background rounded-6 hover:bg-button-primary-hover transition-colors duration-300"
         />
       </div>
