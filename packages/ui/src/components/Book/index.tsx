@@ -10,18 +10,16 @@ export interface IProps {
 const Book: FC<IProps> = ({ img, title, onClick }) => {
   return (
     <div
-      className="flex flex-col gap-12 object-cover w-fit p-12 hover:bg-button-primary-hover/40 rounded-6 transition-colors duration-300 cursor-pointer"
+      className="flex flex-col p-12 w-full gap-12 rounded-6 cursor-pointer transition-colors duration-300 hover:bg-button-primary-hover/40"
       onClick={(e) => {
         e.preventDefault()
         e.stopPropagation()
         onClick()
       }}>
       <img className="rounded-6 h-full" src={img} />
-      <div className="max-w-[140px]">
-        <Typography text="small" ellipsis left>
-          {title}
-        </Typography>
-      </div>
+      <Typography text="small" ellipsis left>
+        {title}
+      </Typography>
     </div>
   )
 }
