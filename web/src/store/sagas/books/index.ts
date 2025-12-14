@@ -1,12 +1,12 @@
 import { PayloadAction } from '@reduxjs/toolkit'
 import { actions, PayloadTypes } from '@store/reducers/books'
-import { booksMapSelector } from '@store/selectors/books'
+import { bookSelector } from '@store/selectors/books'
 import { getDocumentLoader } from 'src/libs/document'
 import { all, call, put, select, takeEvery, takeLatest } from 'typed-redux-saga'
 
 export function* ImportBook(action: PayloadAction<PayloadTypes['importBook']>) {
   try {
-    const bookMap = yield* select(booksMapSelector)
+    const bookMap = yield* select(bookSelector.books)
     const core = yield* call(getDocumentLoader)
     const book = yield* call([core, core.open], action.payload)
 
@@ -25,7 +25,7 @@ export function* ImportBook(action: PayloadAction<PayloadTypes['importBook']>) {
 export function* loadBook(action: PayloadAction<PayloadTypes['loadBook']>) {
   try {
     const hash = action.payload
-    const bookMap = yield* select(booksMapSelector)
+    const bookMap = yield* select(bookSelector.books)
 
     const book = bookMap[hash]
 

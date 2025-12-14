@@ -16,11 +16,6 @@ export interface IMetadata {
   series?: { name: string; position?: number } | null
 }
 
-export interface IResolveHref {
-  page: number
-  anchor?: (doc: Document) => Element | null
-}
-
 export interface Chapter {
   id: string
   href: string
@@ -67,4 +62,11 @@ export interface IXML {
   filePath: string
   doc: Document
   zip: JSZip
+}
+
+// backend interface
+export interface IEpub {
+  chapters: Chapter[]
+  toc: IToc[]
+  book: IBook
 }

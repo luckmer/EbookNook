@@ -6,6 +6,7 @@ import { ZipParser } from './lib/zipParser'
 import { ISettingsState } from '@interfaces/settings/interfaces'
 import { EpubTocParser } from './lib/toc'
 import { flatData } from '@utils/index'
+import { IProgress } from '@interfaces/book/types'
 export interface IEpubChapter extends Chapter {
   index: number
 }
@@ -18,6 +19,7 @@ export class Epub {
   url: string = ''
   currentPage: string = ''
   chapters: IEpubChapter[] = []
+  bookProgress: IProgress = ['', '']
   chapterByHref: Record<string, Chapter> = {}
   chapterByIndex: Record<string, number> = {}
   lastSelectedPath: string = ''
@@ -137,6 +139,7 @@ export class Epub {
         const anchor = hash ? this.getHTMLFragment(doc, hash) : undefined
         const tocProgress = this.getAnchorProgress(anchor)
 
+        console.log(href, tocProgress)
         this.frame.goTo(tocProgress)
         resolve()
       })
@@ -179,6 +182,10 @@ export class Epub {
     } else {
       this.prevChapter()
     }
+  }
+
+  getBookProgress() {
+    return this.bookProgress
   }
 
   nextChapter() {

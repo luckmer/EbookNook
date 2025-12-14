@@ -1,5 +1,6 @@
 import { IBook, IToc } from '@interfaces/book/interfaces'
 import { IProgress } from '@interfaces/book/types'
+
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { PayloadType } from '@store/helper'
 
@@ -8,17 +9,19 @@ export const booksStore = 'booksStore'
 type Hash = string
 
 export interface IBookState {
-  books: IBook[]
+  books: Record<string, IBook>
   epubCodeSearch: string
   toc: Record<Hash, IToc[]>
   selectedChapter: string
+  selectedBook: string
 }
 
 const defaultState: IBookState = {
-  books: [],
-  toc: {},
   epubCodeSearch: '',
   selectedChapter: '',
+  selectedBook: '',
+  books: {},
+  toc: {},
 }
 
 export const store = createSlice({
@@ -33,7 +36,8 @@ export const store = createSlice({
       return state
     },
 
-    loadBook(state, _: PayloadAction<string>) {
+    loadBook(state, action: PayloadAction<string>) {
+      state.selectedBook = action.payload
       return state
     },
 
@@ -43,15 +47,17 @@ export const store = createSlice({
     },
 
     setBook(state, action: PayloadAction<IBook>) {
-      state.books.push(action.payload)
+      state.books[action.payload.hash] = action.payload
       return state
     },
 
     setBookProgress(state, action: PayloadAction<{ hash: Hash; progress: IProgress }>) {
-      const book = state.books.find((b) => b.hash === action.payload.hash)
+      const book = state.books[action.payload.hash]
+
       if (book) {
         book.progress = action.payload.progress
       }
+
       return state
     },
 

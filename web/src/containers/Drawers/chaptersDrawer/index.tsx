@@ -1,14 +1,14 @@
 import ChaptersDrawer from '@pages/chaptersDrawer'
 import { actions as uiActions } from '@store/reducers/ui'
 import { actions as bookActions } from '@store/reducers/books'
-import { bookSelector, booksMapSelector } from '@store/selectors/books'
+import { bookSelector } from '@store/selectors/books'
 import { uiSelector } from '@store/selectors/ui'
 import { useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 const ChaptersDrawerRoot = () => {
-  const booksMap = useSelector(booksMapSelector)
+  const booksMap = useSelector(bookSelector.books)
   const isOpen = useSelector(uiSelector.openChaptersDrawer)
   const tocMap = useSelector(bookSelector.toc)
   const navigate = useNavigate()

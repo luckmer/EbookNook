@@ -6,6 +6,8 @@ export const filteredBooks = createSelector(
   bookSelector.books,
   searchSelector.value,
   (books, value) => {
-    return books.filter((book) => book.title.toLowerCase().includes(value.toLowerCase()))
+    return Object.values(books).filter((book) =>
+      book.title.toLowerCase().includes(value.toLowerCase())
+    )
   }
 )

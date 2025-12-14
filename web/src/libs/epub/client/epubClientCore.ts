@@ -23,7 +23,7 @@ export default class EpubClientCore {
       rootFilePath: xml.rootFilePath,
       sourceTitle: metadata.title,
       createdAt: Date.now(),
-      progress: ['', 0],
+      progress: ['', ''],
       downloadedAt: Date.now(),
       updatedAt: Date.now(),
       uploadedAt: null,
