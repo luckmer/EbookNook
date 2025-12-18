@@ -7,3 +7,8 @@ CREATE TABLE IF NOT EXISTS books (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 "#;
+
+pub const INSERT_BOOK: &str = r#"
+INSERT INTO books (id, title, author, language)
+VALUES (?, ?, ?, ?);
+"#;

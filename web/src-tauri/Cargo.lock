@@ -334,6 +334,11 @@ dependencies = [
 [[package]]
 name = "books"
 version = "0.1.0"
+dependencies = [
+ "database",
+ "serde",
+ "tauri",
+]
 
 [[package]]
 name = "brotli"
@@ -927,6 +932,7 @@ checksum = "d0881ea181b1df73ff77ffaaf9c7544ecc11e82fba9b5f27b262a3c73a332555"
 name = "ebooknook"
 version = "0.1.0"
 dependencies = [
+ "books",
  "database",
  "serde",
  "serde_json",

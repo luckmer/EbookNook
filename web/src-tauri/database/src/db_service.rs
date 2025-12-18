@@ -1,7 +1,8 @@
-use crate::migrations::{books::BOOKS_TABLE, chapters::CHAPTERS_TABLE, toc::TOC_TABLE};
 use std::fs;
 use std::path::PathBuf;
 use turso::Builder;
+
+use crate::{BOOKS_TABLE, CHAPTERS_TABLE, TOC_TABLE};
 
 pub struct DatabaseManager {
     db: turso::Database,
@@ -24,26 +25,21 @@ impl DatabaseManager {
         let db = Builder::new_local(database_url).build().await?;
 
         let database = DatabaseManager { db };
-
         database.run_migrations().await?;
-
         Ok(database)
-    }
-
-    pub fn get_connection(&self) -> turso::Connection {
-        self.db.connect().expect("Failed to establish connection")
     }
 
     async fn run_migrations(&self) -> Result<(), Box<dyn std::error::Error>> {
         let conn = self.get_connection();
-
         conn.execute("PRAGMA foreign_keys = ON;", ()).await?;
-
         conn.execute(BOOKS_TABLE, ()).await?;
         conn.execute(CHAPTERS_TABLE, ()).await?;
         conn.execute(TOC_TABLE, ()).await?;
-
         Ok(())
+    }
+
+    pub fn get_connection(&self) -> turso::Connection {
+        self.db.connect().expect("Failed to establish connection")
     }
 
     fn ensure_db_file_exists(db_path: &PathBuf) {
