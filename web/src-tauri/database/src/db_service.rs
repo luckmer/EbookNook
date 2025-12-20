@@ -1,12 +1,11 @@
 use std::fs;
 use std::path::PathBuf;
-use turso::Builder;
 
 use crate::{BOOKS_TABLE, CHAPTERS_TABLE, TOC_TABLE};
+use sqlx::{SqlitePool, sqlite::SqlitePoolOptions};
 
 pub struct DatabaseManager {
-    db: turso::Database,
-    connection: turso::Connection,
+    pool: SqlitePool,
 }
 
 impl DatabaseManager {
@@ -19,28 +18,33 @@ impl DatabaseManager {
 
         Self::ensure_db_file_exists(&db_path);
 
-        let database_url = db_path
+    let database_url = db_path
             .to_str()
             .expect("Failed to convert database path to string");
 
-        let db = Builder::new_local(database_url).build().await?;
-        let connection = db.connect().expect("Failed to establish connection");
+        let pool = SqlitePoolOptions::new()
+            .connect(&database_url)
+            .await?;
 
-        let database = DatabaseManager { db, connection };
+        let database = DatabaseManager { pool };
         database.run_migrations().await?;
         Ok(database)
     }
 
     async fn run_migrations(&self) -> Result<(), Box<dyn std::error::Error>> {
-        let conn = self.get_connection();
-        conn.execute(BOOKS_TABLE, ()).await?;
-        conn.execute(CHAPTERS_TABLE, ()).await?;
-        conn.execute(TOC_TABLE, ()).await?;
+        let _ = sqlx::query("PRAGMA foreign_keys = ON;")
+            .execute(&self.pool)
+            .await;
+
+        sqlx::query(BOOKS_TABLE).execute(&self.pool).await?;
+        sqlx::query(CHAPTERS_TABLE).execute(&self.pool).await?;
+        sqlx::query(TOC_TABLE).execute(&self.pool).await?;
+
         Ok(())
     }
 
-    pub fn get_connection(&self) -> &turso::Connection {
-        &self.connection
+    pub fn get_pool(&self) -> &SqlitePool {
+        &self.pool
     }
 
     fn ensure_db_file_exists(db_path: &PathBuf) {

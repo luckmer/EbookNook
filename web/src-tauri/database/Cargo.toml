@@ -6,4 +6,4 @@ edition = "2024"
 [dependencies]
 tauri = { workspace = true }
 tokio = "1.48.0"
-turso = "0.3.2"
+sqlx = {workspace = true}

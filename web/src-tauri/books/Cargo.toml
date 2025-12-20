@@ -7,3 +7,4 @@ edition = "2024"
 tauri = { workspace = true }
 serde = { workspace = true }
 database = { path = "../database" }
+sqlx = { workspace = true }
