@@ -1,7 +1,3 @@
-pub mod books;
-pub mod chapters;
-pub mod toc;
+pub mod epub;
 
-pub use books::*;
-pub use chapters::*;
-pub use toc::*;
+pub use epub::*;

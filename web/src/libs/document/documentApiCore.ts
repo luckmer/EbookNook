@@ -1,5 +1,4 @@
-import { IBook, IToc } from '@interfaces/book/interfaces'
-import { BookFormat } from '@interfaces/book/types'
+import { IBookState } from '@interfaces/book/interfaces'
 import { getEpubClient } from '../epub/client'
 import { FORMAT } from './static'
 
@@ -8,30 +7,16 @@ class DocumentApiCore {
     return file.name.endsWith(`.${FORMAT.EPUB}`)
   }
 
-  async _open(file: File): Promise<{ book: IBook; format: BookFormat }> {
-    let book: IBook | null = null
-    let format: BookFormat = 'EPUB'
+  async _init(file: File): Promise<IBookState> {
+    let book: IBookState | null = null
 
     if (!file.size) {
       throw new Error('File is empty')
     }
 
     if (this.isEpub(file)) {
-      format = 'EPUB'
-      book = await getEpubClient().open(file)
+      book = await getEpubClient().init(file)
     }
-
-    if (!book) {
-      throw new Error('File format not supported')
-    }
-
-    return { book, format }
-  }
-
-  async _loadBook(filePath: string): Promise<IToc[]> {
-    let book = null
-
-    book = await getEpubClient().loadBook(filePath)
 
     if (!book) {
       throw new Error('File format not supported')

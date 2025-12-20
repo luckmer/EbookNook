@@ -50,10 +50,8 @@ export class EpubMetadataParser {
       ?.getAttribute('content')
 
     if (seriesName) {
-      meta.series = {
-        name: seriesName,
-        position: seriesIndex ? parseFloat(seriesIndex) : undefined,
-      }
+      meta.seriesName = seriesName
+      meta.seriesPosition = seriesIndex ? parseFloat(seriesIndex) : undefined
     }
 
     await this.extractCover(meta, xml)

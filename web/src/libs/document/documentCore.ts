@@ -1,13 +1,8 @@
-import { BookFormat } from '@interfaces/book/types'
+import { IBookState } from '@interfaces/book/interfaces'
 import documentApiCore from './documentApiCore'
-import { IBook } from '@interfaces/book/interfaces'
 
 export class DocumentCore extends documentApiCore {
-  open(file: File): Promise<{ book: IBook; format: BookFormat }> {
-    return this._open(file)
-  }
-
-  loadBook(filePath: string) {
-    return this._loadBook(filePath)
+  init(file: File): Promise<IBookState> {
+    return this._init(file)
   }
 }

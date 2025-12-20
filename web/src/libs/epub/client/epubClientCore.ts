@@ -1,23 +1,30 @@
-import { IBook, IToc } from '@interfaces/book/interfaces'
+import { BookFormat } from '@interfaces/book/enums'
+import { IBook, IBookState } from '@interfaces/book/interfaces'
 import { rstr2hex } from '@utils/index'
+import { EpubContentParser } from '../lib/chapters'
 import { EpubMetadataParser } from '../lib/epubMetadata'
 import { EpubTocParser } from '../lib/toc'
-import { EpubUtils } from '../utils'
 import { ZipParser } from '../lib/zipParser'
 
 export default class EpubClientCore {
   private metadataParser = new EpubMetadataParser()
+  private contentParser = new EpubContentParser()
   private tocParser = new EpubTocParser()
   private zipParser = new ZipParser()
 
-  async _open(file: File): Promise<IBook> {
+  async _init(file: File): Promise<IBookState> {
     const buffer = await file.arrayBuffer()
     const xml = await this.zipParser.load(buffer)
-    const metadata = await this.metadataParser.parse(file, xml)
+    const [toc, chapters, metadata] = await Promise.all([
+      this.tocParser.parse(xml),
+      this.contentParser.parse(xml),
+      this.metadataParser.parse(file, xml),
+    ])
 
-    return {
-      format: 'EPUB',
+    const book: IBook = {
+      format: BookFormat.EPUB,
       hash: rstr2hex(metadata.title),
+      id: rstr2hex(metadata.title),
       title: metadata.title,
       author: metadata.author,
       rootFilePath: xml.rootFilePath,
@@ -30,13 +37,12 @@ export default class EpubClientCore {
       deletedAt: null,
       metadata,
     }
-  }
 
-  async _loadBook(serializedFile: string): Promise<IToc[]> {
-    const buffer = EpubUtils.binaryStringToArrayBuffer(serializedFile)
-    const xml = await this.zipParser.load(buffer)
-    const toc = await this.tocParser.parse(xml)
-
-    return toc
+    return {
+      format: BookFormat.EPUB,
+      book,
+      chapters,
+      toc,
+    }
   }
 }

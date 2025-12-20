@@ -1,7 +1,7 @@
 import { Chapter, IXML } from '@interfaces/book/interfaces'
 
 export class EpubContentParser {
-  async parse(xml: IXML): Promise<{ chapters: Chapter[] }> {
+  async parse(xml: IXML): Promise<Chapter[]> {
     const doc = xml.doc
 
     const manifest: Record<string, { href: string; type?: string }> = {}
@@ -39,7 +39,7 @@ export class EpubContentParser {
       })
     }
 
-    return { chapters }
+    return chapters
   }
 
   private replaceAssets(doc: Document, base: string, blobs: Map<string, string>) {

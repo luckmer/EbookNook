@@ -1,5 +1,5 @@
-import { BookFormat } from '@interfaces/book/types'
+import { BookFormat } from '@interfaces/book/enums'
 
 export const FORMAT: Record<BookFormat, string> = {
-  EPUB: 'epub',
+  [BookFormat.EPUB]: 'epub',
 }

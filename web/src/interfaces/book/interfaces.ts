@@ -1,4 +1,5 @@
-import { BookFormat, IProgress } from './types'
+import { BookFormat } from './enums'
+import { IProgress } from './types'
 import type JSZip from 'jszip'
 
 export interface IMetadata {
@@ -13,7 +14,8 @@ export interface IMetadata {
   subject?: string[]
   rights?: string
   cover?: string
-  series?: { name: string; position?: number } | null
+  seriesName?: string
+  seriesPosition?: number
 }
 
 export interface Chapter {
@@ -34,6 +36,7 @@ export interface IToc {
 export interface IBook {
   url?: string
   hash: string
+  id: string
   rootFilePath: string
   format: BookFormat
   title: string
@@ -64,9 +67,11 @@ export interface IXML {
   zip: JSZip
 }
 
-// backend interface
 export interface IEpub {
+  format: BookFormat.EPUB
   chapters: Chapter[]
   toc: IToc[]
   book: IBook
 }
+
+export type IBookState = IEpub

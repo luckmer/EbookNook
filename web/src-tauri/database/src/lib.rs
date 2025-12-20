@@ -1,4 +1,3 @@
-pub mod db_commands;
 pub mod db_service;
 pub mod migrations;
 pub mod service;

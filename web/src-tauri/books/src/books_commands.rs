@@ -1,13 +1,9 @@
-use std::error::Error;
-
-use crate::{Book, BooksManager};
+use crate::{BooksManager, Epub};
 use database::AppState;
 use tauri::State;
 
 #[tauri::command]
-pub async fn add_book(state: State<'_, AppState>, book: Book) -> Result<(), String> {
-    println!("get book");
-
+pub async fn add_book(state: State<'_, AppState>, book: Epub) -> Result<(), String> {
     let manager = BooksManager::new();
 
     manager

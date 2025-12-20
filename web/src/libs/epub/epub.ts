@@ -1,11 +1,9 @@
 import { Chapter, IToc } from '@interfaces/book/interfaces'
 import { Frame } from '@libs/Frame/FrameCore'
 import { EpubContentParser } from './lib/chapters'
-import { EpubUtils } from './utils'
 import { ZipParser } from './lib/zipParser'
 import { ISettingsState } from '@interfaces/settings/interfaces'
 import { EpubTocParser } from './lib/toc'
-import { flatData } from '@utils/index'
 import { IProgress } from '@interfaces/book/types'
 export interface IEpubChapter extends Chapter {
   index: number
@@ -76,34 +74,34 @@ export class Epub {
   async loadChapters() {
     this.isLoading = true
 
-    try {
-      const buffer = EpubUtils.binaryStringToArrayBuffer(this.url)
+    // try {
+    //   const buffer = EpubUtils.binaryStringToArrayBuffer(this.url)
 
-      const xml = await this.zipParser.load(buffer)
-      const [tocData, contentData] = await Promise.all([
-        this.EpubTocParser.parse(xml),
-        this.contentParser.parse(xml),
-      ])
+    //   const xml = await this.zipParser.load(buffer)
+    //   const [tocData, contentData] = await Promise.all([
+    //     this.EpubTocParser.parse(xml),
+    //     this.contentParser.parse(xml),
+    //   ])
 
-      const { chapters } = contentData
+    //   const { chapters } = contentData
 
-      this.chapters = chapters.map((chapter, index) => ({
-        ...chapter,
-        index,
-      }))
+    //   this.chapters = chapters.map((chapter, index) => ({
+    //     ...chapter,
+    //     index,
+    //   }))
 
-      for (let chapter of this.chapters) {
-        const href = this.formatChapterHref(chapter.href)
-        this.chapterByHref[href] = chapter
-        this.chapterByIndex[href] = chapter.index
-      }
+    // for (let chapter of this.chapters) {
+    //   const href = this.formatChapterHref(chapter.href)
+    //   this.chapterByHref[href] = chapter
+    //   this.chapterByIndex[href] = chapter.index
+    // }
 
-      this.toc = flatData(tocData)
-    } catch (err) {
-      throw err
-    } finally {
-      this.isLoading = false
-    }
+    //   this.toc = flatData(tocData)
+    // } catch (err) {
+    //   throw err
+    // } finally {
+    //   this.isLoading = false
+    // }
   }
 
   getHTMLFragment = (doc: Document, id: string) => {

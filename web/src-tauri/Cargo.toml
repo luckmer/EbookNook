@@ -45,6 +45,7 @@ sqlx = { version = "0.8.6", features = [
 
 
 [workspace.dependencies]
+serde_json = "1"
 sqlx = { version = "0.8.6", features = [
     "chrono",
     "sqlite",

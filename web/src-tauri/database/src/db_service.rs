@@ -1,7 +1,7 @@
 use std::fs;
 use std::path::PathBuf;
 
-use crate::{BOOKS_TABLE, CHAPTERS_TABLE, TOC_TABLE};
+use crate::EPUB_TABLE;
 use sqlx::{SqlitePool, sqlite::SqlitePoolOptions};
 
 pub struct DatabaseManager {
@@ -18,13 +18,11 @@ impl DatabaseManager {
 
         Self::ensure_db_file_exists(&db_path);
 
-    let database_url = db_path
+        let database_url = db_path
             .to_str()
             .expect("Failed to convert database path to string");
 
-        let pool = SqlitePoolOptions::new()
-            .connect(&database_url)
-            .await?;
+        let pool = SqlitePoolOptions::new().connect(&database_url).await?;
 
         let database = DatabaseManager { pool };
         database.run_migrations().await?;
@@ -36,9 +34,7 @@ impl DatabaseManager {
             .execute(&self.pool)
             .await;
 
-        sqlx::query(BOOKS_TABLE).execute(&self.pool).await?;
-        sqlx::query(CHAPTERS_TABLE).execute(&self.pool).await?;
-        sqlx::query(TOC_TABLE).execute(&self.pool).await?;
+        sqlx::query(EPUB_TABLE).execute(&self.pool).await?;
 
         Ok(())
     }
