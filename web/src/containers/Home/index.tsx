@@ -23,7 +23,7 @@ const HomeRoot = () => {
           console.log('dsdsds')
           await invoke('add_book', {
             book: {
-              id: '3232',
+              id: Math.floor(Math.random() * 4343).toString(),
               title: 'new book',
               author: 'myself',
               language: 'en',
