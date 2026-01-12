@@ -1,4 +1,5 @@
-import { IMetadata, IXML } from '@interfaces/book/interfaces'
+import { Metadata } from '@bindings/epub'
+import { IXML } from '@interfaces/book/interfaces'
 
 export class EpubMetadataParser {
   private getMetaValue(parent: Element, tag: string, metaName = tag, fallback = '') {
@@ -21,11 +22,11 @@ export class EpubMetadataParser {
       .filter((s): s is string => !!s)
   }
 
-  async parse(file: File, xml: IXML): Promise<IMetadata> {
+  async parse(file: File, xml: IXML): Promise<Metadata> {
     const metadataEl = xml.doc.querySelector('metadata')
     if (!metadataEl) throw new Error('No metadata found')
 
-    const meta: IMetadata = {
+    const meta: Metadata = {
       identifier: this.getMetaValue(metadataEl, 'identifier', 'identifier') || crypto.randomUUID(),
       title:
         this.getMetaValue(metadataEl, 'title', 'title', file.name.replace(/\..+$/, '')) ||
@@ -59,7 +60,7 @@ export class EpubMetadataParser {
     return meta
   }
 
-  private async extractCover(meta: IMetadata, xml: IXML) {
+  private async extractCover(meta: Metadata, xml: IXML) {
     try {
       const doc = xml.doc
 
@@ -82,6 +83,7 @@ export class EpubMetadataParser {
       if (!file) return
 
       const blob = await file.async('blob')
+
       meta.cover = URL.createObjectURL(blob)
     } catch {}
   }

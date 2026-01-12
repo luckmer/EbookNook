@@ -1,9 +1,10 @@
-import { IToc, IXML } from '@interfaces/book/interfaces'
+import { IXML } from '@interfaces/book/interfaces'
 import { EpubUtils } from '../utils'
 import { MIME } from './static'
+import { Toc } from '@bindings/epub'
 
 export class EpubTocParser {
-  async parse(xml: IXML): Promise<IToc[]> {
+  async parse(xml: IXML): Promise<Toc[]> {
     const doc = xml.doc
 
     const manifestItems = Array.from(doc.querySelectorAll('manifest > item'))
@@ -32,7 +33,7 @@ export class EpubTocParser {
     return tocDoc.querySelector('ncx') ? this.parseNcx(tocDoc) : this.parseNav(tocDoc)
   }
 
-  private parseNav(navDoc: Document): IToc[] {
+  private parseNav(navDoc: Document): Toc[] {
     const nav = Array.from(navDoc.querySelectorAll('nav')).find((n) => {
       const type = n.getAttribute('epub:type') || n.getAttribute('type')
       return type === 'toc'
@@ -43,10 +44,10 @@ export class EpubTocParser {
     const ol = nav.querySelector('ol')
     if (!ol) return []
 
-    const parseList = (el: Element, parent?: string): IToc[] => {
+    const parseList = (el: Element, parent?: string): Toc[] => {
       return Array.from(el.children)
         .filter((li) => li.tagName.toLowerCase() === 'li')
-        .map<IToc | null>((li) => {
+        .map<Toc | null>((li) => {
           const a = li.querySelector('a') || li.querySelector('span')
           if (!a) return null
 
@@ -63,16 +64,16 @@ export class EpubTocParser {
             subitems: sub ? parseList(sub, id) : [],
           }
         })
-        .filter((item): item is IToc => item !== null)
+        .filter((item): item is Toc => item !== null)
     }
 
     return parseList(ol)
   }
 
-  private parseNcx(toc: Document): IToc[] {
+  private parseNcx(toc: Document): Toc[] {
     const points = Array.from(toc.querySelectorAll('navPoint'))
-    const map: Record<string, IToc> = {}
-    const roots: IToc[] = []
+    const map: Record<string, Toc> = {}
+    const roots: Toc[] = []
 
     for (const p of points) {
       const id = p.getAttribute('id') || ''
@@ -82,7 +83,7 @@ export class EpubTocParser {
       const parentNode = p.parentNode as Element
       const parent = parentNode?.tagName === 'navPoint' ? parentNode.getAttribute('id') : undefined
 
-      map[id] = { id, href: src, label, subitems: [], parent }
+      map[id] = { id, href: src, label, subitems: [], parent: parent ? parent : undefined }
     }
 
     Object.values(map).forEach((item) => {

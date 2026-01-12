@@ -1,8 +1,8 @@
 import Book from '@components/Book'
 import UploadButton from '@components/Buttons/UploadButton'
-import { IBook } from '@interfaces/book/interfaces'
 import { FC, memo } from 'react'
 import { MdAddToPhotos } from 'react-icons/md'
+import { Book as IBook } from '@bindings/epub'
 
 export interface IProps {
   onClickBook: (hash: string) => void

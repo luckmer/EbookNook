@@ -1,14 +1,14 @@
 import DefaultButton from '@components/Buttons/DefaultButton'
 import Show from '@components/Show'
 import { Typography } from '@components/Typography'
-import { IToc } from '@interfaces/book/interfaces'
 import clsx from 'clsx'
 import { FC, memo, useMemo, useState } from 'react'
 import { IoIosArrowUp } from 'react-icons/io'
+import { type Toc } from '@bindings/epub'
 
 export interface IProps {
   onClick: (href: string) => void
-  item: IToc
+  item: Toc
   level: number
 }
 

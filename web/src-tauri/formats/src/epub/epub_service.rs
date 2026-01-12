@@ -1,6 +1,6 @@
 use database::{DatabaseManager, INSERT_EPUB_BOOK};
 
-use types::{Book, Chapter, Epub, Metadata, Toc};
+use types::{Book, Chapter, Epub, Metadata, Toc,Progress};
 
 pub struct EpubService {}
 
@@ -88,7 +88,7 @@ impl EpubService {
         let metadata: Metadata = serde_json::from_str(row.try_get("metadata")?)?;
         let toc: Vec<Toc> = serde_json::from_str(row.try_get("toc")?)?;
         let chapters: Vec<Chapter> = serde_json::from_str(row.try_get("chapters")?)?;
-        let progress: Vec<String> = serde_json::from_str(row.try_get("progress")?)?;
+        let progress: Progress = serde_json::from_str(row.try_get("progress")?)?;
 
         Ok(Epub {
             book: Book {

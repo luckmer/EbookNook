@@ -1,10 +1,9 @@
-import { Chapter, IToc } from '@interfaces/book/interfaces'
 import { Frame } from '@libs/Frame/FrameCore'
 import { EpubContentParser } from './lib/chapters'
 import { ZipParser } from './lib/zipParser'
 import { ISettingsState } from '@interfaces/settings/interfaces'
 import { EpubTocParser } from './lib/toc'
-import { IProgress } from '@interfaces/book/types'
+import { Chapter, Progress, Toc } from '@bindings/epub'
 export interface IEpubChapter extends Chapter {
   index: number
 }
@@ -17,12 +16,12 @@ export class Epub {
   url: string = ''
   currentPage: string = ''
   chapters: IEpubChapter[] = []
-  bookProgress: IProgress = ['', '']
+  bookProgress: Progress = ['', '']
   chapterByHref: Record<string, Chapter> = {}
   chapterByIndex: Record<string, number> = {}
   lastSelectedPath: string = ''
   isLoading: boolean = false
-  toc: IToc[] = []
+  toc: Toc[] = []
   private queue: Promise<void>
 
   private enqueue(action: () => Promise<void>) {

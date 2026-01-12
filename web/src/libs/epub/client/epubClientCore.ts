@@ -1,10 +1,11 @@
 import { BookFormat } from '@interfaces/book/enums'
-import { IBook, IBookState } from '@interfaces/book/interfaces'
+import { IBookState } from '@interfaces/book/interfaces'
 import { rstr2hex } from '@utils/index'
 import { EpubContentParser } from '../lib/chapters'
 import { EpubMetadataParser } from '../lib/epubMetadata'
 import { EpubTocParser } from '../lib/toc'
 import { ZipParser } from '../lib/zipParser'
+import { Book } from '@bindings/epub'
 
 export default class EpubClientCore {
   private metadataParser = new EpubMetadataParser()
@@ -21,7 +22,7 @@ export default class EpubClientCore {
       this.metadataParser.parse(file, xml),
     ])
 
-    const book: IBook = {
+    const book: Book = {
       format: BookFormat.EPUB,
       hash: rstr2hex(metadata.title),
       id: rstr2hex(metadata.title),
@@ -33,8 +34,6 @@ export default class EpubClientCore {
       progress: ['', ''],
       downloadedAt: Date.now(),
       updatedAt: Date.now(),
-      uploadedAt: null,
-      deletedAt: null,
       metadata,
     }
 

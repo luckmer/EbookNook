@@ -63,8 +63,21 @@ pub struct Toc {
 
 #[derive(Serialize, Deserialize, Debug, Clone, TS)]
 #[ts(export, export_to = "epub.ts")]
+pub struct ChapterContentNumber(pub String);
+
+#[derive(Serialize, Deserialize, Debug, Clone, TS)]
+#[ts(export, export_to = "epub.ts")]
+pub struct TocLeftNumberProgress(pub String);
+
+#[derive(Serialize, Deserialize, Debug, Clone, TS)]
+#[ts(export, export_to = "epub.ts")]
+pub struct Progress(pub ChapterContentNumber, pub TocLeftNumberProgress);
+
+#[derive(Serialize, Deserialize, Debug, Clone, TS)]
+#[ts(export, export_to = "epub.ts")]
 pub struct Book {
     pub id: String,
+
     #[ts(optional)]
     pub url: Option<String>,
     pub hash: String,
@@ -73,11 +86,13 @@ pub struct Book {
     pub root_file_path: String,
     pub format: String,
     pub title: String,
+
     #[serde(rename = "sourceTitle")]
     #[ts(rename = "sourceTitle")]
     #[ts(optional)]
     pub source_title: Option<String>,
     pub author: String,
+
     #[serde(rename = "groupId")]
     #[ts(rename = "groupId")]
     #[ts(optional)]
@@ -123,7 +138,7 @@ pub struct Book {
     #[ts(optional)]
     pub primary_language: Option<String>,
     pub metadata: Metadata,
-    pub progress: Vec<String>,
+    pub progress: Progress,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, TS)]

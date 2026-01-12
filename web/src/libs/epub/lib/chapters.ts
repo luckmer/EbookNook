@@ -1,4 +1,5 @@
-import { Chapter, IXML } from '@interfaces/book/interfaces'
+import { Chapter } from '@bindings/epub'
+import { IXML } from '@interfaces/book/interfaces'
 
 export class EpubContentParser {
   async parse(xml: IXML): Promise<Chapter[]> {

@@ -1,6 +1,6 @@
 import EmptyLibrary from '@pages/EmptyBookShelf'
 import { FC, memo } from 'react'
-import { IBook } from '@interfaces/book/interfaces'
+import { Book as IBook } from '@bindings/epub'
 import Show from '@components/Show'
 import BookShelf from '@pages/BookShelf'
 import EmptyResult from '@components/EmptyResult'
