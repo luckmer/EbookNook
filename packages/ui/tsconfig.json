@@ -29,6 +29,9 @@
       "@interfaces/*": [
         "../../web/src/interfaces/*"
       ],
+      "@bindings/*": [
+        "../../web/src-tauri/types/bindings/*"
+      ],
       "@common/*": [
         "./common/*"
       ],

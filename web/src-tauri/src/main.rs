@@ -1,7 +1,7 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use books::books_commands;
+// use books::books_commands;
 use database::{service::init_database, structs::AppState};
 
 fn main() {
@@ -11,9 +11,9 @@ fn main() {
 
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
-            books_commands::get_books,
-            books_commands::add_book,
-            books_commands::remove_book
+            // books_commands::get_books,
+            // books_commands::add_book,
+            // books_commands::remove_book
         ])
         .manage(state)
         .run(tauri::generate_context!())

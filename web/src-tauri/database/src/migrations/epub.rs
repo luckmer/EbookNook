@@ -1,4 +1,4 @@
-pub const EPUB_TABLE: &str = r#"
+pub const EPUB_BOOK_TABLE: &str = r#"
 CREATE TABLE IF NOT EXISTS epub_table (
     id TEXT PRIMARY KEY,
     url TEXT,

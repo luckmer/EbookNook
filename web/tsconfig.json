@@ -32,6 +32,9 @@
       "@interfaces/*": [
         "./src/interfaces/*"
       ],
+      "@bindings/*": [
+        "./src-tauri/types/bindings/*"
+      ],
       "@static/*": [
         "./src/static/*"
       ],
