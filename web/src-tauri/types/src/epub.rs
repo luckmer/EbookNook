@@ -148,3 +148,10 @@ pub struct Epub {
     pub toc: Vec<Toc>,
     pub chapters: Vec<Chapter>,
 }
+
+#[derive(Serialize, Deserialize, Debug, Clone, TS)]
+#[ts(export, export_to = "epub.ts")]
+pub struct EpubStructure {
+    pub toc: Vec<Toc>,
+    pub chapters: Vec<Chapter>,
+}

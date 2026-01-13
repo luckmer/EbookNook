@@ -1,6 +1,9 @@
-use database::{DatabaseManager, INSERT_EPUB_BOOK};
+use database::{
+    DatabaseManager, INSERT_EPUB_BOOK, INSERT_EPUB_CHAPTERS, INSERT_EPUB_TOC,
+    SELECT_EPUB_CHAPTERS_BY_ID, SELECT_EPUB_TOC_BY_ID,
+};
 
-use types::{Book, Chapter, Epub, Metadata, Toc,Progress};
+use types::{Book, Chapter, Epub, EpubStructure, Metadata, Progress, Toc};
 
 pub struct EpubService {}
 
@@ -52,10 +55,21 @@ impl EpubService {
             .bind(&book.primary_language)
             .bind(metadata)
             .bind(progress)
+            .execute(conn)
+            .await?;
+
+        sqlx::query(INSERT_EPUB_TOC)
+            .bind(&book.id)
             .bind(toc)
+            .execute(conn)
+            .await?;
+
+        sqlx::query(INSERT_EPUB_CHAPTERS)
+            .bind(&book.id)
             .bind(chapters)
             .execute(conn)
             .await?;
+
         Ok(())
     }
 
@@ -77,6 +91,29 @@ impl EpubService {
         Ok(books)
     }
 
+    pub async fn get_epub_structure_by_id(
+        &self,
+        db: &DatabaseManager,
+        id: String,
+    ) -> Result<EpubStructure, Box<dyn std::error::Error>> {
+        let conn = db.get_pool();
+
+        let toc_json: String = sqlx::query_scalar(SELECT_EPUB_TOC_BY_ID)
+            .bind(id.clone())
+            .fetch_one(conn)
+            .await?;
+
+        let chapters_json: String = sqlx::query_scalar(SELECT_EPUB_CHAPTERS_BY_ID)
+            .bind(id.clone())
+            .fetch_one(conn)
+            .await?;
+
+        let toc: Vec<Toc> = serde_json::from_str(&toc_json)?;
+        let chapters: Vec<Chapter> = serde_json::from_str(&chapters_json)?;
+
+        Ok(EpubStructure { toc, chapters })
+    }
+
     fn parse_book(&self, row: sqlx::sqlite::SqliteRow) -> Result<Epub, Box<dyn std::error::Error>> {
         use sqlx::Row;
 
@@ -86,8 +123,6 @@ impl EpubService {
             .transpose()?;
 
         let metadata: Metadata = serde_json::from_str(row.try_get("metadata")?)?;
-        let toc: Vec<Toc> = serde_json::from_str(row.try_get("toc")?)?;
-        let chapters: Vec<Chapter> = serde_json::from_str(row.try_get("chapters")?)?;
         let progress: Progress = serde_json::from_str(row.try_get("progress")?)?;
 
         Ok(Epub {
@@ -115,8 +150,8 @@ impl EpubService {
                 metadata,
                 progress,
             },
-            toc,
-            chapters,
+            toc: vec![],
+            chapters: vec![],
         })
     }
 }

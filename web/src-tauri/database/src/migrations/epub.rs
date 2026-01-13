@@ -22,9 +22,7 @@ CREATE TABLE IF NOT EXISTS epub_table (
     last_updated INTEGER,
     primary_language TEXT,
     metadata TEXT NOT NULL,
-    progress TEXT NOT NULL,
-    toc TEXT NOT NULL,
-    chapters TEXT NOT NULL
+    progress TEXT NOT NULL
 );
 "#;
 
@@ -33,9 +31,39 @@ INSERT INTO epub_table (
     id, url, hash, root_file_path, format, title, source_title, author,
     book_group, group_id, group_name, tags, cover_image_url, created_at,
     updated_at, deleted_at, uploaded_at, downloaded_at, cover_downloaded_at,
-    last_updated, primary_language, metadata, progress, toc, chapters
+    last_updated, primary_language, metadata, progress
 )
 VALUES (
-    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
 );
+"#;
+
+pub const EPUB_TOC_TABLE: &str = r#"
+CREATE TABLE IF NOT EXISTS epub_toc_table (
+    id TEXT PRIMARY KEY,
+    toc TEXT NOT NULL
+);
+"#;
+
+pub const INSERT_EPUB_TOC: &str = r#"
+INSERT INTO epub_toc_table (toc) VALUES (?);
+"#;
+
+pub const SELECT_EPUB_TOC_BY_ID: &str = r#"
+SELECT toc FROM epub_toc_table WHERE id = ?;
+"#;
+
+pub const EPUB_CHAPTERS_TABLE: &str = r#"
+CREATE TABLE IF NOT EXISTS epub_chapters_table (
+    id TEXT PRIMARY KEY,
+    chapters TEXT NOT NULL
+);
+"#;
+
+pub const INSERT_EPUB_CHAPTERS: &str = r#"
+INSERT INTO epub_chapters_table (toc) VALUES (?);
+"#;
+
+pub const SELECT_EPUB_CHAPTERS_BY_ID: &str = r#"
+SELECT toc FROM epub_chapters_table WHERE id = ?;
 "#;

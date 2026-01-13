@@ -1,7 +1,7 @@
 use std::fs;
 use std::path::PathBuf;
 
-use crate::EPUB_BOOK_TABLE;
+use crate::{EPUB_BOOK_TABLE, EPUB_CHAPTERS_TABLE, EPUB_TOC_TABLE};
 use sqlx::{SqlitePool, sqlite::SqlitePoolOptions};
 
 pub struct DatabaseManager {
@@ -35,6 +35,8 @@ impl DatabaseManager {
             .await;
 
         sqlx::query(EPUB_BOOK_TABLE).execute(&self.pool).await?;
+        sqlx::query(EPUB_TOC_TABLE).execute(&self.pool).await?;
+        sqlx::query(EPUB_CHAPTERS_TABLE).execute(&self.pool).await?;
 
         Ok(())
     }
