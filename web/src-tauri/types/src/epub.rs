@@ -28,17 +28,18 @@ pub struct Metadata {
     #[serde(rename = "seriesName")]
     #[ts(rename = "seriesName")]
     pub series_name: Option<String>,
-    #[ts(optional)]
+    #[ts(optional, type = "string")]
     #[serde(rename = "seriesPosition")]
     #[ts(rename = "seriesPosition")]
-    pub series_positions: Option<i32>,
+    pub series_positions: Option<i64>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, TS)]
 #[ts(export, export_to = "epub.ts")]
 pub struct Series {
     pub name: String,
-    pub position: Option<i32>,
+    #[ts(type = "string")]
+    pub position: Option<i64>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, TS)]
@@ -46,7 +47,8 @@ pub struct Series {
 pub struct Chapter {
     pub id: String,
     pub href: String,
-    pub index: i32,
+    #[ts(type = "string")]
+    pub index: i64,
     pub content: String,
 }
 
@@ -109,30 +111,32 @@ pub struct Book {
     pub cover_image_url: Option<String>,
     #[serde(rename = "createdAt")]
     #[ts(rename = "createdAt")]
-    pub created_at: i32,
+    #[ts(type = "number")]
+    pub created_at: i64,
     #[serde(rename = "updatedAt")]
     #[ts(rename = "updatedAt")]
-    pub updated_at: i32,
+    #[ts(type = "number")]
+    pub updated_at: i64,
     #[serde(rename = "deletedAt")]
     #[ts(rename = "deletedAt")]
-    #[ts(optional)]
-    pub deleted_at: Option<i32>,
+    #[ts(optional, type = "string")]
+    pub deleted_at: Option<i64>,
     #[serde(rename = "uploadedAt")]
     #[ts(rename = "uploadedAt")]
-    #[ts(optional)]
-    pub uploaded_at: Option<i32>,
+    #[ts(optional, type = "string")]
+    pub uploaded_at: Option<i64>,
     #[serde(rename = "downloadedAt")]
     #[ts(rename = "downloadedAt")]
-    #[ts(optional)]
-    pub downloaded_at: Option<i32>,
+    #[ts(optional, type = "number")]
+    pub downloaded_at: Option<i64>,
     #[serde(rename = "coverDownloadedAt")]
     #[ts(rename = "coverDownloadedAt")]
-    #[ts(optional)]
-    pub cover_downloaded_at: Option<i32>,
+    #[ts(optional, type = "string")]
+    pub cover_downloaded_at: Option<i64>,
     #[serde(rename = "lastUpdated")]
     #[ts(rename = "lastUpdated")]
-    #[ts(optional)]
-    pub last_updated: Option<i32>,
+    #[ts(optional, type = "string")]
+    pub last_updated: Option<i64>,
     #[serde(rename = "primaryLanguage")]
     #[ts(rename = "primaryLanguage")]
     #[ts(optional)]

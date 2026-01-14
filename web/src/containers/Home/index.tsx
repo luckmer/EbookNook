@@ -22,7 +22,7 @@ const HomeRoot = () => {
       }}
       onClickBook={(hash) => {
         navigate('reader', { state: { id: hash } })
-        dispatch(actions.loadBook(hash))
+        dispatch(actions.getEpubStructure(hash))
         dispatch(uiActions.setHideHeader(true))
       }}
     />

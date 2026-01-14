@@ -1,23 +1,25 @@
+import { Books } from '@bindings/book'
+import { EpubStructure } from '@bindings/epub'
 import { PayloadAction } from '@reduxjs/toolkit'
 import { actions, PayloadTypes } from '@store/reducers/books'
-import { bookSelector } from '@store/selectors/books'
+import { selectEpubMap } from '@store/selectors/books'
 import { invoke } from '@tauri-apps/api/core'
 import { getDocumentLoader } from 'src/libs/document'
-import { all, call, select, takeEvery } from 'typed-redux-saga'
+import { all, call, put, select, takeEvery, takeLatest } from 'typed-redux-saga'
+
+export function* loadState() {
+  const books = yield* call(invoke<Books>, 'get_books')
+
+  yield* put(actions.setBooks(books))
+}
 
 export function* ImportBook(action: PayloadAction<PayloadTypes['importBook']>) {
   try {
-    const bookMap = yield* select(bookSelector.books)
     const core = yield* call(getDocumentLoader)
     const response = yield* call([core, core.init], action.payload)
 
-    if (bookMap[response.book.hash]) {
-      // TODO
-      return
-    }
-
-    yield* call(invoke, 'add_book', {
-      book: response.book,
+    yield* call(invoke, 'add_epub_book', {
+      epub: response,
     })
   } catch (err) {
     console.log(err)
@@ -25,14 +27,31 @@ export function* ImportBook(action: PayloadAction<PayloadTypes['importBook']>) {
   }
 }
 
+export function* getEpubStructure(action: PayloadAction<PayloadTypes['getEpubStructure']>) {
+  const bookMap = yield* select(selectEpubMap)
+
+  const book = bookMap[action.payload]
+  if (book.toc.length > 0 && book.chapters.length > 0) return
+
+  const structure = yield* call(invoke<EpubStructure>, 'get_epub_structure_by_id', {
+    id: book.book.id,
+  })
+
+  yield* put(actions.setEpubStructure({ structure, id: book.book.id }))
+}
+
 export function* ImportBookSaga() {
   yield* takeEvery(actions.importBook, ImportBook)
 }
 
-export function* loadBookSaga() {
-  // yield* takeLatest(actions.loadBook, loadBook)
+export function* loadStateSaga() {
+  yield* takeLatest(actions.load, loadState)
+}
+
+export function* getEpubStructureSaga() {
+  yield* takeLatest(actions.getEpubStructure, getEpubStructure)
 }
 
 export default function* RootSaga() {
-  yield all([ImportBookSaga(), loadBookSaga()])
+  yield all([ImportBookSaga(), loadStateSaga(), getEpubStructureSaga()])
 }
