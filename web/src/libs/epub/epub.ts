@@ -4,8 +4,10 @@ import { ZipParser } from './lib/zipParser'
 import { ISettingsState } from '@interfaces/settings/interfaces'
 import { EpubTocParser } from './lib/toc'
 import { Chapter, Progress, Toc } from '@bindings/epub'
+import { Epub as IEpub } from '@bindings/epub'
+import { flatData } from '@utils/index'
 export interface IEpubChapter extends Chapter {
-  index: number
+  chapterIndex: number
 }
 
 export class Epub {
@@ -13,30 +15,20 @@ export class Epub {
   zipParser = new ZipParser()
   EpubTocParser = new EpubTocParser()
   frame = new Frame()
-  url: string = ''
   currentPage: string = ''
   chapters: IEpubChapter[] = []
   bookProgress: Progress = ['', '']
   chapterByHref: Record<string, Chapter> = {}
   chapterByIndex: Record<string, number> = {}
   lastSelectedPath: string = ''
-  isLoading: boolean = false
   toc: Toc[] = []
-  private queue: Promise<void>
+  book: IEpub
 
-  private enqueue(action: () => Promise<void>) {
-    this.queue = this.queue.then(() => action()).catch(console.error)
-    return this.queue
-  }
-
-  constructor(url: string) {
-    this.url = url
+  constructor(book: IEpub) {
     this.chapters = []
-    this.isLoading = true
+    this.book = book
 
-    this.queue = Promise.resolve()
-
-    this.enqueue(() => this.loadChapters())
+    this.loadChapters()
     this.frame.onLinkClick((href) => this.handleFrameLink(href))
   }
 
@@ -54,15 +46,11 @@ export class Epub {
   }
 
   renderTo(element: string) {
-    return this.enqueue(async () => {
-      await this.frame.attachTo(element)
-    })
+    this.frame.attachTo(element)
   }
 
   setStyles(settings: ISettingsState) {
-    return this.enqueue(async () => {
-      return this.frame.setStyles(settings)
-    })
+    this.frame.setStyles(settings)
   }
 
   formatChapterHref(href: string) {
@@ -70,37 +58,19 @@ export class Epub {
     return base[base.length - 1]
   }
 
-  async loadChapters() {
-    this.isLoading = true
+  loadChapters() {
+    this.chapters = this.book.chapters.map((chapter, index) => ({
+      ...chapter,
+      chapterIndex: index,
+    }))
 
-    // try {
-    //   const buffer = EpubUtils.binaryStringToArrayBuffer(this.url)
+    for (let chapter of this.chapters) {
+      const href = this.formatChapterHref(chapter.href)
+      this.chapterByHref[href] = chapter
+      this.chapterByIndex[href] = chapter.chapterIndex
+    }
 
-    //   const xml = await this.zipParser.load(buffer)
-    //   const [tocData, contentData] = await Promise.all([
-    //     this.EpubTocParser.parse(xml),
-    //     this.contentParser.parse(xml),
-    //   ])
-
-    //   const { chapters } = contentData
-
-    //   this.chapters = chapters.map((chapter, index) => ({
-    //     ...chapter,
-    //     index,
-    //   }))
-
-    // for (let chapter of this.chapters) {
-    //   const href = this.formatChapterHref(chapter.href)
-    //   this.chapterByHref[href] = chapter
-    //   this.chapterByIndex[href] = chapter.index
-    // }
-
-    //   this.toc = flatData(tocData)
-    // } catch (err) {
-    //   throw err
-    // } finally {
-    //   this.isLoading = false
-    // }
+    this.toc = flatData(this.book.toc)
   }
 
   getHTMLFragment = (doc: Document, id: string) => {
@@ -119,28 +89,23 @@ export class Epub {
   }
 
   loadNextChapter(href: string) {
-    return this.enqueue(async () => {
-      new Promise<void>((resolve) => {
-        const [basePath, hash] = href.split('#')
-        const path = this.formatChapterHref(basePath)
+    const [basePath, hash] = href.split('#')
+    const path = this.formatChapterHref(basePath)
 
-        if (this.lastSelectedPath !== path) {
-          const chapter = this.chapterByHref[path]
+    if (this.lastSelectedPath !== path) {
+      const chapter = this.chapterByHref[path]
 
-          if (!chapter) return
-          this.frame.loadChapter(chapter.content)
-          this.lastSelectedPath = path
-        }
+      if (!chapter) return
+      this.frame.loadChapter(chapter.content)
+      this.lastSelectedPath = path
+    }
 
-        const doc = this.frame.document
-        const anchor = hash ? this.getHTMLFragment(doc, hash) : undefined
-        const tocProgress = this.getAnchorProgress(anchor)
+    const doc = this.frame.document
+    const anchor = hash ? this.getHTMLFragment(doc, hash) : undefined
+    const tocProgress = this.getAnchorProgress(anchor)
 
-        console.log(href, tocProgress)
-        this.frame.goTo(tocProgress)
-        resolve()
-      })
-    })
+    console.log(href, tocProgress)
+    this.frame.goTo(tocProgress)
   }
 
   progress(callback: (current: number, total: number) => void) {
@@ -148,20 +113,18 @@ export class Epub {
   }
 
   loadFirstChapter() {
-    return this.enqueue(async () => {
-      this.lastSelectedPath = this.formatChapterHref(this.chapters[0].href)
-      await this.frame.loadChapter(this.chapters[0].content)
-    })
+    this.lastSelectedPath = this.formatChapterHref(this.chapters[0].href)
+    this.frame.loadChapter(this.chapters[0].content)
   }
 
-  async display(href?: string) {
+  display(href?: string) {
     if (this.isContentEmpty(href)) {
-      await this.loadFirstChapter()
+      this.loadFirstChapter()
       return
     }
 
     if (typeof href !== 'undefined') {
-      await this.loadNextChapter(href)
+      this.loadNextChapter(href)
     }
   }
 
@@ -186,30 +149,20 @@ export class Epub {
   }
 
   nextChapter() {
-    this.enqueue(async () => {
-      new Promise<void>((resolve) => {
-        const index = this.chapterByIndex[this.lastSelectedPath] + 1
-        const chapter = this.chapters[index]
+    const index = this.chapterByIndex[this.lastSelectedPath] + 1
+    const chapter = this.chapters[index]
 
-        if (!chapter) return
+    if (!chapter) return
 
-        this.loadNextChapter(chapter.href)
-        resolve()
-      })
-    })
+    this.loadNextChapter(chapter.href)
   }
 
   prevChapter() {
-    this.enqueue(async () => {
-      new Promise<void>((resolve) => {
-        const index = this.chapterByIndex[this.lastSelectedPath] - 1
-        const chapter = this.chapters[index]
+    const index = this.chapterByIndex[this.lastSelectedPath] - 1
+    const chapter = this.chapters[index]
 
-        if (!chapter) return
-        this.loadNextChapter(chapter.href)
-        resolve()
-      })
-    })
+    if (!chapter) return
+    this.loadNextChapter(chapter.href)
   }
 
   destroyFrameCore() {

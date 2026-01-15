@@ -4,7 +4,7 @@ import { FORMAT } from './static'
 
 class DocumentApiCore {
   isEpub(file: File): boolean {
-    return file.name.endsWith(`.${FORMAT.EPUB}`)
+    return file.name.endsWith(`.${FORMAT.epub}`)
   }
 
   async _init(file: File): Promise<IBookState> {

@@ -9,12 +9,10 @@ export const booksStore = 'booksStore'
 
 export interface IBookState {
   books: Books
-  epubCodeSearch: string
   selectedChapter: string
 }
 
 const defaultState: IBookState = {
-  epubCodeSearch: '',
   selectedChapter: '',
   books: {
     epub: [],
@@ -40,11 +38,6 @@ export const store = createSlice({
 
     setSelectedChapter(state, action: PayloadAction<string>) {
       state.selectedChapter = action.payload
-      return state
-    },
-
-    setEpubCodeSearch(state, action: PayloadAction<string>) {
-      state.epubCodeSearch = action.payload
       return state
     },
 

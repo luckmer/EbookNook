@@ -2,6 +2,8 @@ import { Books } from '@bindings/book'
 import { EpubStructure } from '@bindings/epub'
 import { PayloadAction } from '@reduxjs/toolkit'
 import { actions, PayloadTypes } from '@store/reducers/books'
+import { actions as uiActions } from '@store/reducers/ui'
+
 import { selectEpubMap } from '@store/selectors/books'
 import { invoke } from '@tauri-apps/api/core'
 import { getDocumentLoader } from 'src/libs/document'
@@ -28,6 +30,7 @@ export function* ImportBook(action: PayloadAction<PayloadTypes['importBook']>) {
 }
 
 export function* getEpubStructure(action: PayloadAction<PayloadTypes['getEpubStructure']>) {
+  yield* put(uiActions.setIsFetchingStructure(true))
   const bookMap = yield* select(selectEpubMap)
 
   const book = bookMap[action.payload]
@@ -38,6 +41,7 @@ export function* getEpubStructure(action: PayloadAction<PayloadTypes['getEpubStr
   })
 
   yield* put(actions.setEpubStructure({ structure, id: book.book.id }))
+  yield* put(uiActions.setIsFetchingStructure(false))
 }
 
 export function* ImportBookSaga() {
