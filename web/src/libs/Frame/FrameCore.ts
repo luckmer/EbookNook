@@ -72,7 +72,11 @@ export class Frame {
       setStylesImportant(el, {
         'max-height': `${height - this.padding * 2}px`,
         'max-width': '100%',
+        height: 'auto',
+        width: 'auto',
         'object-fit': 'contain',
+        display: 'block',
+        margin: 'auto',
         'page-break-inside': 'avoid',
         'break-inside': 'avoid',
         'box-sizing': 'border-box',
