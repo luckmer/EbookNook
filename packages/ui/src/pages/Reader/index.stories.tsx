@@ -13,19 +13,15 @@ export const BannersStory: Story = {
   render: () => {
     return (
       <Reader
-        epubCodeSearch=""
-        selectedChapter=""
-        hideContent={false}
         onHideHeader={() => {}}
         onShowHeader={() => {}}
-        settings={{
-          defaultFontSize: 16,
-          fontWeight: 400,
-          wordSpacing: 0,
-          letterSpacing: 0,
-          textIndent: 0,
-          lineHeight: 1.5,
-        }}
+        onClickNextChapter={() => {}}
+        onClickPrevChapter={() => {}}
+        onClickNextPage={() => {}}
+        onClickPrevPage={() => {}}
+        pageInfo={{ current: 1, total: 1 }}
+        loading={false}
+        hideContent
       />
     )
   },

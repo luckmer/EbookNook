@@ -34,7 +34,10 @@ export function* getEpubStructure(action: PayloadAction<PayloadTypes['getEpubStr
   const bookMap = yield* select(selectEpubMap)
 
   const book = bookMap[action.payload]
-  if (book.toc.length > 0 && book.chapters.length > 0) return
+  if (book.toc.length > 0 && book.chapters.length > 0) {
+    yield* put(uiActions.setIsFetchingStructure(false))
+    return
+  }
 
   const structure = yield* call(invoke<EpubStructure>, 'get_epub_structure_by_id', {
     id: book.book.id,

@@ -82,9 +82,17 @@ export class EpubMetadataParser {
       const file = xml.zip.file(normalized)
       if (!file) return
 
-      const blob = await file.async('blob')
+      const base64Data = await file.async('base64')
 
-      meta.cover = URL.createObjectURL(blob)
-    } catch {}
+      const extension = coverPath.split('.').pop()?.toLowerCase()
+      let mimeType = 'image/jpeg'
+      if (extension === 'png') mimeType = 'image/png'
+      if (extension === 'webp') mimeType = 'image/webp'
+      if (extension === 'gif') mimeType = 'image/gif'
+
+      meta.cover = `data:${mimeType};base64,${base64Data}`
+    } catch (error) {
+      console.error('Failed to extract cover:', error)
+    }
   }
 }

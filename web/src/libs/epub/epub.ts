@@ -1,6 +1,5 @@
 import { Frame } from '@libs/Frame/FrameCore'
 import { EpubContentParser } from './lib/chapters'
-import { ZipParser } from './lib/zipParser'
 import { ISettingsState } from '@interfaces/settings/interfaces'
 import { EpubTocParser } from './lib/toc'
 import { Chapter, Progress, Toc } from '@bindings/epub'
@@ -12,7 +11,6 @@ export interface IEpubChapter extends Chapter {
 
 export class Epub {
   contentParser = new EpubContentParser()
-  zipParser = new ZipParser()
   EpubTocParser = new EpubTocParser()
   frame = new Frame()
   currentPage: string = ''
@@ -104,7 +102,6 @@ export class Epub {
     const anchor = hash ? this.getHTMLFragment(doc, hash) : undefined
     const tocProgress = this.getAnchorProgress(anchor)
 
-    console.log(href, tocProgress)
     this.frame.goTo(tocProgress)
   }
 

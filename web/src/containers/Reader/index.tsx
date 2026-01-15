@@ -27,17 +27,25 @@ const ReaderRoot = () => {
   const viewRef = useRef<Epub | null>(null)
 
   useEffect(() => {
-    if (typeof book !== 'undefined' && !isFetchingStructure) {
+    setLoading(true)
+  }, [book])
+
+  useEffect(() => {
+    if (typeof book !== 'undefined' && !isFetchingStructure && viewRef.current === null) {
       const book_epub = new Epub(book)
 
       book_epub.renderTo('.book-content')
       setLoading(false)
       viewRef.current = book_epub
     }
+
+    return () => {
+      viewRef.current = null
+    }
   }, [book, isFetchingStructure])
 
   useEffect(() => {
-    if (typeof book !== 'undefined' && !isFetchingStructure) {
+    if (typeof book !== 'undefined' && !isFetchingStructure && viewRef.current) {
       viewRef.current?.display(selectedChapter)
       viewRef.current?.progress((current, total) => {
         setPageInfo({ current, total })

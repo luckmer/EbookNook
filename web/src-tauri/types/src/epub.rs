@@ -28,7 +28,7 @@ pub struct Metadata {
     #[serde(rename = "seriesName")]
     #[ts(rename = "seriesName")]
     pub series_name: Option<String>,
-    #[ts(optional, type = "string")]
+    #[ts(optional, type = "number")]
     #[serde(rename = "seriesPosition")]
     #[ts(rename = "seriesPosition")]
     pub series_positions: Option<i64>,
@@ -47,7 +47,7 @@ pub struct Series {
 pub struct Chapter {
     pub id: String,
     pub href: String,
-    #[ts(type = "string")]
+    #[ts(type = "number")]
     pub index: i64,
     pub content: String,
 }
@@ -83,9 +83,6 @@ pub struct Book {
     #[ts(optional)]
     pub url: Option<String>,
     pub hash: String,
-    #[serde(rename = "rootFilePath")]
-    #[ts(rename = "rootFilePath")]
-    pub root_file_path: String,
     pub format: String,
     pub title: String,
 

@@ -36,7 +36,6 @@ impl EpubService {
             .bind(&book.id)
             .bind(&book.url)
             .bind(&book.hash)
-            .bind(&book.root_file_path)
             .bind(&book.format)
             .bind(&book.title)
             .bind(&book.source_title)
@@ -130,7 +129,6 @@ impl EpubService {
                 id: row.try_get("id")?,
                 url: row.try_get("url")?,
                 hash: row.try_get("hash")?,
-                root_file_path: row.try_get("root_file_path")?,
                 format: row.try_get("format")?,
                 title: row.try_get("title")?,
                 source_title: row.try_get("source_title")?,
