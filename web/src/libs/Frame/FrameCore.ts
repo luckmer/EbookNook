@@ -11,7 +11,6 @@ export class Frame {
   private currentPage = 1
   private totalPages = 1
   private padding = 20
-  private queue: Promise<void> = Promise.resolve()
   private progressCallback?: (current: number, total: number) => void
   private linkClickCallback?: (href: string) => void
   private onIframeScroll?: EventListener
@@ -85,17 +84,10 @@ export class Frame {
     callback(this.currentPage, this.totalPages)
   }
 
-  private enqueue(action: () => Promise<void>) {
-    this.queue = this.queue.then(() => action()).catch(console.error)
-    return this.queue
-  }
-
   attachTo(selector: string) {
-    return this.enqueue(async () => {
-      const container = document.querySelector(selector)
-      if (!container) throw new Error("Can't find container")
-      container.appendChild(this.element)
-    })
+    const container = document.querySelector(selector)
+    if (!container) throw new Error("Can't find container")
+    container.appendChild(this.element)
   }
 
   setStyles(styles: ISettingsState) {
@@ -170,34 +162,29 @@ export class Frame {
   }
 
   async loadChapter(content: string) {
-    return this.enqueue(async () => {
-      this.removeIframeScrollListener()
-      this.currentPage = 1
-      this.totalPages = 1
+    this.removeIframeScrollListener()
+    this.currentPage = 1
+    this.totalPages = 1
 
-      const blob = new Blob([content], { type: 'text/html' })
-      if (this.blobUrl) URL.revokeObjectURL(this.blobUrl)
-      this.blobUrl = URL.createObjectURL(blob)
-      this.iframe.src = this.blobUrl
-      this.iframe.style.opacity = '0'
+    const blob = new Blob([content], { type: 'text/html' })
+    if (this.blobUrl) URL.revokeObjectURL(this.blobUrl)
+    this.blobUrl = URL.createObjectURL(blob)
+    this.iframe.src = this.blobUrl
+    this.iframe.style.opacity = '0'
 
-      await new Promise<void>((resolve) => {
-        this.iframe.onload = async () => {
-          const doc = this.document
-          this.applyStyles()
-          doc.body.appendChild(this.spacer)
-          this.contentRange.selectNodeContents(doc.body)
-          this.observer.observe(doc.body)
-          await doc.fonts.ready
-          this.attachIframeScrollListener()
-          this.attachLinkHandler()
-          this.calculatePagination()
-          this.goTo(0)
-          this.iframe.style.opacity = '1'
-          resolve()
-        }
-      })
-    })
+    this.iframe.onload = async () => {
+      const doc = this.document
+      this.applyStyles()
+      doc.body.appendChild(this.spacer)
+      this.contentRange.selectNodeContents(doc.body)
+      this.observer.observe(doc.body)
+      await doc.fonts.ready
+      this.attachIframeScrollListener()
+      this.attachLinkHandler()
+      this.calculatePagination()
+      this.goTo(0)
+      this.iframe.style.opacity = '1'
+    }
   }
 
   private attachIframeScrollListener() {
