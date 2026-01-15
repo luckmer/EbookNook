@@ -16,7 +16,7 @@ const HomeRoot = () => {
   return (
     <Home
       books={books}
-      hasBooks={Object.values(availableBooks).length > 0}
+      hasBooks={Object.values(availableBooks).flat().length > 0}
       onClick={async (file) => {
         dispatch(actions.importBook(file))
       }}

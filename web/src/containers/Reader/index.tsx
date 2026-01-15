@@ -34,7 +34,7 @@ const ReaderRoot = () => {
       setLoading(false)
       viewRef.current = book_epub
     }
-  }, [selectedChapter, book, isFetchingStructure])
+  }, [book, isFetchingStructure])
 
   useEffect(() => {
     if (typeof book !== 'undefined' && !isFetchingStructure) {
