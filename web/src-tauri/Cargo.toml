@@ -31,6 +31,8 @@ formats = { path = "./formats" }
 search = { path = "./search" }
 utils = { path = "./utils" }
 api = { path = "./api" }
+types = { path = "./types" }
+state = { path = "./state" }
 
 tauri-plugin-opener = "2"
 serde = { version = "1", features = [
@@ -72,4 +74,5 @@ members = [
   "api",
   "utils",
   "types",
+  "state",
 ]

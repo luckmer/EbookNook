@@ -44,6 +44,10 @@ CREATE TABLE IF NOT EXISTS epub_toc_table (
 );
 "#;
 
+pub const UPDATE_EPUB_BOOK_PROGRESS: &str = r#"
+UPDATE epub_table SET progress = ?, updated_at = ? WHERE id = ?
+"#;
+
 pub const INSERT_EPUB_TOC: &str = r#"
 INSERT INTO epub_toc_table (id, toc) VALUES (?, ?);
 "#;

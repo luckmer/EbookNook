@@ -1,11 +1,8 @@
 [package]
-name = "api"
+name = "state"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-tauri = { workspace = true }
 database = { path = "../database" }
 formats = { path = "../formats" }
-types = { path = "../types" }
-state = { path = "../state" }

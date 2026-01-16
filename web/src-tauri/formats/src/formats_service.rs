@@ -1,5 +1,5 @@
 use database::DatabaseManager;
-use types::{Books, Epub, EpubStructure};
+use types::{Books, Epub, EpubStructure, Progress};
 
 use crate::init_epub_service;
 
@@ -43,5 +43,20 @@ impl FormatsService {
         let epub_structure = epub_service.get_epub_structure_by_id(db, id).await?;
 
         Ok(epub_structure)
+    }
+
+    pub async fn set_epub_book_progress(
+        &self,
+        db: &DatabaseManager,
+        id: String,
+        progress: Progress,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        let epub_service = init_epub_service();
+
+        epub_service
+            .set_epub_book_progress(db, id, progress)
+            .await?;
+
+        Ok(())
     }
 }

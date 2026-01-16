@@ -1,8 +1,9 @@
 use database::{
     DatabaseManager, INSERT_EPUB_BOOK, INSERT_EPUB_CHAPTERS, INSERT_EPUB_TOC,
-    SELECT_EPUB_CHAPTERS_BY_ID, SELECT_EPUB_TOC_BY_ID,
+    SELECT_EPUB_CHAPTERS_BY_ID, SELECT_EPUB_TOC_BY_ID, UPDATE_EPUB_BOOK_PROGRESS,
 };
 
+use sqlx::types::chrono;
 use types::{Book, Chapter, Epub, EpubStructure, Metadata, Progress, Toc};
 
 pub struct EpubService {}
@@ -71,6 +72,29 @@ impl EpubService {
 
         Ok(())
     }
+
+    pub async fn set_epub_book_progress(
+        &self,
+        db: &DatabaseManager,
+        id: String,
+        progress: Progress,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        let conn = db.get_pool();
+
+        let new_progress = serde_json::to_string(&progress)?;
+
+        let now = chrono::Utc::now().timestamp();
+
+        sqlx::query(UPDATE_EPUB_BOOK_PROGRESS)
+            .bind(new_progress) 
+            .bind(now) 
+            .bind(id)  
+            .execute(conn)
+            .await?;
+
+        Ok(())
+    }
+
 
     pub async fn get_books(
         &self,
