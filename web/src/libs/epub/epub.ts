@@ -87,7 +87,7 @@ export class Epub {
   }
 
   loadNextChapter(href: string) {
-    const [basePath, hash] = href.split('#')
+    const [basePath, id] = href.split('#')
     const path = this.formatChapterHref(basePath)
 
     if (this.lastSelectedPath !== path) {
@@ -99,7 +99,7 @@ export class Epub {
     }
 
     const doc = this.frame.document
-    const anchor = hash ? this.getHTMLFragment(doc, hash) : undefined
+    const anchor = id ? this.getHTMLFragment(doc, id) : undefined
     const tocProgress = this.getAnchorProgress(anchor)
 
     this.frame.goTo(tocProgress)

@@ -7,8 +7,11 @@ import { store } from '@store/reducers/books'
 export const bookSelector = createStoreSelectors(store)
 
 export const selectEpubMap = createSelector([bookSelector.books], (books) => {
-  return books[BookFormat.EPUB].reduce((acc, item) => {
-    acc[item.book.hash] = item
-    return acc
-  }, {} as Record<string, Epub | undefined>)
+  return books[BookFormat.EPUB].reduce(
+    (acc, item) => {
+      acc[item.book.id] = item
+      return acc
+    },
+    {} as Record<string, Epub | undefined>,
+  )
 })

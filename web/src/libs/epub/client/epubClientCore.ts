@@ -24,9 +24,8 @@ export default class EpubClientCore {
 
     const book: Book = {
       format: BookFormat.EPUB,
-      hash: rstr2hex(metadata.title),
       id: `${rstr2hex(metadata.author)}-${rstr2hex(metadata.title)}-${rstr2hex(
-        Date.now().toString()
+        Date.now().toString(),
       )} `,
       title: metadata.title,
       author: metadata.author,

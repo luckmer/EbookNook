@@ -27,8 +27,8 @@ const ReaderRoot = () => {
   const renderedBookIdRef = useRef<string | null>(null)
   const viewRef = useRef<Epub | null>(null)
 
-  const hash = useMemo(() => location?.state?.id, [location])
-  const book = useMemo(() => booksMap[hash], [hash, booksMap])
+  const id = useMemo(() => location?.state?.id, [location])
+  const book = useMemo(() => booksMap[id], [id, booksMap])
 
   const handleHideHeader = useCallback(() => {
     dispatch(actions.setHideHeader(true))

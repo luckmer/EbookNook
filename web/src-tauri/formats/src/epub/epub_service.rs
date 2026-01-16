@@ -36,7 +36,6 @@ impl EpubService {
         sqlx::query(INSERT_EPUB_BOOK)
             .bind(&book.id)
             .bind(&book.url)
-            .bind(&book.hash)
             .bind(&book.format)
             .bind(&book.title)
             .bind(&book.source_title)
@@ -152,7 +151,6 @@ impl EpubService {
             book: Book {
                 id: row.try_get("id")?,
                 url: row.try_get("url")?,
-                hash: row.try_get("hash")?,
                 format: row.try_get("format")?,
                 title: row.try_get("title")?,
                 source_title: row.try_get("source_title")?,

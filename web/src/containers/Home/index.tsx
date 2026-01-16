@@ -23,9 +23,9 @@ const HomeRoot = () => {
       onClick={async (file) => {
         dispatch(actions.importBook(file))
       }}
-      onClickBook={(hash) => {
-        navigate('reader', { state: { id: hash } })
-        dispatch(actions.getEpubStructure(hash))
+      onClickBook={(id) => {
+        navigate('reader', { state: { id } })
+        dispatch(actions.getEpubStructure(id))
         dispatch(uiActions.setHideHeader(true))
       }}
     />

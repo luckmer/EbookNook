@@ -33,7 +33,7 @@ export function* getEpubStructure(action: PayloadAction<PayloadTypes['getEpubStr
 }
 
 export function* updateEpubBookProgress(
-  action: PayloadAction<PayloadTypes['setUpdateEpubBookProgress']>
+  action: PayloadAction<PayloadTypes['setUpdateEpubBookProgress']>,
 ) {
   try {
     yield* call(invoke, 'set_epub_book_progress', action.payload)

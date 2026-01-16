@@ -6,21 +6,36 @@ import { searchSelector } from '@store/selectors/search'
 import { uiSelector } from '@store/selectors/ui'
 import '@styles/import.css'
 import { getCurrentWindow } from '@tauri-apps/api/window'
-import { useLayoutEffect } from 'react'
+import { useEffect, useLayoutEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Route, Routes } from 'react-router-dom'
+import { Route, Routes, useLocation } from 'react-router-dom'
 import { routes } from './routes'
+import { selectEpubMap } from '@store/selectors/books'
 
 function App() {
   const isSettingsOpen = useSelector(uiSelector.openSettingsModal)
   const isSidebarOpen = useSelector(uiSelector.openChaptersDrawer)
   const searchValue = useSelector(searchSelector.value)
   const hideHeader = useSelector(uiSelector.hideHeader)
+  const booksMap = useSelector(selectEpubMap)
+
   const dispatch = useDispatch()
+
+  const location = useLocation()
 
   useLayoutEffect(() => {
     dispatch(bookActions.load())
   }, [])
+
+  useEffect(() => {
+    if (location?.state?.id) {
+      const bookId = location.state.id
+      const book = booksMap[bookId]
+      if (book) {
+        dispatch(bookActions.getEpubStructure(book.book.id))
+      }
+    }
+  }, [booksMap])
 
   return (
     <div className="w-full h-full flex flex-col gap-4">

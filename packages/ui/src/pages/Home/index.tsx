@@ -8,7 +8,7 @@ import Spin from '@components/Spin'
 
 export interface IProps {
   onClick: (file: File) => void
-  onClickBook: (hash: string) => void
+  onClickBook: (id: string) => void
   books: IBook[]
   hasBooks: boolean
   isLoadingState: boolean

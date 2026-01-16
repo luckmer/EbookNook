@@ -2,7 +2,6 @@ pub const EPUB_BOOK_TABLE: &str = r#"
 CREATE TABLE IF NOT EXISTS epub_table (
     id TEXT PRIMARY KEY,
     url TEXT,
-    hash TEXT NOT NULL,
     format TEXT NOT NULL,
     title TEXT NOT NULL,
     source_title TEXT,
@@ -27,13 +26,13 @@ CREATE TABLE IF NOT EXISTS epub_table (
 
 pub const INSERT_EPUB_BOOK: &str = r#"
 INSERT INTO epub_table (
-    id, url, hash, format, title, source_title, author,
+    id, url, format, title, source_title, author,
     group_id, group_name, tags, cover_image_url, created_at,
     updated_at, deleted_at, uploaded_at, downloaded_at, cover_downloaded_at,
     last_updated, primary_language, metadata, progress
 )
 VALUES (
-    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
 );
 "#;
 

@@ -15,8 +15,8 @@ const ChaptersDrawerRoot = () => {
   const location = useLocation()
   const dispatch = useDispatch()
 
-  const hash = useMemo(() => location?.state?.id, [location])
-  const book = useMemo(() => booksMap[hash], [hash, booksMap])
+  const bookId = useMemo(() => location?.state?.id, [location])
+  const book = useMemo(() => booksMap[bookId], [bookId, booksMap])
 
   return (
     <ChaptersDrawer

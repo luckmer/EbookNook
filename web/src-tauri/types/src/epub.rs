@@ -82,7 +82,6 @@ pub struct Book {
 
     #[ts(optional)]
     pub url: Option<String>,
-    pub hash: String,
     pub format: String,
     pub title: String,
 
