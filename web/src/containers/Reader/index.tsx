@@ -56,11 +56,11 @@ const ReaderRoot = () => {
             BookActions.setUpdateEpubBookProgress({
               progress: [info.path, info.current.toString()],
               id: currentBook.book.id,
-            })
+            }),
           )
         }
       }, 500),
-    [dispatch]
+    [dispatch],
   )
 
   useEffect(() => {
@@ -107,8 +107,10 @@ const ReaderRoot = () => {
   }, [selectedChapter, isFetchingStructure, book?.book.id])
 
   useEffect(() => {
-    viewRef.current?.setStyles(settings)
-  }, [settings])
+    if (!loading) {
+      viewRef.current?.setStyles(settings)
+    }
+  }, [settings, loading])
 
   useEffect(() => {
     if (pageInfo.path) debouncedUpdate(pageInfo)

@@ -23,6 +23,8 @@ export function* ImportBook(action: PayloadAction<PayloadTypes['importBook']>) {
     yield* call(invoke, 'add_epub_book', {
       epub: response,
     })
+
+    yield* put(actions.setEpubBook(response))
   } catch (err) {
     console.log(err)
     console.log('failed to open document')

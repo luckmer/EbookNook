@@ -103,9 +103,13 @@ export class Frame {
   }
 
   setStyles(styles: ISettingsState) {
-    this.chapterStyles = { ...this.chapterStyles, ...styles }
-    this.applyStyles()
-    this.calculatePagination()
+    try {
+      this.chapterStyles = { ...this.chapterStyles, ...styles }
+      this.applyStyles()
+      this.calculatePagination()
+    } catch {
+      console.log('failed to apply styles')
+    }
   }
 
   private applyStyles() {

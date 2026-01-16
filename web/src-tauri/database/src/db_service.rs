@@ -1,28 +1,39 @@
-use std::fs;
-use std::path::PathBuf;
-
 use crate::{EPUB_BOOK_TABLE, EPUB_CHAPTERS_TABLE, EPUB_TOC_TABLE};
-use sqlx::{SqlitePool, sqlite::SqlitePoolOptions};
+use sqlx::sqlite::{SqliteConnectOptions, SqliteJournalMode, SqlitePoolOptions, SqliteSynchronous};
+use sqlx::{Pool, Sqlite, SqlitePool};
+use std::fs;
+use std::str::FromStr;
+use tauri::{AppHandle, Manager};
 
 pub struct DatabaseManager {
-    pool: SqlitePool,
+    pub pool: Pool<Sqlite>,
 }
 
 impl DatabaseManager {
-    pub async fn new() -> Result<Self, Box<dyn std::error::Error>> {
-        let db_path = if cfg!(debug_assertions) {
-            PathBuf::from("database/database.db")
-        } else {
-            PathBuf::from("database/database.db")
-        };
+    pub async fn new(app_handle: &AppHandle) -> Result<Self, Box<dyn std::error::Error>> {
+        let app_dir = app_handle.path().app_data_dir()?;
 
-        Self::ensure_db_file_exists(&db_path);
+        if !app_dir.exists() {
+            fs::create_dir_all(&app_dir)?;
+        }
 
-        let database_url = db_path
-            .to_str()
-            .expect("Failed to convert database path to string");
+        let db_path = app_dir.join("database.sqlite");
+        let db_url = format!(
+            "sqlite:{}",
+            db_path.to_str().ok_or("Invalid path encoding")?
+        );
 
-        let pool = SqlitePoolOptions::new().connect(&database_url).await?;
+        let options = SqliteConnectOptions::from_str(&db_url)?
+            .create_if_missing(true)
+            .foreign_keys(true)
+            .journal_mode(SqliteJournalMode::Wal)
+            .synchronous(SqliteSynchronous::Normal)
+            .busy_timeout(std::time::Duration::from_secs(5));
+
+        let pool = SqlitePoolOptions::new()
+            .max_connections(5)
+            .connect_with(options)
+            .await?;
 
         let database = DatabaseManager { pool };
         database.run_migrations().await?;
@@ -30,10 +41,9 @@ impl DatabaseManager {
     }
 
     async fn run_migrations(&self) -> Result<(), Box<dyn std::error::Error>> {
-        let _ = sqlx::query("PRAGMA foreign_keys = ON;")
+            sqlx::query("PRAGMA foreign_keys = ON;")
             .execute(&self.pool)
-            .await;
-
+            .await?;
         sqlx::query(EPUB_BOOK_TABLE).execute(&self.pool).await?;
         sqlx::query(EPUB_TOC_TABLE).execute(&self.pool).await?;
         sqlx::query(EPUB_CHAPTERS_TABLE).execute(&self.pool).await?;
@@ -43,19 +53,5 @@ impl DatabaseManager {
 
     pub fn get_pool(&self) -> &SqlitePool {
         &self.pool
-    }
-
-    fn ensure_db_file_exists(db_path: &PathBuf) {
-        if db_path.exists() {
-            return;
-        }
-
-        let db_dir = db_path.parent().expect("Failed to get parent directory");
-
-        if !db_dir.exists() {
-            fs::create_dir_all(db_dir).expect("Failed to create database directory");
-        }
-
-        fs::File::create(db_path).expect("Failed to create database file");
     }
 }
