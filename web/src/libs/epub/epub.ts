@@ -105,23 +105,25 @@ export class Epub {
     this.frame.goTo(tocProgress)
   }
 
-  progress(callback: (current: number, total: number) => void) {
-    this.frame.progress(callback)
+  progress(callback: (current: number, total: number, path: string) => void) {
+    this.frame.progress((current, total) => {
+      callback(current, total, this.lastSelectedPath)
+    })
   }
 
-  loadFirstChapter() {
+  async loadFirstChapter() {
     this.lastSelectedPath = this.formatChapterHref(this.chapters[0].href)
-    this.frame.loadChapter(this.chapters[0].content)
+    await this.frame.loadChapter(this.chapters[0].content)
   }
 
-  display(href?: string) {
+  async display(href?: string) {
     if (this.isContentEmpty(href)) {
-      this.loadFirstChapter()
+      await this.loadFirstChapter()
       return
     }
 
     if (typeof href !== 'undefined') {
-      this.loadNextChapter(href)
+      await this.loadNextChapter(href)
     }
   }
 
@@ -163,6 +165,30 @@ export class Epub {
   }
 
   destroyFrameCore() {
+    this.frame.destroy()
+  }
+
+  async loadProgress(progress: Progress) {
+    const [chapterHref, page] = progress
+
+    const chapter = this.chapterByHref[chapterHref]
+
+    const href = chapter.href
+
+    const [basePath] = href.split('#')
+    const path = this.formatChapterHref(basePath)
+
+    if (this.lastSelectedPath !== path) {
+      const chapter = this.chapterByHref[path]
+
+      if (!chapter) return
+      await this.frame.loadChapter(chapter.content)
+      this.frame.goToPage(+page)
+      this.lastSelectedPath = path
+    }
+  }
+
+  destroy() {
     this.frame.destroy()
   }
 }

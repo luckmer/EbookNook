@@ -10,5 +10,5 @@ export const selectEpubMap = createSelector([bookSelector.books], (books) => {
   return books[BookFormat.EPUB].reduce((acc, item) => {
     acc[item.book.hash] = item
     return acc
-  }, {} as Record<string, Epub>)
+  }, {} as Record<string, Epub | undefined>)
 })

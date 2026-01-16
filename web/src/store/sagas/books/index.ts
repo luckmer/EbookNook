@@ -1,13 +1,12 @@
 import { Books } from '@bindings/book'
-import { EpubStructure } from '@bindings/epub'
 import { PayloadAction } from '@reduxjs/toolkit'
 import { actions, PayloadTypes } from '@store/reducers/books'
 import { actions as uiActions } from '@store/reducers/ui'
 
-import { selectEpubMap } from '@store/selectors/books'
 import { invoke } from '@tauri-apps/api/core'
 import { getDocumentLoader } from 'src/libs/document'
-import { all, call, put, select, takeEvery, takeLatest } from 'typed-redux-saga'
+import { all, call, put, takeEvery, takeLatest, takeLeading } from 'typed-redux-saga'
+import { getEpubStructure, updateEpubBookProgress } from './epub'
 
 export function* loadState() {
   yield* put(uiActions.setIsLoadingState(true))
@@ -30,24 +29,6 @@ export function* ImportBook(action: PayloadAction<PayloadTypes['importBook']>) {
   }
 }
 
-export function* getEpubStructure(action: PayloadAction<PayloadTypes['getEpubStructure']>) {
-  yield* put(uiActions.setIsFetchingStructure(true))
-  const bookMap = yield* select(selectEpubMap)
-
-  const book = bookMap[action.payload]
-  if (book.toc.length > 0 && book.chapters.length > 0) {
-    yield* put(uiActions.setIsFetchingStructure(false))
-    return
-  }
-
-  const structure = yield* call(invoke<EpubStructure>, 'get_epub_structure_by_id', {
-    id: book.book.id,
-  })
-
-  yield* put(actions.setEpubStructure({ structure, id: book.book.id }))
-  yield* put(uiActions.setIsFetchingStructure(false))
-}
-
 export function* ImportBookSaga() {
   yield* takeEvery(actions.importBook, ImportBook)
 }
@@ -60,6 +41,15 @@ export function* getEpubStructureSaga() {
   yield* takeLatest(actions.getEpubStructure, getEpubStructure)
 }
 
+export function* updateEpubBookProgressSaga() {
+  yield takeLeading(actions.setUpdateEpubBookProgress, updateEpubBookProgress)
+}
+
 export default function* RootSaga() {
-  yield all([ImportBookSaga(), loadStateSaga(), getEpubStructureSaga()])
+  yield all([
+    ImportBookSaga(),
+    loadStateSaga(),
+    getEpubStructureSaga(),
+    updateEpubBookProgressSaga(),
+  ])
 }

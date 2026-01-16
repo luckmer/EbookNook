@@ -1,5 +1,5 @@
 import { Books } from '@bindings/book'
-import { EpubStructure } from '@bindings/epub'
+import { EpubStructure, Progress } from '@bindings/epub'
 import { BookFormat } from '@interfaces/book/enums'
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
@@ -43,6 +43,16 @@ export const store = createSlice({
 
     getEpubStructure(state, _: PayloadAction<string>) {
       return state
+    },
+
+    setUpdateEpubBookProgress(state, action: PayloadAction<{ progress: Progress; id: string }>) {
+      const epubState = state.books[BookFormat.EPUB]
+
+      epubState.forEach((epub) => {
+        if (epub.book.id === action.payload.id) {
+          epub.book.progress = action.payload.progress
+        }
+      })
     },
 
     setEpubStructure(state, action: PayloadAction<{ structure: EpubStructure; id: string }>) {
