@@ -10,9 +10,10 @@ import { getDocumentLoader } from 'src/libs/document'
 import { all, call, put, select, takeEvery, takeLatest } from 'typed-redux-saga'
 
 export function* loadState() {
+  yield* put(uiActions.setIsLoadingState(true))
   const books = yield* call(invoke<Books>, 'get_books')
-
   yield* put(actions.setBooks(books))
+  yield* put(uiActions.setIsLoadingState(false))
 }
 
 export function* ImportBook(action: PayloadAction<PayloadTypes['importBook']>) {
