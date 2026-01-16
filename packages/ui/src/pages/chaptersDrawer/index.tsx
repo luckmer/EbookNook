@@ -2,10 +2,9 @@ import DefaultButton from '@components/Buttons/DefaultButton'
 import Drawer from '@components/Drawer'
 import Toc from '@components/Toc'
 import { Typography } from '@components/Typography'
-import { IToc } from '@interfaces/book/interfaces'
 import { FC } from 'react'
 import { IoLibraryOutline } from 'react-icons/io5'
-
+import { type Toc as IToc } from '@bindings/epub'
 export interface IProps {
   onClick: (href: string) => void
   onClickClose: () => void

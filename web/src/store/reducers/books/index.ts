@@ -1,24 +1,22 @@
-import { IBook, IToc } from '@interfaces/book/interfaces'
-import { IProgress } from '@interfaces/book/types'
+import { Books } from '@bindings/book'
+import { Epub, EpubStructure, Progress } from '@bindings/epub'
+import { BookFormat } from '@interfaces/book/enums'
+
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { PayloadType } from '@store/helper'
 
 export const booksStore = 'booksStore'
 
-type Hash = string
-
 export interface IBookState {
-  books: IBook[]
-  epubCodeSearch: string
-  toc: Record<Hash, IToc[]>
+  books: Books
   selectedChapter: string
 }
 
 const defaultState: IBookState = {
-  books: [],
-  toc: {},
-  epubCodeSearch: '',
   selectedChapter: '',
+  books: {
+    epub: [],
+  },
 }
 
 export const store = createSlice({
@@ -29,11 +27,12 @@ export const store = createSlice({
       return state
     },
 
-    importBook(state, _: PayloadAction<File>) {
+    setBooks(state, action: PayloadAction<Books>) {
+      state.books = action.payload
       return state
     },
 
-    loadBook(state, _: PayloadAction<string>) {
+    importBook(state, _: PayloadAction<File>) {
       return state
     },
 
@@ -42,29 +41,35 @@ export const store = createSlice({
       return state
     },
 
-    setBook(state, action: PayloadAction<IBook>) {
-      state.books.push(action.payload)
+    getEpubStructure(state, _: PayloadAction<string>) {
       return state
     },
 
-    setBookProgress(state, action: PayloadAction<{ hash: Hash; progress: IProgress }>) {
-      const book = state.books.find((b) => b.hash === action.payload.hash)
-      if (book) {
-        book.progress = action.payload.progress
-      }
+    setUpdateEpubBookProgress(state, action: PayloadAction<{ progress: Progress; id: string }>) {
+      const epubState = state.books[BookFormat.EPUB]
+
+      epubState.forEach((epub) => {
+        if (epub.book.id === action.payload.id) {
+          epub.book.progress = action.payload.progress
+        }
+      })
+    },
+
+    setEpubBook(state, action: PayloadAction<Epub>) {
+      state.books[BookFormat.EPUB].push(action.payload)
       return state
     },
 
-    setEpubCodeSearch(state, action: PayloadAction<string>) {
-      state.epubCodeSearch = action.payload
-      return state
-    },
+    setEpubStructure(state, action: PayloadAction<{ structure: EpubStructure; id: string }>) {
+      const epubState = state.books[BookFormat.EPUB]
 
-    setToc: (state, action: PayloadAction<{ hash: Hash; toc: IToc[] }>) => {
-      if (!state.toc[action.payload.hash]) {
-        state.toc[action.payload.hash] = []
-      }
-      state.toc[action.payload.hash] = action.payload.toc
+      epubState.forEach((epub) => {
+        if (epub.book.id === action.payload.id) {
+          epub.chapters = action.payload.structure.chapters
+          epub.toc = action.payload.structure.toc
+        }
+      })
+
       return state
     },
   },

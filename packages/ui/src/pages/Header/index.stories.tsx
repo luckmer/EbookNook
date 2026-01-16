@@ -13,6 +13,7 @@ export const BannersStory: Story = {
   render: () => {
     return (
       <Header
+        hideHeader={false}
         location="/"
         onClickOpenSidebar={() => {}}
         onClickSettings={() => {}}

@@ -19,10 +19,8 @@ export class ZipParser {
     const basePath = rootFilePath.substring(0, rootFilePath.lastIndexOf('/') + 1)
 
     return {
-      rootFilePath: EpubUtils.arrayBufferToBinaryString(buffer),
-      filePath: rootFilePath,
-      basePath,
       doc: EpubUtils.parseXml(opfText, MIME.XML),
+      basePath,
       zip,
     }
   }

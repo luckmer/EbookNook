@@ -9,7 +9,7 @@
     ],
     "module": "ESNext",
     "skipLibCheck": true,
-    "ignoreDeprecations": "6.0",
+    "ignoreDeprecations": "5.0",
     "baseUrl": ".",
     /* Bundler mode */
     "moduleResolution": "bundler",
@@ -28,6 +28,9 @@
     "paths": {
       "@interfaces/*": [
         "../../web/src/interfaces/*"
+      ],
+      "@bindings/*": [
+        "../../web/src-tauri/types/bindings/*"
       ],
       "@common/*": [
         "./common/*"

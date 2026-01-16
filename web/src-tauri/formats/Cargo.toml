@@ -1,0 +1,12 @@
+[package]
+name = "formats"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+database = { path = "../database" }
+types = { path = "../types" }
+sqlx = { workspace = true }
+serde_json = { workspace = true }
+serde = { workspace = true }
+ts-rs = { workspace = true }

@@ -1,11 +1,11 @@
 import Book from '@components/Book'
 import UploadButton from '@components/Buttons/UploadButton'
-import { IBook } from '@interfaces/book/interfaces'
 import { FC, memo } from 'react'
 import { MdAddToPhotos } from 'react-icons/md'
+import { Book as IBook } from '@bindings/epub'
 
 export interface IProps {
-  onClickBook: (hash: string) => void
+  onClickBook: (id: string) => void
   onClickImportBook: (file: File) => void
   books: IBook[]
 }
@@ -19,7 +19,7 @@ const BookShelf: FC<IProps> = ({ books, onClickBook, onClickImportBook }) => {
           img={book.metadata.cover}
           title={book.metadata.title}
           onClick={() => {
-            onClickBook(book.hash)
+            onClickBook(book.id)
           }}
         />
       ))}

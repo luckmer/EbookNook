@@ -3,14 +3,18 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 export const uiStore = 'uiStore'
 
 export interface IUiState {
+  isFetchingStructure: boolean
   openChaptersDrawer: boolean
   openSettingsModal: boolean
+  isLoadingState: boolean
   hideHeader: boolean
 }
 
 const defaultState: IUiState = {
+  isFetchingStructure: true,
   openChaptersDrawer: false,
   openSettingsModal: false,
+  isLoadingState: true,
   hideHeader: false,
 }
 
@@ -31,6 +35,14 @@ export const store = createSlice({
     },
     setHideHeader(state, action: PayloadAction<boolean>) {
       state.hideHeader = action.payload
+      return state
+    },
+    setIsLoadingState(state, action: PayloadAction<boolean>) {
+      state.isLoadingState = action.payload
+      return state
+    },
+    setIsFetchingStructure(state, action: PayloadAction<boolean>) {
+      state.isFetchingStructure = action.payload
       return state
     },
   },

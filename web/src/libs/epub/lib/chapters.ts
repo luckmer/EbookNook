@@ -1,7 +1,8 @@
-import { Chapter, IXML } from '@interfaces/book/interfaces'
+import { Chapter } from '@bindings/epub'
+import { IXML } from '@interfaces/book/interfaces'
 
 export class EpubContentParser {
-  async parse(xml: IXML): Promise<{ chapters: Chapter[] }> {
+  async parse(xml: IXML): Promise<Chapter[]> {
     const doc = xml.doc
 
     const manifest: Record<string, { href: string; type?: string }> = {}
@@ -14,7 +15,7 @@ export class EpubContentParser {
 
     const spine = Array.from(doc.querySelectorAll('spine > itemref'))
 
-    const blobMap = await this.buildBlobMap(xml, manifest)
+    const assetMap = await this.buildAssetMap(xml, manifest)
 
     const chapters: Chapter[] = []
 
@@ -29,7 +30,7 @@ export class EpubContentParser {
 
       const chapterDoc = new DOMParser().parseFromString(text, 'text/html')
 
-      this.replaceAssets(chapterDoc, xml.basePath, blobMap)
+      this.replaceAssets(chapterDoc, xml.basePath, assetMap)
 
       chapters.push({
         id: idref,
@@ -39,40 +40,53 @@ export class EpubContentParser {
       })
     }
 
-    return { chapters }
+    return chapters
   }
 
-  private replaceAssets(doc: Document, base: string, blobs: Map<string, string>) {
+  private replaceAssets(doc: Document, base: string, assets: Map<string, string>) {
     doc.querySelectorAll('img').forEach((img) => {
       const src = img.getAttribute('src')
       if (!src) return
-      const path = (base + src).replace(/\\/g, '/')
-      if (blobs.has(path)) img.src = blobs.get(path)!
+      const path = this.normalizePath(base, src)
+      if (assets.has(path)) img.src = assets.get(path)!
     })
 
     doc.querySelectorAll<HTMLLinkElement>("link[rel='stylesheet']").forEach((link) => {
       const href = link.getAttribute('href')
       if (!href) return
-      const path = (base + href).replace(/\\/g, '/')
-      if (blobs.has(path)) link.href = blobs.get(path)!
+      const path = this.normalizePath(base, href)
+      if (assets.has(path)) link.href = assets.get(path)!
     })
   }
 
-  private async buildBlobMap(xml: IXML, manifest: Record<string, { href: string; type?: string }>) {
+  private async buildAssetMap(
+    xml: IXML,
+    manifest: Record<string, { href: string; type?: string }>
+  ) {
     const map = new Map<string, string>()
 
     for (const id in manifest) {
-      const full = (xml.basePath + manifest[id].href).replace(/\\/g, '/')
-      const file = xml.zip.file(full)
-      if (!file) continue
+      const item = manifest[id]
+      const fullPath = this.normalizePath(xml.basePath, item.href)
+      const file = xml.zip.file(fullPath)
 
-      try {
-        const blob = await file.async('blob')
-        const url = URL.createObjectURL(blob)
-        map.set(full, url)
-      } catch {}
+      if (!file || !item.type) continue
+
+      if (item.type.startsWith('image/') || item.type === 'text/css') {
+        try {
+          const base64 = await file.async('base64')
+          const dataUri = `data:${item.type};base64,${base64}`
+          map.set(fullPath, dataUri)
+        } catch (e) {
+          console.error(`Failed to process asset: ${fullPath}`, e)
+        }
+      }
     }
 
     return map
+  }
+
+  private normalizePath(base: string, relative: string): string {
+    return (base + relative).replace(/\\/g, '/')
   }
 }

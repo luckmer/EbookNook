@@ -11,6 +11,18 @@ type Story = StoryObj<typeof Reader>
 
 export const BannersStory: Story = {
   render: () => {
-    return <Reader epubCodeSearch="" selectedChapter="" />
+    return (
+      <Reader
+        onHideHeader={() => {}}
+        onShowHeader={() => {}}
+        onClickNextChapter={() => {}}
+        onClickPrevChapter={() => {}}
+        onClickNextPage={() => {}}
+        onClickPrevPage={() => {}}
+        pageInfo={{ current: 1, total: 1 }}
+        loading={false}
+        hideContent
+      />
+    )
   },
 }

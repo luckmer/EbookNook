@@ -1,0 +1,9 @@
+[package]
+name = "database"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+tauri = { workspace = true }
+tokio = "1.48.0"
+sqlx = { workspace = true }

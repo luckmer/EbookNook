@@ -9,7 +9,7 @@
     ],
     "module": "ESNext",
     "skipLibCheck": true,
-    "ignoreDeprecations": "6.0",
+    "ignoreDeprecations": "5.0",
     "baseUrl": ".",
     /* Bundler mode */
     "moduleResolution": "bundler",
@@ -31,6 +31,9 @@
       ],
       "@interfaces/*": [
         "./src/interfaces/*"
+      ],
+      "@bindings/*": [
+        "./src-tauri/types/bindings/*"
       ],
       "@static/*": [
         "./src/static/*"
@@ -70,6 +73,5 @@
   "include": [
     "src",
     "../packages/**/*"
-  ],
-  "references": []
+  ]
 }

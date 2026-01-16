@@ -1,47 +1,33 @@
+import { Books } from '@bindings/book'
 import { PayloadAction } from '@reduxjs/toolkit'
 import { actions, PayloadTypes } from '@store/reducers/books'
-import { booksMapSelector } from '@store/selectors/books'
+import { actions as uiActions } from '@store/reducers/ui'
+
+import { invoke } from '@tauri-apps/api/core'
 import { getDocumentLoader } from 'src/libs/document'
-import { all, call, put, select, takeEvery, takeLatest } from 'typed-redux-saga'
+import { all, call, put, takeEvery, takeLatest, takeLeading } from 'typed-redux-saga'
+import { getEpubStructure, updateEpubBookProgress } from './epub'
+
+export function* loadState() {
+  yield* put(uiActions.setIsLoadingState(true))
+  const books = yield* call(invoke<Books>, 'get_books')
+  yield* put(actions.setBooks(books))
+  yield* put(uiActions.setIsLoadingState(false))
+}
 
 export function* ImportBook(action: PayloadAction<PayloadTypes['importBook']>) {
   try {
-    const bookMap = yield* select(booksMapSelector)
     const core = yield* call(getDocumentLoader)
-    const book = yield* call([core, core.open], action.payload)
+    const response = yield* call([core, core.init], action.payload)
 
-    if (bookMap[book.book.hash]) {
-      // TODO
-      return
-    }
+    yield* call(invoke, 'add_epub_book', {
+      epub: response,
+    })
 
-    yield* put(actions.setBook(book.book))
+    yield* put(actions.setEpubBook(response))
   } catch (err) {
     console.log(err)
     console.log('failed to open document')
-  }
-}
-
-export function* loadBook(action: PayloadAction<PayloadTypes['loadBook']>) {
-  try {
-    const hash = action.payload
-    const bookMap = yield* select(booksMapSelector)
-
-    const book = bookMap[hash]
-
-    if (!book) {
-      throw new Error('book not found')
-    }
-
-    const filePath = book.rootFilePath
-
-    const core = yield* call(getDocumentLoader)
-    const toc = yield* call([core, core.loadBook], filePath)
-
-    yield* put(actions.setEpubCodeSearch(filePath))
-    yield* put(actions.setToc({ hash, toc }))
-  } catch (err) {
-    console.log('failed to load book', err)
   }
 }
 
@@ -49,10 +35,23 @@ export function* ImportBookSaga() {
   yield* takeEvery(actions.importBook, ImportBook)
 }
 
-export function* loadBookSaga() {
-  yield* takeLatest(actions.loadBook, loadBook)
+export function* loadStateSaga() {
+  yield* takeLatest(actions.load, loadState)
+}
+
+export function* getEpubStructureSaga() {
+  yield* takeLatest(actions.getEpubStructure, getEpubStructure)
+}
+
+export function* updateEpubBookProgressSaga() {
+  yield takeLeading(actions.setUpdateEpubBookProgress, updateEpubBookProgress)
 }
 
 export default function* RootSaga() {
-  yield all([ImportBookSaga(), loadBookSaga()])
+  yield all([
+    ImportBookSaga(),
+    loadStateSaga(),
+    getEpubStructureSaga(),
+    updateEpubBookProgressSaga(),
+  ])
 }

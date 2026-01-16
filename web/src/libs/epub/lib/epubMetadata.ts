@@ -1,4 +1,5 @@
-import { IMetadata, IXML } from '@interfaces/book/interfaces'
+import { Metadata } from '@bindings/epub'
+import { IXML } from '@interfaces/book/interfaces'
 
 export class EpubMetadataParser {
   private getMetaValue(parent: Element, tag: string, metaName = tag, fallback = '') {
@@ -21,11 +22,11 @@ export class EpubMetadataParser {
       .filter((s): s is string => !!s)
   }
 
-  async parse(file: File, xml: IXML): Promise<IMetadata> {
+  async parse(file: File, xml: IXML): Promise<Metadata> {
     const metadataEl = xml.doc.querySelector('metadata')
     if (!metadataEl) throw new Error('No metadata found')
 
-    const meta: IMetadata = {
+    const meta: Metadata = {
       identifier: this.getMetaValue(metadataEl, 'identifier', 'identifier') || crypto.randomUUID(),
       title:
         this.getMetaValue(metadataEl, 'title', 'title', file.name.replace(/\..+$/, '')) ||
@@ -50,10 +51,8 @@ export class EpubMetadataParser {
       ?.getAttribute('content')
 
     if (seriesName) {
-      meta.series = {
-        name: seriesName,
-        position: seriesIndex ? parseFloat(seriesIndex) : undefined,
-      }
+      meta.seriesName = seriesName
+      meta.seriesPosition = seriesIndex ? parseFloat(seriesIndex) : undefined
     }
 
     await this.extractCover(meta, xml)
@@ -61,7 +60,7 @@ export class EpubMetadataParser {
     return meta
   }
 
-  private async extractCover(meta: IMetadata, xml: IXML) {
+  private async extractCover(meta: Metadata, xml: IXML) {
     try {
       const doc = xml.doc
 
@@ -83,8 +82,17 @@ export class EpubMetadataParser {
       const file = xml.zip.file(normalized)
       if (!file) return
 
-      const blob = await file.async('blob')
-      meta.cover = URL.createObjectURL(blob)
-    } catch {}
+      const base64Data = await file.async('base64')
+
+      const extension = coverPath.split('.').pop()?.toLowerCase()
+      let mimeType = 'image/jpeg'
+      if (extension === 'png') mimeType = 'image/png'
+      if (extension === 'webp') mimeType = 'image/webp'
+      if (extension === 'gif') mimeType = 'image/gif'
+
+      meta.cover = `data:${mimeType};base64,${base64Data}`
+    } catch (error) {
+      console.error('Failed to extract cover:', error)
+    }
   }
 }
