@@ -20,7 +20,7 @@ const Book: FC<IProps> = ({ img, title, onClick, onClickDetails }) => {
         onClick()
       }}>
       <img className="rounded-6 h-full object-cover" src={img} />
-      <div className="flex flex-col">
+      <div className="flex flex-col gap-6">
         <Typography text="small" ellipsis left>
           {title}
         </Typography>
