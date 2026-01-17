@@ -6,11 +6,12 @@ import { Book as IBook } from '@bindings/epub'
 
 export interface IProps {
   onClickBook: (id: string) => void
+  onClickDetails: (id: string) => void
   onClickImportBook: (file: File) => void
   books: IBook[]
 }
 
-const BookShelf: FC<IProps> = ({ books, onClickBook, onClickImportBook }) => {
+const BookShelf: FC<IProps> = ({ books, onClickBook, onClickImportBook, onClickDetails }) => {
   return (
     <div className="grid flex-1 grid-cols-3 px-4 sm:px-2 sm:grid-cols-4 md:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-12 gap-12 ">
       {books.map((book, id) => (
@@ -18,6 +19,9 @@ const BookShelf: FC<IProps> = ({ books, onClickBook, onClickImportBook }) => {
           key={id}
           img={book.metadata.cover}
           title={book.metadata.title}
+          onClickDetails={() => {
+            onClickDetails(book.id)
+          }}
           onClick={() => {
             onClickBook(book.id)
           }}

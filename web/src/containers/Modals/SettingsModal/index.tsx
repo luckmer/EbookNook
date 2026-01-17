@@ -1,5 +1,5 @@
 import { SETTINGS } from '@interfaces/settings/enums'
-import Settings from '@pages/Settings'
+import Settings from '@pages/Modals/Settings'
 import { actions as settingsActions } from '@store/reducers/settings'
 import { actions } from '@store/reducers/ui'
 import { settingsConfig } from '@store/selectors/settings'

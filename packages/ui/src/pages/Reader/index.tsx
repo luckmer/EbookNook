@@ -31,7 +31,7 @@ const Reader: FC<IProps> = ({
   const containerRef = useRef<HTMLDivElement | null>(null)
 
   return (
-    <main className="w-full h-full  flex flex-col">
+    <main className="w-full h-full flex flex-col">
       <EpubNavigation
         onClickNextChapter={onClickNextChapter}
         onClickPrevChapter={onClickPrevChapter}
@@ -60,7 +60,7 @@ const Reader: FC<IProps> = ({
             ref={containerRef}
             className={clsx(
               loading && 'h-0',
-              'book-content rounded bg-white relative w-full h-full overflow-hidden'
+              'book-content rounded bg-white relative w-full h-full overflow-hidden',
             )}
           />
         </div>

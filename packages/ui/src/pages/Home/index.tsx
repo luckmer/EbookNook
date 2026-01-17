@@ -9,12 +9,20 @@ import Spin from '@components/Spin'
 export interface IProps {
   onClick: (file: File) => void
   onClickBook: (id: string) => void
+  onClickDetails: (id: string) => void
   books: IBook[]
   hasBooks: boolean
   isLoadingState: boolean
 }
 
-const Home: FC<IProps> = ({ onClick, onClickBook, books, hasBooks, isLoadingState }) => {
+const Home: FC<IProps> = ({
+  onClick,
+  onClickBook,
+  onClickDetails,
+  books,
+  hasBooks,
+  isLoadingState,
+}) => {
   return (
     <main className="w-full h-full overflow-y-auto px-24 py-12">
       <Show
@@ -22,7 +30,12 @@ const Home: FC<IProps> = ({ onClick, onClickBook, books, hasBooks, isLoadingStat
         fallback={
           <Show when={hasBooks} fallback={<EmptyLibrary onClick={onClick} />}>
             <Show when={books.length > 0 && hasBooks} fallback={<EmptyResult />}>
-              <BookShelf books={books} onClickImportBook={onClick} onClickBook={onClickBook} />
+              <BookShelf
+                books={books}
+                onClickImportBook={onClick}
+                onClickBook={onClickBook}
+                onClickDetails={onClickDetails}
+              />
             </Show>
           </Show>
         }>
