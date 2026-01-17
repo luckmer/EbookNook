@@ -154,7 +154,16 @@ export class Frame {
       'font-family': 'arial, helvetica, sans-serif',
     }
 
-    setStylesImportant(doc.documentElement, defaultStyles)
+    doc.body.querySelectorAll('p').forEach((el) => {
+      setStylesImportant(el, defaultStyles)
+    })
+
+    setStylesImportant(doc.documentElement, {
+      padding: `0px ${this.padding}px`,
+      'box-sizing': 'border-box',
+      overflow: 'hidden',
+    })
+
     setStylesImportant(doc.body, bodyStyles)
   }
 
