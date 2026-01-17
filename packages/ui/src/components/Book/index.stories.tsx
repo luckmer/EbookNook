@@ -11,6 +11,6 @@ type Story = StoryObj<typeof Book>
 
 export const BannersStory: Story = {
   render: () => {
-    return <Book img="" title="test" onClick={() => {}} />
+    return <Book img="" title="test" onClick={() => {}} onClickDetails={() => {}} />
   },
 }

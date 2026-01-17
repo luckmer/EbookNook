@@ -23,6 +23,14 @@ const HomeRoot = () => {
       onClick={async (file) => {
         dispatch(actions.importBook(file))
       }}
+      onClickDetails={(bookId) => {
+        dispatch(
+          uiActions.setOpenBookOverviewModal({
+            status: true,
+            bookId,
+          }),
+        )
+      }}
       onClickBook={(id) => {
         navigate('reader', { state: { id } })
         dispatch(actions.getEpubStructure(id))

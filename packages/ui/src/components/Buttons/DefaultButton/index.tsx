@@ -13,6 +13,7 @@ const DefaultButton: React.FC<IProps> = ({ children, onClick, className, disable
       disabled={disabled}
       onClick={(e) => {
         e.preventDefault()
+        e.stopPropagation()
         onClick()
       }}
       className={clsx('cursor-pointer', className, disabled && 'pointer-events-none opacity-50')}>

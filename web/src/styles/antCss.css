@@ -2,3 +2,15 @@
   top: 24px !important;
   right: 24px !important;
 }
+
+.ant-modal-content {
+  max-height: calc(100vh - 30px) !important;
+  overflow: hidden;
+  border-radius: 10px;
+  width: 100%;
+  display: flex;
+}
+
+.ant-modal-body {
+  width: 100% !important;
+}

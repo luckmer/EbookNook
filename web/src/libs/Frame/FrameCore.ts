@@ -74,6 +74,7 @@ export class Frame {
         'max-width': '100%',
         height: 'auto',
         width: 'auto',
+        background: '#181818',
         'object-fit': 'contain',
         display: 'block',
         margin: 'auto',
@@ -106,9 +107,15 @@ export class Frame {
     try {
       this.chapterStyles = { ...this.chapterStyles, ...styles }
       this.applyStyles()
+
+      if (this.document?.body) {
+        void this.document.body.scrollWidth
+      }
+
       this.calculatePagination()
-    } catch {
-      console.log('failed to apply styles')
+      this.scrollToPage(Math.min(this.currentPage, this.totalPages))
+    } catch (err) {
+      console.log('failed to apply styles', err)
     }
   }
 
@@ -145,6 +152,7 @@ export class Frame {
       margin: '0',
       color: '#fff',
       'column-width': '600px',
+      background: '#181818',
       'column-gap': '40px',
       'column-fill': 'auto',
       'word-wrap': 'break-word',
@@ -152,7 +160,16 @@ export class Frame {
       'font-family': 'arial, helvetica, sans-serif',
     }
 
-    setStylesImportant(doc.documentElement, defaultStyles)
+    doc.body.querySelectorAll('p').forEach((el) => {
+      setStylesImportant(el, defaultStyles)
+    })
+
+    setStylesImportant(doc.documentElement, {
+      padding: `0px ${this.padding}px`,
+      'box-sizing': 'border-box',
+      overflow: 'hidden',
+    })
+
     setStylesImportant(doc.body, bodyStyles)
   }
 

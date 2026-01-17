@@ -16,6 +16,7 @@ export const Default: Story = {
         hasBooks={false}
         onClick={() => {}}
         onClickBook={() => {}}
+        onClickDetails={() => {}}
         books={[]}
         isLoadingState={false}
       />
