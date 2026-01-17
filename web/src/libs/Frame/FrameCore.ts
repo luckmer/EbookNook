@@ -107,9 +107,15 @@ export class Frame {
     try {
       this.chapterStyles = { ...this.chapterStyles, ...styles }
       this.applyStyles()
+
+      if (this.document?.body) {
+        void this.document.body.scrollWidth
+      }
+
       this.calculatePagination()
-    } catch {
-      console.log('failed to apply styles')
+      this.scrollToPage(Math.min(this.currentPage, this.totalPages))
+    } catch (err) {
+      console.log('failed to apply styles', err)
     }
   }
 
