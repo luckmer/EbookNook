@@ -42,6 +42,9 @@ const BookOverviewModal: FC<IProps> = ({ onClickClose, isOpen, book }) => {
         margin: 0; padding: 0; color: white; 
         font-family: system-ui, -apple-system, sans-serif; 
         font-size: 14px; line-height: 1.5; overflow: hidden; 
+        * { 
+          color: #9CA3AF; 
+        }
       }
     `
       doc.head.appendChild(style)
@@ -84,7 +87,7 @@ const BookOverviewModal: FC<IProps> = ({ onClickClose, isOpen, book }) => {
             />
             <div className="flex flex-col justify-between py-4">
               <div className="flex flex-col gap-8">
-                <Typography text="body">{book?.author || 'Unknown Author'}</Typography>
+                <Typography text="h2">{book?.author || 'Unknown Author'}</Typography>
                 <Typography text="caption" color="secondary">
                   {book?.title || 'Unknown title'}
                 </Typography>
