@@ -6,7 +6,7 @@ import { searchSelector } from '@store/selectors/search'
 import { uiSelector } from '@store/selectors/ui'
 import '@styles/import.css'
 import { getCurrentWindow } from '@tauri-apps/api/window'
-import { useEffect, useLayoutEffect } from 'react'
+import { useEffect, useLayoutEffect, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Route, Routes, useLocation } from 'react-router-dom'
 import { routes } from './routes'
@@ -37,9 +37,13 @@ function App() {
     }
   }, [booksMap])
 
+  const bookId = useMemo(() => location?.state?.id, [location])
+  const book = useMemo(() => booksMap[bookId], [bookId, booksMap])
+
   return (
     <div className="w-full h-full flex flex-col gap-4">
       <Header
+        bookName={book?.book.title}
         hideHeader={hideHeader}
         onClickSettings={() => {
           dispatch(uiActions.setOpenSettingsModal(!isSettingsOpen))

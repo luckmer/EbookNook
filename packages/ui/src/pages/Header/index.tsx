@@ -7,6 +7,7 @@ import { BsLayoutSidebarInset } from 'react-icons/bs'
 import { GiHamburgerMenu } from 'react-icons/gi'
 import { CgMenuRound } from 'react-icons/cg'
 import clsx from 'clsx'
+import { Typography } from '@components/Typography'
 
 export interface IProps {
   onClickClose: () => void
@@ -18,6 +19,7 @@ export interface IProps {
   hideHeader: boolean
   location: string
   value: string
+  bookName?: string
 }
 
 export const Header: FC<IProps> = ({
@@ -29,6 +31,7 @@ export const Header: FC<IProps> = ({
   value,
   location,
   hideHeader,
+  bookName,
   onChange,
 }) => {
   const isReader = location.match(NAVIGATION.READER)
@@ -38,7 +41,7 @@ export const Header: FC<IProps> = ({
       data-tauri-drag-region
       className={clsx(
         hideHeader ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-auto',
-        'relative flex flex-row items-center justify-between gap-48 p-12 rounded-8 transition-opacity duration-300 h-[70px]'
+        'relative flex flex-row items-center justify-between gap-48 p-12 rounded-8 transition-opacity duration-300 h-[70px]',
       )}>
       <Show when={isReader !== null}>
         <DefaultButton
@@ -46,6 +49,15 @@ export const Header: FC<IProps> = ({
           className="transition-colors hover:bg-button-primary-hover hover:text-text-primary text-text-secondary duration-300 rounded-4 px-6 py-6">
           <BsLayoutSidebarInset className="w-18 h-18 transition-colors duration-200" />
         </DefaultButton>
+      </Show>
+      <Show when={!!bookName}>
+        <div
+          className="w-full flex items-center justify-center overflow-hidden max-[470px]:hidden"
+          data-tauri-drag-region>
+          <Typography text="caption" color="white" ellipsis>
+            {bookName}
+          </Typography>
+        </div>
       </Show>
       <Show when={!isReader}>
         <div className="w-full h-full">
@@ -59,7 +71,7 @@ export const Header: FC<IProps> = ({
           />
         </div>
       </Show>
-      <div className="flex flex-row gap-4 ml-auto" data-tauri-drag-region="false">
+      <div className="flex flex-row gap-4 ml-auto" data-tauri-drag-region>
         <DefaultButton
           disabled
           onClick={() => {}}
