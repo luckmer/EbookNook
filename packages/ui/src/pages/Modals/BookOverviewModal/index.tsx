@@ -1,4 +1,5 @@
-import Modal from '@components/Modal'
+import Modal from '@components/Modals/Modal'
+import ModalHeader from '@components/Modals/ModalHeader'
 import Show from '@components/Show'
 import { Typography } from '@components/Typography'
 import clsx from 'clsx'
@@ -72,12 +73,16 @@ const BookOverviewModal: FC<IProps> = ({ onClickClose, isOpen, book }) => {
   }, [bookDesc, isOpen])
 
   return (
-    <Modal isFooter={false} onClickClose={onClickClose} isOpen={isOpen} centered width={500}>
-      <div className="flex flex-col gap-24 h-full w-full overflow-hidden max-h-[700px]">
-        <div className="w-[calc(100%-44px)] flex items-center justify-center min-h-[40px]">
-          <Typography text="body">Book details</Typography>
-        </div>
-        <div className="flex flex-col gap-24 overflow-y-auto w-full flex-1 pr-12">
+    <Modal
+      isFooter={false}
+      onClickClose={onClickClose}
+      isOpen={isOpen}
+      centered
+      width={500}
+      closable={false}>
+      <div className="flex flex-col gap-[20px] h-full w-full overflow-hidden max-h-[700px]">
+        <ModalHeader onClickClose={onClickClose} label="Book overview" />
+        <div className="flex flex-col gap-24 overflow-y-auto w-full flex-1 p-24">
           <div className="flex flex-row gap-24">
             <img
               src={book.cover}

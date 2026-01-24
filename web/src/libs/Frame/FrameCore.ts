@@ -58,10 +58,28 @@ export class Frame {
       this.setImageSize()
       this.expand()
     })
+
+    // chack for custom margin
+    // this.watchResize()
   }
+
   get document() {
     return this.iframe.contentDocument!
   }
+
+  // private watchResize() {
+  //   window.addEventListener('resize', (data) => {
+  //     const size = data.target.innerWidth
+  //     Object.assign(this.iframe.style, {
+  //       border: '0',
+  //       width: '100%',
+  //       height: '100%',
+  //       maxWidth: `${size > 1400 ? 1400 - 400 : size - 700}px`,
+  //       overflow: 'hidden',
+  //       scrollbarWidth: 'none',
+  //     })
+  //   })
+  // }
 
   private setImageSize() {
     const doc = this.document

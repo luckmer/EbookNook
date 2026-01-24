@@ -7,4 +7,11 @@ export enum SETTINGS {
   LETTER_SPACING = 'LETTER_SPACING',
   TEXT_INDENT = 'TEXT_INDENT',
   LINE_HEIGHT = 'LINE_HEIGHT',
+  PARAGRAPH_MARGIN = 'PARAGRAPH_MARGIN',
+}
+
+export enum OPTIONS {
+  APPEARANCE = 'appearance',
+  FONT = 'font',
+  LAYOUT = 'layout',
 }

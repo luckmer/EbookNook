@@ -4,6 +4,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 export const settingsStore = 'settingsStore'
 
 const defaultState: ISettingsState = {
+  paragraphMargin: 0,
   defaultFontSize: 16,
   fontWeight: 400,
   wordSpacing: 0,
@@ -54,9 +55,16 @@ export const store = createSlice({
       state.fontWeight = defaultState.fontWeight
       return state
     },
+
+    setParagraphMargin(state, action: PayloadAction<number>) {
+      state.paragraphMargin = action.payload
+      return state
+    },
+
     setResetLayoutSettings(state) {
       state.wordSpacing = defaultState.wordSpacing
       state.letterSpacing = defaultState.letterSpacing
+      state.paragraphMargin = defaultState.paragraphMargin
       state.textIndent = defaultState.textIndent
       state.lineHeight = defaultState.lineHeight
       return state

@@ -5,6 +5,7 @@
 
 .ant-modal-content {
   max-height: calc(100vh - 30px) !important;
+  padding: 0 !important;
   overflow: hidden;
   border-radius: 10px;
   width: 100%;

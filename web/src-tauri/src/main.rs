@@ -28,7 +28,7 @@ fn main() {
 
             main_window
                 .set_min_size(Some(PhysicalSize {
-                    width: 500,
+                    width: 360,
                     height: 600,
                 }))
                 .unwrap();

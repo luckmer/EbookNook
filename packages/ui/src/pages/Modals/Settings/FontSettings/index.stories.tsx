@@ -11,6 +11,14 @@ type Story = StoryObj<typeof FontSettings>
 
 export const Default: Story = {
   render: () => {
-    return <FontSettings onClick={() => {}} fontWeight={400} defaultFontSize={16} />
+    return (
+      <FontSettings
+        onClick={() => {}}
+        fontWeight={400}
+        defaultFontSize={16}
+        onClickRestart={() => {}}>
+        <div>children</div>
+      </FontSettings>
+    )
   },
 }

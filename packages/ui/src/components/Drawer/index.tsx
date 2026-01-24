@@ -15,6 +15,7 @@ const DrawerRoot: FC<IProps> = ({ placement, isOpen, children, onClickClose }) =
       closable={false}
       onClose={onClickClose}
       open={isOpen}
+      height={'100%'}
       key={placement}>
       {children}
     </Drawer>
