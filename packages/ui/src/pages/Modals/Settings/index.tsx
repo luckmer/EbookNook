@@ -2,9 +2,12 @@ import Match from '@components/Match'
 import Modal from '@components/Modals/Modal'
 import ModalHeader from '@components/Modals/ModalHeader'
 import Switch from '@components/Switch'
+import TypographyPreview from '@components/TypographyPreview'
 import { OPTIONS, SETTINGS } from '@interfaces/settings/enums'
 import { ISettingsState } from '@interfaces/settings/interfaces'
-import { FC, memo, useMemo, useState } from 'react'
+import clsx from 'clsx'
+import { FC, memo, useEffect, useMemo, useState } from 'react'
+import { useWindowSize } from 'src/hooks/useWindowSize'
 import FontSettings from './FontSettings'
 import LayoutSettings from './LayoutSettings'
 import SettingsSidePanel from './SettingsSidePanel'
@@ -16,10 +19,25 @@ export interface IProps {
   isOpen: boolean
 }
 
-const Settings: FC<IProps> = ({ isOpen = true, onClickClose, settings, onClick }) => {
-  const [option, SetOption] = useState<OPTIONS>(OPTIONS.FONT)
+const Settings: FC<IProps> = ({ isOpen, onClickClose, settings, onClick }) => {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [option, setOption] = useState<OPTIONS>(OPTIONS.FONT)
+  const { width } = useWindowSize()
 
-  const styles = useMemo(() => {
+  const isMobile = useMemo(() => width <= 700, [width])
+
+  useEffect(() => {
+    if (isOpen) {
+      setIsMobileMenuOpen(false)
+      setOption(OPTIONS.FONT)
+    }
+  }, [isOpen])
+
+  useEffect(() => {
+    if (!isMobile) setIsMobileMenuOpen(false)
+  }, [isMobile])
+
+  const previewStyles = useMemo(() => {
     return {
       marginBottom: `${settings.paragraphMargin}px`,
       fontSize: `${settings.defaultFontSize}px`,
@@ -33,69 +51,62 @@ const Settings: FC<IProps> = ({ isOpen = true, onClickClose, settings, onClick }
 
   return (
     <Modal
-      width={900}
+      isFullscreen={isMobile}
+      width={isMobile ? '100%' : 900}
+      height={isMobile ? '100%' : undefined}
       isFooter={false}
       onClickClose={onClickClose}
       isOpen={isOpen}
       centered
       closable={false}>
-      <div className="flex flex-col">
-        <ModalHeader onClickClose={onClickClose} label="Settings" />
-        <div className="flex flex-row h-full ">
-          <div className="min-w-[220px] border-r border-border-modal bg-surface-400 py-16">
-            <SettingsSidePanel option={option} onClickOption={SetOption} />
-          </div>
-          <div className="py-24 h-[600px] w-full">
+      <div className="flex flex-col overflow-hidden h-full relative">
+        <ModalHeader
+          onClickClose={onClickClose}
+          label="Settings"
+          onClickOpen={isMobile ? () => setIsMobileMenuOpen(!isMobileMenuOpen) : undefined}
+          open={isMobileMenuOpen}
+        />
+        <div className="flex flex-row h-full overflow-hidden">
+          <aside
+            className={clsx(
+              'border-r border-border-modal bg-surface-400 py-16 transition-all duration-200 z-10',
+              isMobile ? 'absolute h-full w-full' : 'min-w-[220px] static',
+              isMobile && (isMobileMenuOpen ? 'left-0' : '-left-full'),
+            )}>
+            <SettingsSidePanel
+              option={option}
+              onClickOption={(newOption: OPTIONS) => {
+                setOption(newOption)
+                setIsMobileMenuOpen(false)
+              }}
+            />
+          </aside>
+          <main
+            className={clsx('py-24  overflow-y-auto w-full', isMobile ? 'h-full' : 'h-[600px] ')}>
             <Switch>
               <Match when={option === OPTIONS.FONT}>
                 <FontSettings
-                  onClickRestart={() => {
-                    onClick(SETTINGS.RESET_FONT_SETTINGS, 0)
-                  }}
+                  onClickRestart={() => onClick(SETTINGS.RESET_FONT_SETTINGS, 0)}
                   onClick={onClick}
                   defaultFontSize={settings.defaultFontSize}
                   fontWeight={settings.fontWeight}>
-                  <div>
-                    <p style={styles}>
-                      The quick brown fox jumps over the lazy dog. Typography is the art and
-                      technique of arranging type to make written language legible, readable, and
-                      appealing when displayed.
-                    </p>
-                    <p style={styles}>
-                      The arrangement of type involves selecting typefaces, point sizes, line
-                      lengths, line-spacing, and letter-spacing for better readability and visual
-                      appeal.
-                    </p>
-                  </div>
+                  <TypographyPreview styles={previewStyles} />
                 </FontSettings>
               </Match>
               <Match when={option === OPTIONS.LAYOUT}>
                 <LayoutSettings
-                  onClickRestart={() => {
-                    onClick(SETTINGS.RESET_LAYOUT_SETTINGS, 0)
-                  }}
+                  onClickRestart={() => onClick(SETTINGS.RESET_LAYOUT_SETTINGS, 0)}
                   onClick={onClick}
                   wordSpacing={settings.wordSpacing}
                   letterSpacing={settings.letterSpacing}
                   textIndent={settings.textIndent}
                   lineHeight={settings.lineHeight}
                   paragraphMargin={settings.paragraphMargin}>
-                  <div>
-                    <p style={styles}>
-                      The quick brown fox jumps over the lazy dog. Typography is the art and
-                      technique of arranging type to make written language legible, readable, and
-                      appealing when displayed.
-                    </p>
-                    <p style={styles}>
-                      The arrangement of type involves selecting typefaces, point sizes, line
-                      lengths, line-spacing, and letter-spacing for better readability and visual
-                      appeal.
-                    </p>
-                  </div>
+                  <TypographyPreview styles={previewStyles} />
                 </LayoutSettings>
               </Match>
             </Switch>
-          </div>
+          </main>
         </div>
       </div>
     </Modal>

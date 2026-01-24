@@ -39,7 +39,7 @@ const FontSettings: FC<IProps> = ({
 
   return (
     <div className="flex flex-col gap-[36px] h-full w-full">
-      <div className="flex flex-row gap-12 items-center justify-between  px-24">
+      <div className="flex flex-row gap-12 items-center justify-between px-24">
         <Typography text="body">Font</Typography>
         <DefaultButton
           onClick={onClickRestart}
@@ -56,7 +56,7 @@ const FontSettings: FC<IProps> = ({
       <div className="flex flex-col gap-24 overflow-y-auto px-24">
         <div className="flex flex-col gap-12">
           <ContentMeta label="Font Size" description="Adjust text size for better readability" />
-          <div className="flex gap-8">
+          <div className="flex flex-wrap gap-8 ">
             {sizePresets.map((preset) => (
               <DefaultButton
                 key={preset.label}
@@ -89,7 +89,7 @@ const FontSettings: FC<IProps> = ({
         </div>
         <div className="flex flex-col gap-12">
           <ContentMeta label="Font Weight" description="Control the thickness of text" />
-          <div className="flex gap-8">
+          <div className="flex flex-wrap gap-8">
             {weightPresets.map((preset) => (
               <DefaultButton
                 key={preset.label}

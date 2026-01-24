@@ -75,7 +75,7 @@ const LayoutSettings: FC<IProps> = ({
 
   return (
     <div className="flex flex-col gap-[36px] h-full w-full">
-      <div className="flex flex-row gap-12 items-center justify-between  px-24">
+      <div className="flex flex-row gap-12 items-center justify-between px-24">
         <Typography text="body">Layout</Typography>
         <DefaultButton
           onClick={onClickRestart}
