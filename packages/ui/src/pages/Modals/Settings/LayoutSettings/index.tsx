@@ -97,9 +97,7 @@ const LayoutSettings: FC<IProps> = ({
               step={item.step}
               value={item.value}
               onChange={(value) => {
-                if (value) {
-                  onClick(item.type, value)
-                }
+                onClick(item.type, value)
               }}
             />
           </div>
