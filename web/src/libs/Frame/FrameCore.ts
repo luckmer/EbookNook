@@ -164,6 +164,9 @@ export class Frame {
       'box-sizing': 'border-box',
       overflow: 'hidden',
       padding: `0px ${this.padding}px`,
+      'margin-bottom': this.chapterStyles.paragraphMargin
+        ? `${this.chapterStyles.paragraphMargin}px`
+        : '0px',
     }
 
     const bodyStyles = {
