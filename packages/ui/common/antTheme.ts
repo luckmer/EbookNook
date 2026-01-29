@@ -19,7 +19,6 @@ export const theme: ThemeConfig = {
       colorBgMask: 'rgba(0, 0, 0, 0.65)',
       colorText: '#FFFFFF',
       colorIcon: '#C9C9C9',
-
       colorIconHover: '#FFFFFF',
     },
     Modal: {
@@ -31,15 +30,12 @@ export const theme: ThemeConfig = {
     Segmented: {
       colorBgLayout: 'transparent',
       colorBgContainer: 'transparent',
-
       itemColor: '#C9C9C9',
       itemHoverColor: '#FFFFFF',
       itemSelectedColor: '#FFFFFF',
-
       itemHoverBg: '#242424',
       itemActiveBg: '#242424',
       itemSelectedBg: '#242424',
-
       colorIcon: '#C9C9C9',
       colorIconHover: '#FFFFFF',
     },
@@ -59,6 +55,34 @@ export const theme: ThemeConfig = {
       colorBgElevated: '#2D2D2D',
       colorBorder: '#424242',
       colorText: '#FFFFFF',
+    },
+    Slider: {
+      colorPrimary: '#474747',
+      colorPrimaryBorder: '#474747',
+      colorPrimaryHover: '#9A9A9A',
+      trackBg: '#474747',
+      trackHoverBg: '#9A9A9A',
+      handleColor: '#FFFFFF',
+      handleActiveColor: '#FFFFFF',
+      handleActiveOutlineColor: 'rgba(255, 255, 255, 0.2)',
+      railBg: '#333333',
+      railHoverBg: '#3F3F3F',
+      dotActiveBorderColor: '#474747',
+      colorText: '#FFFFFF',
+    },
+    InputNumber: {
+      colorBgContainer: '#2A2A2A',
+      colorBorder: '#303030',
+      colorText: '#FFFFFF',
+      colorTextDescription: '#9A9A9A',
+      colorPrimary: '#474747',
+      colorPrimaryHover: '#474747',
+      controlOutline: 'rgba(71, 71, 71, 0.1)',
+      hoverBorderColor: '#474747',
+      activeBorderColor: '#474747',
+      handleBg: '#333333',
+      handleActiveBg: '#202020',
+      handleHoverColor: '#FFFFFF',
     },
   },
 }

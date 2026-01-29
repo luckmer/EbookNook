@@ -29,6 +29,9 @@
       "@interfaces/*": [
         "../../web/src/interfaces/*"
       ],
+      "@hooks/*": [
+        "./src/hooks/*"
+      ],
       "@bindings/*": [
         "../../web/src-tauri/types/bindings/*"
       ],

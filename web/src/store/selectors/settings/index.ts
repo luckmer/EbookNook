@@ -11,7 +11,24 @@ export const settingsConfig = createSelector(
   settingsSelector.letterSpacing,
   settingsSelector.textIndent,
   settingsSelector.lineHeight,
-  (defaultFontSize, fontWeight, wordSpacing, letterSpacing, textIndent, lineHeight) => {
-    return { defaultFontSize, fontWeight, wordSpacing, letterSpacing, textIndent, lineHeight }
-  }
+  settingsSelector.paragraphMargin,
+  (
+    defaultFontSize,
+    fontWeight,
+    wordSpacing,
+    letterSpacing,
+    textIndent,
+    lineHeight,
+    paragraphMargin,
+  ) => {
+    return {
+      defaultFontSize,
+      fontWeight,
+      wordSpacing,
+      letterSpacing,
+      textIndent,
+      lineHeight,
+      paragraphMargin,
+    }
+  },
 )

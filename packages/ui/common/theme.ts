@@ -24,6 +24,8 @@ const theme = {
     surface: {
       100: '#2A2A2A',
       200: '#333333',
+      300: '#202020',
+      400: '#1e1e1e',
       modal: '#2E2E2E',
       drawer: '#242424',
       popover: '#2D2D2D',

@@ -17,6 +17,7 @@ export const Default: Story = {
         onClick={() => {}}
         onClickClose={() => {}}
         settings={{
+          paragraphMargin: 0,
           defaultFontSize: 0,
           fontWeight: 0,
           wordSpacing: 0,

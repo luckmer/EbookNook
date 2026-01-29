@@ -3,7 +3,7 @@ import ModalRoot from './index'
 
 const meta: Meta<typeof ModalRoot> = {
   component: ModalRoot,
-  title: 'Components/ModalRoot',
+  title: 'Components/Modals/ModalRoot',
 }
 
 export default meta

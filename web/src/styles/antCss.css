@@ -5,6 +5,7 @@
 
 .ant-modal-content {
   max-height: calc(100vh - 30px) !important;
+  padding: 0 !important;
   overflow: hidden;
   border-radius: 10px;
   width: 100%;
@@ -13,4 +14,12 @@
 
 .ant-modal-body {
   width: 100% !important;
+}
+
+.ant-slider-tooltip .ant-tooltip-inner {
+  background-color: #222222 !important;
+}
+
+.ant-slider-tooltip .ant-tooltip-arrow::before {
+  background: #222222 !important;
 }

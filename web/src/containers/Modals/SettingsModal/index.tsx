@@ -49,6 +49,10 @@ const SettingsModal = () => {
             dispatch(settingsActions.setResetLayoutSettings())
             break
           }
+          case SETTINGS.PARAGRAPH_MARGIN: {
+            dispatch(settingsActions.setParagraphMargin(value))
+            break
+          }
         }
       }}
       onClickClose={() => {

@@ -13,12 +13,15 @@ export const Default: Story = {
   render: () => {
     return (
       <LayoutSettings
+        paragraphMargin={0}
+        onClickRestart={() => {}}
         onClick={() => {}}
         wordSpacing={0}
         letterSpacing={0}
         textIndent={0}
-        lineHeight={0}
-      />
+        lineHeight={0}>
+        <div>Children</div>
+      </LayoutSettings>
     )
   },
 }
