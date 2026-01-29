@@ -35,6 +35,9 @@
       "@bindings/*": [
         "./src-tauri/types/bindings/*"
       ],
+      "@hooks/*": [
+        "../packages/ui/src/hooks/*"
+      ],
       "@static/*": [
         "./src/static/*"
       ],
