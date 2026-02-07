@@ -238,10 +238,13 @@ export class Epub {
       return
     }
 
+    if (+!savedOffset) return
+
     this.lastPath = path
 
     await this.frame.loadChapter(chapter.content)
-    this.frame.scrollToOffset(parseFloat(savedOffset))
+
+    this.frame.scrollToOffset(+savedOffset)
   }
 
   nextPage() {

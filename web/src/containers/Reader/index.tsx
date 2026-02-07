@@ -61,7 +61,7 @@ const ReaderRoot = () => {
         if (info.path !== savedPath || +info.offset !== +savedOffset) {
           dispatch(
             BookActions.setUpdateEpubBookProgress({
-              progress: [info.path, info.offset.toString()],
+              progress: [info.path, info.offset.toString(), info.percent.toString()],
               id: currentBook.book.id,
             }),
           )

@@ -85,15 +85,15 @@ impl EpubService {
         let now = chrono::Utc::now().timestamp();
 
         sqlx::query(UPDATE_EPUB_BOOK_PROGRESS)
-            .bind(new_progress) 
-            .bind(now) 
-            .bind(id)  
+            .bind(new_progress)
+            .bind(now)
+            .bind(id)
             .execute(conn)
             .await?;
 
         Ok(())
     }
-
+    
 
     pub async fn get_books(
         &self,

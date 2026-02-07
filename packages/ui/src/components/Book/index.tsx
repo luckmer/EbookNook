@@ -1,16 +1,18 @@
 import DefaultButton from '@components/Buttons/DefaultButton'
 import { Typography } from '@components/Typography'
+import { Progress } from 'antd'
 import { FC, memo } from 'react'
-import { IoIosInformationCircleOutline } from 'react-icons/io'
+import { TfiMenuAlt } from 'react-icons/tfi'
 
 export interface IProps {
   onClickDetails: () => void
   onClick: () => void
   img?: string
   title: string
+  progress: string
 }
 
-const Book: FC<IProps> = ({ img, title, onClick, onClickDetails }) => {
+const Book: FC<IProps> = ({ img, progress, title, onClick, onClickDetails }) => {
   return (
     <div
       className="flex flex-col p-12 w-full gap-12 rounded-6 cursor-pointer transition-colors duration-300 hover:bg-button-primary-hover/40"
@@ -20,13 +22,14 @@ const Book: FC<IProps> = ({ img, title, onClick, onClickDetails }) => {
         onClick()
       }}>
       <img className="rounded-6 h-full object-cover" src={img} />
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-12">
         <Typography text="small" ellipsis left>
           {title}
         </Typography>
-        <div className="flex flex-row items-center justify-end">
+        <div className="flex flex-row items-center  justify-between">
+          <Progress type="circle" percent={parseFloat(parseFloat(progress).toFixed(2))} size={18} />
           <DefaultButton onClick={onClickDetails}>
-            <IoIosInformationCircleOutline className="text-text-primary min-w-18 min-h-18" />
+            <TfiMenuAlt className="text-text-primary min-w-18 min-h-18 max-h-18 max-w-18" />
           </DefaultButton>
         </div>
       </div>

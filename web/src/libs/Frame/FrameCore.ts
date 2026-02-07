@@ -355,7 +355,6 @@ export class Frame {
   }
 
   public scrollToPage(page: number) {
-    this.isNavigating = true
     const maxPage = this.lockedTotalPages || this.totalPages
     this.currentPage = Math.max(1, Math.min(page, maxPage))
 
@@ -364,10 +363,6 @@ export class Frame {
     this.element.scrollLeft = offset
 
     this.progressCallback?.(this.currentPage, maxPage, this.element.scrollLeft)
-
-    requestAnimationFrame(() => {
-      this.isNavigating = false
-    })
   }
 
   public getTotalScrollWidth(): number {
@@ -375,8 +370,6 @@ export class Frame {
   }
 
   public scrollToOffset(offset: number) {
-    this.isNavigating = true
-
     const maxOffset = this.getTotalScrollWidth() - this.viewportWidth
     const clampedOffset = Math.max(0, Math.min(offset, maxOffset))
 
@@ -390,10 +383,6 @@ export class Frame {
       this.lockedTotalPages || this.totalPages,
       this.element.scrollLeft,
     )
-
-    requestAnimationFrame(() => {
-      this.isNavigating = false
-    })
   }
 
   private handleResize() {

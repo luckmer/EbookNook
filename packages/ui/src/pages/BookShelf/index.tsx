@@ -13,10 +13,11 @@ export interface IProps {
 
 const BookShelf: FC<IProps> = ({ books, onClickBook, onClickImportBook, onClickDetails }) => {
   return (
-    <div className="grid flex-1 grid-cols-3 px-4 sm:px-2 sm:grid-cols-4 md:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-12 gap-12 ">
+    <div className="grid flex-1 grid-cols-3 px-4 sm:px-2 sm:grid-cols-4 md:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-12 gap-12">
       {books.map((book, id) => (
         <Book
           key={id}
+          progress={book.progress.at(-1) ?? '0'}
           img={book.metadata.cover}
           title={book.metadata.title}
           onClickDetails={() => {
