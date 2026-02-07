@@ -74,7 +74,7 @@ const LayoutSettings: FC<IProps> = ({
   }, [wordSpacing, letterSpacing, textIndent, lineHeight, paragraphMargin])
 
   return (
-    <div className="flex flex-col gap-[36px] h-full w-full">
+    <div className="flex flex-col gap-[36px] h-full w-full min-h-[552px]">
       <div className="flex flex-row gap-12 items-center justify-between px-24">
         <Typography text="body">Layout</Typography>
         <DefaultButton
