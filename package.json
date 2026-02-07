@@ -11,7 +11,7 @@
     "storybook": "cd packages/ui && pnpm storybook",
     "build-storybook": "cd packages/ui && storybook build",
     "typecheck": "cd web && pnpm typecheck --noEmit && cd packages/ui && pnpm typecheck --noEmit",
-    "build": "cd web && pnpm build"
+    "build": "cd web && pnpm tauri:build"
   },
   "dependencies": {
     "@tailwindcss/postcss": "4.1.16",

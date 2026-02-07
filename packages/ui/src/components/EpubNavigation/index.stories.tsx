@@ -14,8 +14,6 @@ export const BannersStory: Story = {
     return (
       <EpubNavigation
         hideContent
-        currentPage={1}
-        totalPage={1}
         onClickNextChapter={() => {}}
         onClickPrevChapter={() => {}}
         onClickNextPage={() => {}}

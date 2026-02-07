@@ -3,11 +3,12 @@ import { actions as uiActions } from '@store/reducers/ui'
 import { actions as bookActions } from '@store/reducers/books'
 import { selectEpubMap } from '@store/selectors/books'
 import { uiSelector } from '@store/selectors/ui'
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 const ChaptersDrawerRoot = () => {
+  const [cache, setCache] = useState('')
   const booksMap = useSelector(selectEpubMap)
   const isOpen = useSelector(uiSelector.openChaptersDrawer)
   const navigate = useNavigate()
@@ -16,7 +17,15 @@ const ChaptersDrawerRoot = () => {
   const dispatch = useDispatch()
 
   const bookId = useMemo(() => location?.state?.id, [location])
-  const book = useMemo(() => booksMap[bookId], [bookId, booksMap])
+
+  const book = useMemo(() => booksMap[cache], [cache, booksMap])
+
+  useEffect(() => {
+    if (!bookId) return
+    if (bookId !== cache) {
+      setCache(bookId)
+    }
+  }, [bookId])
 
   return (
     <ChaptersDrawer

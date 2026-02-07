@@ -16,10 +16,14 @@
   width: 100% !important;
 }
 
-.ant-slider-tooltip .ant-tooltip-inner {
+.ant-tooltip-inner {
   background-color: #222222 !important;
 }
 
-.ant-slider-tooltip .ant-tooltip-arrow::before {
+.ant-tooltip-arrow::before {
   background: #222222 !important;
+}
+
+.ant-tooltip-inner {
+  background-color: #2d2d2d !important;
 }

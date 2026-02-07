@@ -19,7 +19,7 @@ export const BannersStory: Story = {
         onClickPrevChapter={() => {}}
         onClickNextPage={() => {}}
         onClickPrevPage={() => {}}
-        pageInfo={{ current: 1, total: 1 }}
+        pageInfo={{ current: 1, total: 1, percentage: 0 }}
         loading={false}
         hideContent
       />

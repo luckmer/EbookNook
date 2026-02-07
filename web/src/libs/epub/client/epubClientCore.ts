@@ -31,7 +31,7 @@ export default class EpubClientCore {
       author: metadata.author,
       sourceTitle: metadata.title,
       createdAt: Date.now(),
-      progress: ['', ''],
+      progress: ['', '', ''],
       downloadedAt: Date.now(),
       updatedAt: Date.now(),
       metadata,

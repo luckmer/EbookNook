@@ -82,7 +82,10 @@ const Settings: FC<IProps> = ({ isOpen, onClickClose, settings, onClick }) => {
             />
           </aside>
           <main
-            className={clsx('py-24  overflow-y-auto w-full', isMobile ? 'h-full' : 'h-[600px] ')}>
+            className={clsx(
+              'py-24  overflow-y-auto w-full',
+              isMobile ? 'h-full' : 'max-h-[600px]',
+            )}>
             <Switch>
               <Match when={option === OPTIONS.FONT}>
                 <FontSettings

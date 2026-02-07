@@ -1,3 +1,4 @@
+import { IProgressInfo } from '@interfaces/index'
 import { Epub } from '@libs/epub/epub'
 import Reader from '@pages/Reader'
 import { actions as BookActions } from '@store/reducers/books'
@@ -11,9 +12,15 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useLocation } from 'react-router-dom'
 
 const ReaderRoot = () => {
-  const [pageInfo, setPageInfo] = useState({ current: 1, total: 1, path: '' })
   const [bookId, setBookId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const [pageInfo, setPageInfo] = useState<IProgressInfo>({
+    current: 1,
+    total: 1,
+    path: '',
+    percent: 0,
+    offset: 0,
+  })
 
   const isFetchingStructure = useSelector(uiSelector.isFetchingStructure)
   const selectedChapter = useSelector(bookSelector.selectedChapter)
@@ -50,11 +57,11 @@ const ReaderRoot = () => {
         const currentBook = bookRef.current
         if (!currentBook) return
 
-        const [savedPath, savedPage] = currentBook.book.progress
-        if (info.path !== savedPath || info.current.toString() !== savedPage) {
+        const [savedPath, savedOffset] = currentBook.book.progress
+        if (info.path !== savedPath || +info.offset !== +savedOffset) {
           dispatch(
             BookActions.setUpdateEpubBookProgress({
-              progress: [info.path, info.current.toString()],
+              progress: [info.path, info.offset.toString(), info.percent.toString()],
               id: currentBook.book.id,
             }),
           )
@@ -69,8 +76,8 @@ const ReaderRoot = () => {
 
       const instance = new Epub(book)
       instance.renderTo('.book-content')
-      instance.progress((current, total, path) => {
-        setPageInfo({ current, total, path })
+      instance.progress((progress) => {
+        setPageInfo(progress)
       })
 
       viewRef.current = instance
@@ -88,21 +95,26 @@ const ReaderRoot = () => {
 
   useEffect(() => {
     if (viewRef.current && !isFetchingStructure) {
+      viewRef.current.setStyles(settings)
       setLoading(true)
+
       if (selectedChapter) {
         viewRef.current.display(selectedChapter).then(() => {
           setLoading(false)
         })
-      } else if (book?.book.progress?.every((p) => p.length > 0)) {
+        return
+      }
+
+      if (book?.book.progress.slice(0, 2)?.every((p) => p.length > 0)) {
         viewRef.current.loadProgress(book.book.progress).then(() => {
           setLoading(false)
         })
-      } else {
-        viewRef.current.display().then(() => {
-          setLoading(false)
-        })
+        return
       }
-      setLoading(false)
+
+      viewRef.current.display().then(() => {
+        setLoading(false)
+      })
     }
   }, [selectedChapter, isFetchingStructure, book?.book.id])
 
@@ -126,7 +138,11 @@ const ReaderRoot = () => {
 
   return (
     <Reader
-      pageInfo={pageInfo}
+      pageInfo={{
+        percentage: pageInfo.percent,
+        current: pageInfo.current,
+        total: pageInfo.total,
+      }}
       loading={loading || !book}
       hideContent={hideContent}
       onHideHeader={handleHideHeader}

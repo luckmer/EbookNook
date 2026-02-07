@@ -52,7 +52,7 @@ export const Header: FC<IProps> = ({
       </Show>
       <Show when={!!bookName}>
         <div
-          className="w-full flex items-center justify-center overflow-hidden max-[470px]:hidden"
+          className="w-full flex items-center justify-center overflow-hidden max-[470px]:hidden pointer-events-none"
           data-tauri-drag-region>
           <Typography text="caption" color="white" ellipsis>
             {bookName}
