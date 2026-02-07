@@ -1,9 +1,9 @@
 <div align="center">
-<img src="https://github.com/user-attachments/assets/d4b1a076-07c2-4949-b548-b6aadba12651" width="45%" />
-<img src="https://github.com/user-attachments/assets/a44c9777-1b6c-4627-bea0-f54d019ce2a8" width="45%" />
+<img src="https://github.com/user-attachments/assets/d4b1a076-07c2-4949-b548-b6aadba12651" width="91%" />
+  
 </div>
 <div align="center">
-<img src="https://github.com/user-attachments/assets/f6afa9b4-4e2c-4077-b3f1-56a5ef519257" width="45%" />
+<img src="https://github.com/user-attachments/assets/a44c9777-1b6c-4627-bea0-f54d019ce2a8" width="45%" />
 <img src="https://github.com/user-attachments/assets/6d5246ed-1590-4531-a17f-0ef0ad71f365" width="45%" />
 </div>
 <div align="center">
