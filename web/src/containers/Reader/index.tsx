@@ -95,13 +95,16 @@ const ReaderRoot = () => {
 
   useEffect(() => {
     if (viewRef.current && !isFetchingStructure) {
+      viewRef.current.setStyles(settings)
       setLoading(true)
+
       if (selectedChapter) {
         viewRef.current.display(selectedChapter).then(() => {
           setLoading(false)
         })
         return
       }
+
       if (book?.book.progress.slice(0, 2)?.every((p) => p.length > 0)) {
         viewRef.current.loadProgress(book.book.progress).then(() => {
           setLoading(false)
@@ -112,7 +115,6 @@ const ReaderRoot = () => {
       viewRef.current.display().then(() => {
         setLoading(false)
       })
-      setLoading(false)
     }
   }, [selectedChapter, isFetchingStructure, book?.book.id])
 
