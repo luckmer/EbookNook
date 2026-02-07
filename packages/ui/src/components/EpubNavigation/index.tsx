@@ -1,5 +1,4 @@
 import DefaultButton from '@components/Buttons/DefaultButton'
-import { Typography } from '@components/Typography'
 import clsx from 'clsx'
 import { FC, memo, ReactNode } from 'react'
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa6'
@@ -10,8 +9,6 @@ export interface IProps {
   onClickPrevPage: () => void
   onClickNextChapter: () => void
   onClickPrevChapter: () => void
-  currentPage: number
-  totalPage: number
   hideContent: boolean
 }
 
@@ -21,17 +18,15 @@ const EpubNavigation: FC<IProps> = ({
   onClickNextPage,
   onClickPrevChapter,
   onClickPrevPage,
-  currentPage,
   hideContent,
-  totalPage,
 }) => {
   return (
     <div className="w-full h-full flex flex-col">
       {children}
       <div
         className={clsx(
-          'flex flex-row justify-between items-center w-full transition-opacity duration-300 px-12 pb-12',
-          hideContent ? 'opacity-0' : 'opacity-100'
+          'flex flex-row justify-between items-center w-full transition-opacity duration-300 px-12 py-12 z-10 bg-deep',
+          hideContent ? 'opacity-0' : 'opacity-100',
         )}>
         <div className="flex flex-row gap-6">
           <DefaultButton
@@ -45,9 +40,6 @@ const EpubNavigation: FC<IProps> = ({
             <FaChevronLeft className="w-18 h-18 transition-colors duration-200" />
           </DefaultButton>
         </div>
-        <Typography>
-          {currentPage} / {totalPage}
-        </Typography>
         <div className="flex flex-row gap-6">
           <DefaultButton
             onClick={onClickNextPage}

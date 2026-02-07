@@ -1,3 +1,4 @@
+import { IProgressInfo } from '@interfaces/index'
 import { Epub } from '@libs/epub/epub'
 import Reader from '@pages/Reader'
 import { actions as BookActions } from '@store/reducers/books'
@@ -11,9 +12,16 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useLocation } from 'react-router-dom'
 
 const ReaderRoot = () => {
-  const [pageInfo, setPageInfo] = useState({ current: 1, total: 1, path: '' })
   const [bookId, setBookId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const [pageInfo, setPageInfo] = useState<IProgressInfo>({
+    current: 1,
+    total: 1,
+    path: '',
+    chapterPage: 1,
+    chapterTotal: 1,
+    percent: 0,
+  })
 
   const isFetchingStructure = useSelector(uiSelector.isFetchingStructure)
   const selectedChapter = useSelector(bookSelector.selectedChapter)
@@ -69,8 +77,8 @@ const ReaderRoot = () => {
 
       const instance = new Epub(book)
       instance.renderTo('.book-content')
-      instance.progress((current, total, path) => {
-        setPageInfo({ current, total, path })
+      instance.progress((progress) => {
+        setPageInfo(progress)
       })
 
       viewRef.current = instance
@@ -126,7 +134,11 @@ const ReaderRoot = () => {
 
   return (
     <Reader
-      pageInfo={pageInfo}
+      pageInfo={{
+        percentage: pageInfo.percent,
+        current: pageInfo.current,
+        total: pageInfo.total,
+      }}
       loading={loading || !book}
       hideContent={hideContent}
       onHideHeader={handleHideHeader}
