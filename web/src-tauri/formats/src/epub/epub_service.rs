@@ -1,5 +1,5 @@
 use database::{
-    DatabaseManager, INSERT_EPUB_BOOK, INSERT_EPUB_CHAPTERS, INSERT_EPUB_TOC,
+    DELETE_EPUB_TABLE, DatabaseManager, INSERT_EPUB_BOOK, INSERT_EPUB_CHAPTERS, INSERT_EPUB_TOC,
     SELECT_EPUB_CHAPTERS_BY_ID, SELECT_EPUB_TOC_BY_ID, UPDATE_EPUB_BOOK_PROGRESS,
 };
 
@@ -93,7 +93,29 @@ impl EpubService {
 
         Ok(())
     }
-    
+
+    pub async fn delete_epub_book(
+        &self,
+        db: &DatabaseManager,
+        id: String,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        let conn = db.get_pool();
+        sqlx::query(DELETE_EPUB_TABLE)
+            .bind(id)
+            .execute(conn)
+            .await?;
+
+        Ok(())
+    }
+
+    pub async fn edit_epub_book(
+        &self,
+        db: &DatabaseManager,
+        id: String,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        // TODO: implement edit
+        Ok(())
+    }
 
     pub async fn get_books(
         &self,

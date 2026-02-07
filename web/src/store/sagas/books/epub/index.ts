@@ -2,7 +2,6 @@ import { EpubStructure } from '@bindings/epub'
 import { PayloadAction } from '@reduxjs/toolkit'
 import { actions, PayloadTypes } from '@store/reducers/books'
 import { actions as uiActions } from '@store/reducers/ui'
-
 import { selectEpubMap } from '@store/selectors/books'
 import { invoke } from '@tauri-apps/api/core'
 import { call, put, select } from 'typed-redux-saga'
@@ -39,6 +38,25 @@ export function* updateEpubBookProgress(
     yield* call(invoke, 'set_epub_book_progress', action.payload)
   } catch (err) {
     console.log(err)
-    console.log('failed to open document')
+    console.log('failed to update epub book progress')
+  }
+}
+
+export function* deleteEpubBook(action: PayloadAction<PayloadTypes['deleteEpub']>) {
+  try {
+    yield* call(invoke, 'delete_epub_book', { id: action.payload })
+    yield* put(actions.removeEpub(action.payload))
+  } catch (err) {
+    console.log(err)
+    console.log('failed to remove epub')
+  }
+}
+
+export function* editEpubBook(action: PayloadAction<PayloadTypes['editEpub']>) {
+  try {
+    yield* call(invoke, 'edit_epub_book', { id: action.payload })
+  } catch (err) {
+    console.log(err)
+    console.log('failed to edit epub')
   }
 }

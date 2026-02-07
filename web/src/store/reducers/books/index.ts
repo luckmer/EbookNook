@@ -77,6 +77,11 @@ export const store = createSlice({
       return state
     },
 
+    removeEpub(state, action: PayloadAction<string>) {
+      state.books.epub = state.books.epub.filter((epub) => epub.book.id !== action.payload)
+      return state
+    },
+
     editEpub(state) {
       return state
     },

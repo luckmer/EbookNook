@@ -39,7 +39,9 @@ fn main() {
             commands::get_books,
             commands::add_epub_book,
             commands::get_epub_structure_by_id,
-            commands::set_epub_book_progress
+            commands::set_epub_book_progress,
+            commands::delete_epub_book,
+            commands::edit_epub_book,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

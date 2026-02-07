@@ -59,4 +59,28 @@ impl FormatsService {
 
         Ok(())
     }
+
+    pub async fn delete_epub_book(
+        &self,
+        db: &DatabaseManager,
+        id: String,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        let epub_service = init_epub_service();
+
+        epub_service.delete_epub_book(db, id).await?;
+
+        Ok(())
+    }
+
+    pub async fn edit_epub_book(
+        &self,
+        db: &DatabaseManager,
+        id: String,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        let epub_service = init_epub_service();
+
+        epub_service.edit_epub_book(db, id).await?;
+
+        Ok(())
+    }
 }
