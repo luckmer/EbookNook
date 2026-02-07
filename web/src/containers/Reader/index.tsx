@@ -100,15 +100,18 @@ const ReaderRoot = () => {
         viewRef.current.display(selectedChapter).then(() => {
           setLoading(false)
         })
-      } else if (book?.book.progress?.every((p) => p.length > 0)) {
+        return
+      }
+      if (book?.book.progress.slice(0, 2)?.every((p) => p.length > 0)) {
         viewRef.current.loadProgress(book.book.progress).then(() => {
           setLoading(false)
         })
-      } else {
-        viewRef.current.display().then(() => {
-          setLoading(false)
-        })
+        return
       }
+
+      viewRef.current.display().then(() => {
+        setLoading(false)
+      })
       setLoading(false)
     }
   }, [selectedChapter, isFetchingStructure, book?.book.id])
