@@ -1,9 +1,12 @@
+import DefaultButton from '@components/Buttons/DefaultButton'
 import Modal from '@components/Modals/Modal'
 import ModalHeader from '@components/Modals/ModalHeader'
 import Show from '@components/Show'
 import { Typography } from '@components/Typography'
 import clsx from 'clsx'
 import { FC, useEffect, useRef } from 'react'
+import { MdEdit } from 'react-icons/md'
+import { IoTrashBin } from 'react-icons/io5'
 
 export interface IBook {
   bookDescription?: string
@@ -15,12 +18,20 @@ export interface IBook {
 }
 
 export interface IProps {
+  onClickDelete: () => void
+  onClickEdit: () => void
   onClickClose: () => void
   book: IBook
   isOpen: boolean
 }
 
-const BookOverviewModal: FC<IProps> = ({ onClickClose, isOpen, book }) => {
+const BookOverviewModal: FC<IProps> = ({
+  onClickClose,
+  onClickDelete,
+  onClickEdit,
+  isOpen,
+  book,
+}) => {
   const refIframe = useRef<HTMLIFrameElement>(null)
   const bookDesc = book.bookDescription
 
@@ -80,47 +91,63 @@ const BookOverviewModal: FC<IProps> = ({ onClickClose, isOpen, book }) => {
       centered
       width={500}
       closable={false}>
-      <div className="flex flex-col gap-[20px] h-full w-full overflow-hidden max-h-[700px]">
+      <div className="flex flex-col  h-full w-full overflow-hidden max-h-[700px]">
         <ModalHeader onClickClose={onClickClose} label="Book overview" />
-        <div className="flex flex-col gap-24 overflow-y-auto w-full flex-1 p-24">
-          <div className="flex flex-row gap-24">
-            <img
-              src={book.cover}
-              alt="cover"
-              loading="lazy"
-              className="rounded-6  max-h-[200px] min-h-[200px] min-w-[130px] max-w-[130px] object-cover bg-neutral-800"
-            />
-            <div className="flex flex-col justify-between py-4">
-              <div className="flex flex-col gap-8">
-                <Typography text="h2">{book?.author || 'Unknown Author'}</Typography>
-                <Typography text="caption" color="secondary">
-                  {book?.title || 'Unknown title'}
-                </Typography>
-              </div>
-              <div className="flex flex-col gap-8">
-                <Typography text="body">{book?.published || 'Unknown date'}</Typography>
-                <Typography text="caption" color="secondary">
-                  {book?.publisher || 'Unknown publisher'}
-                </Typography>
+        <div className="flex flex-col overflow-y-auto w-full flex-1 p-24">
+          <div className="flex flex-row items-center justify-end gap-12 w-full">
+            <DefaultButton
+              onClick={onClickDelete}
+              className="p-6 hover:bg-button-primary-hover rounded-4 duration-150">
+              <IoTrashBin className="text-status-error min-w-18 min-h-18" />
+            </DefaultButton>
+            <DefaultButton
+              onClick={onClickEdit}
+              className="p-6 hover:bg-button-primary-hover rounded-4 duration-150">
+              <MdEdit className="min-w-18 min-h-18" />
+            </DefaultButton>
+          </div>
+          <div className="flex flex-col gap-24">
+            <div className="flex flex-row gap-24">
+              <img
+                src={book.cover}
+                alt="cover"
+                loading="lazy"
+                className="rounded-6  max-h-[200px] min-h-[200px] min-w-[130px] max-w-[130px] object-cover bg-neutral-800"
+              />
+              <div className="flex flex-col justify-between items-start py-4  ">
+                <div className="flex flex-col gap-24 py-4">
+                  <div className="flex flex-col gap-8">
+                    <Typography text="h2">{book?.author || 'Unknown Author'}</Typography>
+                    <Typography text="caption" color="secondary">
+                      {book?.title || 'Unknown title'}
+                    </Typography>
+                  </div>
+                  <div className="flex flex-col gap-8">
+                    <Typography text="body">{book?.published || 'Unknown date'}</Typography>
+                    <Typography text="caption" color="secondary">
+                      {book?.publisher || 'Unknown publisher'}
+                    </Typography>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-          <div className="flex flex-col gap-12">
-            <Typography text="body" color="white">
-              Description
-            </Typography>
-            <Show when={!bookDesc}>
-              <Typography text="caption" color="secondary">
-                No description
+            <div className="flex flex-col gap-12">
+              <Typography text="body" color="white">
+                Description
               </Typography>
-            </Show>
-            <div className={clsx('w-full', !bookDesc && 'hidden')}>
-              <iframe
-                title="book-description"
-                ref={refIframe}
-                scrolling="no"
-                className="w-full border-0 transition-all duration-200"
-              />
+              <Show when={!bookDesc}>
+                <Typography text="caption" color="secondary">
+                  No description
+                </Typography>
+              </Show>
+              <div className={clsx('w-full', !bookDesc && 'hidden')}>
+                <iframe
+                  title="book-description"
+                  ref={refIframe}
+                  scrolling="no"
+                  className="w-full border-0 transition-all duration-200"
+                />
+              </div>
             </div>
           </div>
         </div>

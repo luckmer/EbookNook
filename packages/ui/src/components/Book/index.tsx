@@ -15,7 +15,7 @@ export interface IProps {
 const Book: FC<IProps> = ({ img, progress, title, onClick, onClickDetails }) => {
   return (
     <div
-      className="flex flex-col p-12 w-full gap-12 rounded-6 cursor-pointer transition-colors duration-300 hover:bg-button-primary-hover/40"
+      className="group flex flex-col p-12 w-full gap-12 rounded-6 cursor-pointer transition-colors duration-300 hover:bg-button-primary-hover/40"
       onClick={(e) => {
         e.preventDefault()
         e.stopPropagation()
@@ -26,9 +26,11 @@ const Book: FC<IProps> = ({ img, progress, title, onClick, onClickDetails }) => 
         <Typography text="small" ellipsis left>
           {title}
         </Typography>
-        <div className="flex flex-row items-center  justify-between">
+        <div className="flex flex-row items-center  justify-between ">
           <Progress type="circle" percent={parseFloat(parseFloat(progress).toFixed(2))} size={18} />
-          <DefaultButton onClick={onClickDetails}>
+          <DefaultButton
+            onClick={onClickDetails}
+            className="group-hover:opacity-100 opacity-0 duration-300 transition-opacity">
             <TfiMenuAlt className="text-text-primary min-w-18 min-h-18 max-h-18 max-w-18" />
           </DefaultButton>
         </div>

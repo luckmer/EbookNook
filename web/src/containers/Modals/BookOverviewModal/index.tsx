@@ -1,5 +1,6 @@
 import BookOverviewModal from '@pages/Modals/BookOverviewModal'
 import { actions } from '@store/reducers/ui'
+import { actions as bookActions } from '@store/reducers/books/index'
 import { selectEpubMap } from '@store/selectors/books'
 import { uiSelector } from '@store/selectors/ui'
 import { useMemo } from 'react'
@@ -26,6 +27,13 @@ const BookOverviewModalRoot = () => {
       }}
       onClickClose={() => {
         dispatch(actions.setOpenBookOverviewModal({ status: false, bookId: '' }))
+      }}
+      onClickDelete={() => {
+        dispatch(bookActions.deleteEpub(book?.book.id ?? ''))
+        dispatch(actions.setOpenBookOverviewModal({ status: false, bookId: '' }))
+      }}
+      onClickEdit={() => {
+        dispatch(bookActions.editEpub())
       }}
       isOpen={openSettingsModal.status}
     />
