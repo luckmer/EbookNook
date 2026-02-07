@@ -22,7 +22,7 @@ export class EpubMetadataParser {
       .filter((s): s is string => !!s)
   }
 
-  async parse(file: File, xml: IXML): Promise<Metadata> {
+  public async parse(file: File, xml: IXML): Promise<Metadata> {
     const metadataEl = xml.doc.querySelector('metadata')
     if (!metadataEl) throw new Error('No metadata found')
 
@@ -78,9 +78,20 @@ export class EpubMetadataParser {
 
       if (!coverPath) return
 
-      const normalized = (xml.basePath + coverPath).replace(/\\/g, '/')
-      const file = xml.zip.file(normalized)
-      if (!file) return
+      if (coverPath.match(/\.(x?html?)$/i)) {
+        coverPath = await this.extractImageFromCoverHTML(xml, coverPath)
+        if (!coverPath) return
+      }
+
+      const normalized = this.normalizePath(xml.basePath, coverPath)
+
+      let file = xml.zip.file(normalized)
+      if (!file) file = xml.zip.file(coverPath)
+      if (!file) file = xml.zip.file(decodeURIComponent(normalized))
+
+      if (!file) {
+        return
+      }
 
       const base64Data = await file.async('base64')
 
@@ -89,10 +100,53 @@ export class EpubMetadataParser {
       if (extension === 'png') mimeType = 'image/png'
       if (extension === 'webp') mimeType = 'image/webp'
       if (extension === 'gif') mimeType = 'image/gif'
+      if (extension === 'svg') mimeType = 'image/svg+xml'
 
       meta.cover = `data:${mimeType};base64,${base64Data}`
-    } catch (error) {
-      console.error('Failed to extract cover:', error)
+    } catch {}
+  }
+
+  private async extractImageFromCoverHTML(xml: IXML, htmlPath: string): Promise<string> {
+    try {
+      const normalized = this.normalizePath(xml.basePath, htmlPath)
+      let file = xml.zip.file(normalized)
+      if (!file) file = xml.zip.file(htmlPath)
+
+      if (!file) return ''
+
+      const htmlContent = await file.async('text')
+      const parser = new DOMParser()
+      const htmlDoc = parser.parseFromString(htmlContent, 'text/html')
+
+      const imgTag = htmlDoc.querySelector('img')
+      if (!imgTag) return ''
+
+      const imgSrc = imgTag.getAttribute('src')
+      if (!imgSrc) return ''
+
+      const htmlDir = htmlPath.substring(0, htmlPath.lastIndexOf('/') + 1)
+      return this.normalizePath(htmlDir, imgSrc)
+    } catch {
+      return ''
     }
+  }
+
+  private normalizePath(basePath: string, relativePath: string): string {
+    relativePath = relativePath.replace(/^\/+/, '')
+    let combined = basePath + relativePath
+    combined = combined.replace(/\\/g, '/')
+
+    const parts = combined.split('/')
+    const resolved: string[] = []
+
+    for (const part of parts) {
+      if (part === '..') {
+        resolved.pop()
+      } else if (part !== '.' && part !== '') {
+        resolved.push(part)
+      }
+    }
+
+    return resolved.join('/')
   }
 }

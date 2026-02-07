@@ -195,10 +195,10 @@ export class Epub {
 
     const [basePath, anchorId] = href.split('#')
     const path = this.formatHref(basePath)
+
     const chapter = this.chapterByPath[path]
 
     if (!chapter) {
-      console.log(`Chapter not found for path: ${path}`)
       return
     }
 
@@ -209,6 +209,15 @@ export class Epub {
       await this.frame.loadChapter(chapter.content)
     }
 
+    if (anchorId) {
+      const anchor = this.getHTMLFragment(this.frame.document, anchorId)
+      if (anchor) {
+        const anchorLeft = anchor.getBoundingClientRect().left
+        this.frame.scrollToOffset(anchorLeft)
+        return
+      }
+    }
+
     let targetPage = 1
 
     if (lastPage) {
@@ -217,8 +226,6 @@ export class Epub {
       const pagesBefore = this.getPagesBefore(chapterIndex)
       const chapterStaticPages = Math.max(1, Math.ceil(chapter.len / STATIC_UNIT))
       this.currentStaticPage = pagesBefore + chapterStaticPages
-    } else if (anchorId) {
-      this.updateStaticPage(targetPage, this.frame.getTotalPages())
     } else if (isNewChapter) {
       const chapterIndex = this.chapters.findIndex((c) => this.formatHref(c.href) === this.lastPath)
       this.currentStaticPage = this.getPagesBefore(chapterIndex) + 1

@@ -72,6 +72,14 @@ export const store = createSlice({
 
       return state
     },
+
+    deleteEpub(state, _: PayloadAction<string>) {
+      return state
+    },
+
+    editEpub(state) {
+      return state
+    },
   },
 })
 
