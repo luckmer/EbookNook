@@ -145,16 +145,16 @@ export class Epub {
   }
 
   progress(callback: (data: IProgressInfo) => void) {
-    this.frame.progress((curr, tot) => {
+    this.frame.progress((curr, tot, offset) => {
       const chapter = this.chapterByPath[this.lastPath]
+
       if (!chapter) {
         callback({
           path: this.lastPath,
-          chapterPage: curr,
-          chapterTotal: tot,
           current: 1,
           percent: 0,
           total: 1,
+          offset: 0,
         })
         return
       }
@@ -175,8 +175,7 @@ export class Epub {
         current: this.currentStaticPage,
         total: this.totalPages,
         path: this.lastPath,
-        chapterPage: curr,
-        chapterTotal: tot,
+        offset: offset,
       })
     })
   }
@@ -229,7 +228,7 @@ export class Epub {
   }
 
   async loadProgress(progress: Progress) {
-    const [chapterHref, page] = progress
+    const [chapterHref, savedOffset] = progress
 
     const path = this.formatHref(chapterHref)
     const chapter = this.chapterByPath[path]
@@ -240,10 +239,9 @@ export class Epub {
     }
 
     this.lastPath = path
-    await this.frame.loadChapter(chapter.content)
 
-    this.frame.scrollToPage(+page)
-    this.updateStaticPage(+page, this.frame.getTotalPages())
+    await this.frame.loadChapter(chapter.content)
+    this.frame.scrollToOffset(parseFloat(savedOffset))
   }
 
   nextPage() {

@@ -18,9 +18,8 @@ const ReaderRoot = () => {
     current: 1,
     total: 1,
     path: '',
-    chapterPage: 1,
-    chapterTotal: 1,
     percent: 0,
+    offset: 0,
   })
 
   const isFetchingStructure = useSelector(uiSelector.isFetchingStructure)
@@ -58,11 +57,11 @@ const ReaderRoot = () => {
         const currentBook = bookRef.current
         if (!currentBook) return
 
-        const [savedPath, savedPage] = currentBook.book.progress
-        if (info.path !== savedPath || info.current.toString() !== savedPage) {
+        const [savedPath, savedOffset] = currentBook.book.progress
+        if (info.path !== savedPath || +info.offset !== +savedOffset) {
           dispatch(
             BookActions.setUpdateEpubBookProgress({
-              progress: [info.path, info.current.toString()],
+              progress: [info.path, info.offset.toString()],
               id: currentBook.book.id,
             }),
           )

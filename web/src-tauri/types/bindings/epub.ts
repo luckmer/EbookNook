@@ -2,6 +2,8 @@
 
 export type Book = { id: string, url?: string, format: string, title: string, sourceTitle?: string, author: string, groupId?: string, groupName?: string, tags?: Array<string>, coverImageUrl?: string, createdAt: number, updatedAt: number, deletedAt?: string, uploadedAt?: string, downloadedAt?: number, coverDownloadedAt?: string, lastUpdated?: string, primaryLanguage?: string, metadata: Metadata, progress: Progress, };
 
+export type BookOffset = string;
+
 export type Chapter = { id: string, href: string, index: number, content: string, };
 
 export type ChapterContentNumber = string;
@@ -12,10 +14,8 @@ export type EpubStructure = { toc: Array<Toc>, chapters: Array<Chapter>, };
 
 export type Metadata = { identifier?: string, title: string, author: string, language?: Array<string>, description?: string, publisher?: string, published?: string, modified?: string, subject?: Array<string>, rights?: string, cover?: string, seriesName?: string, seriesPosition?: number, };
 
-export type Progress = [ChapterContentNumber, TocLeftNumberProgress];
+export type Progress = [ChapterContentNumber, BookOffset];
 
 export type Series = { name: string, position: string, };
 
 export type Toc = { id: string, href: string, label: string, parent?: string, subitems: Array<Toc>, };
-
-export type TocLeftNumberProgress = string;

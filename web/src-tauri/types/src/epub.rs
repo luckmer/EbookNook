@@ -69,11 +69,11 @@ pub struct ChapterContentNumber(pub String);
 
 #[derive(Serialize, Deserialize, Debug, Clone, TS)]
 #[ts(export, export_to = "epub.ts")]
-pub struct TocLeftNumberProgress(pub String);
+pub struct BookOffset(pub String);
 
 #[derive(Serialize, Deserialize, Debug, Clone, TS)]
 #[ts(export, export_to = "epub.ts")]
-pub struct Progress(pub ChapterContentNumber, pub TocLeftNumberProgress);
+pub struct Progress(pub ChapterContentNumber, pub BookOffset);
 
 #[derive(Serialize, Deserialize, Debug, Clone, TS)]
 #[ts(export, export_to = "epub.ts")]

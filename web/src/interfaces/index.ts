@@ -3,6 +3,5 @@ export interface IProgressInfo {
   total: number
   percent: number
   path: string
-  chapterPage: number
-  chapterTotal: number
+  offset: number
 }

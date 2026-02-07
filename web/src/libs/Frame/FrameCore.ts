@@ -12,7 +12,7 @@ export class Frame {
   private totalPages = 1
   private padding = 20
   private queue: Promise<void> = Promise.resolve()
-  private progressCallback?: (current: number, total: number) => void
+  private progressCallback?: (current: number, total: number, offset: number) => void
   private linkClickCallback?: (href: string) => void
   private blobUrl?: string
   private chapterStyles: Partial<ISettingsState> = {}
@@ -95,9 +95,9 @@ export class Frame {
     }
   }
 
-  progress(callback: (current: number, total: number) => void) {
+  progress(callback: (current: number, total: number, offset: number) => void) {
     this.progressCallback = callback
-    callback(this.currentPage, this.lockedTotalPages || this.totalPages)
+    callback(this.currentPage, this.lockedTotalPages || this.totalPages, this.element.scrollLeft)
   }
 
   private enqueue(action: () => Promise<void>) {
@@ -233,7 +233,12 @@ export class Frame {
 
       if (this.currentPage !== page) {
         this.currentPage = page
-        this.progressCallback?.(this.currentPage, this.lockedTotalPages || this.totalPages)
+
+        this.progressCallback?.(
+          this.currentPage,
+          this.lockedTotalPages || this.totalPages,
+          this.element.scrollLeft,
+        )
       }
     }
 
@@ -278,7 +283,7 @@ export class Frame {
 
           this.observer.observe(this.element)
 
-          this.progressCallback?.(this.currentPage, this.lockedTotalPages)
+          this.progressCallback?.(this.currentPage, this.lockedTotalPages, this.element.scrollLeft)
           resolve()
         }
       })
@@ -355,9 +360,36 @@ export class Frame {
     this.currentPage = Math.max(1, Math.min(page, maxPage))
 
     const offset = (this.currentPage - 1) * this.viewportWidth
+
     this.element.scrollLeft = offset
 
-    this.progressCallback?.(this.currentPage, maxPage)
+    this.progressCallback?.(this.currentPage, maxPage, this.element.scrollLeft)
+
+    requestAnimationFrame(() => {
+      this.isNavigating = false
+    })
+  }
+
+  public getTotalScrollWidth(): number {
+    return this.getTotalPages() * this.viewportWidth
+  }
+
+  public scrollToOffset(offset: number) {
+    this.isNavigating = true
+
+    const maxOffset = this.getTotalScrollWidth() - this.viewportWidth
+    const clampedOffset = Math.max(0, Math.min(offset, maxOffset))
+
+    this.element.scrollLeft = clampedOffset
+
+    const page = Math.floor(clampedOffset / this.viewportWidth) + 1
+    this.currentPage = Math.min(page, this.lockedTotalPages || this.totalPages)
+
+    this.progressCallback?.(
+      this.currentPage,
+      this.lockedTotalPages || this.totalPages,
+      this.element.scrollLeft,
+    )
 
     requestAnimationFrame(() => {
       this.isNavigating = false
