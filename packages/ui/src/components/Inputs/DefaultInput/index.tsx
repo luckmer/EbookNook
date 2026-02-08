@@ -18,7 +18,7 @@ const DefaultInput: FC<IProps> = ({ id, name, className, placeholder, value, onC
       className={clsx(
         'w-full',
         'placeholder:text-[14px] placeholder:text-text-primary/60 text-text-primary outline-none',
-        className
+        className,
       )}
       placeholder={placeholder}
       value={value}

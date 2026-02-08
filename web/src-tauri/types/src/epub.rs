@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
@@ -162,4 +164,20 @@ pub struct Epub {
 pub struct EpubStructure {
     pub toc: Vec<Toc>,
     pub chapters: Vec<Chapter>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deserialize, Serialize)]
+#[serde(rename_all = "lowercase")]
+pub enum NewEpubBookContent {
+    Author,
+    Description,
+    Published,
+    Publisher,
+    Title,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct EditEpubPayload {
+    pub id: String,
+    pub content: HashMap<NewEpubBookContent, String>,
 }

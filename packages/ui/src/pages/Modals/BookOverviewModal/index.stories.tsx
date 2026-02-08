@@ -13,6 +13,8 @@ export const Default: Story = {
   render: () => {
     return (
       <BookOverviewModal
+        onClickDelete={() => {}}
+        onClickEdit={() => {}}
         book={{
           bookDescription: 'description',
           cover: 'cover',

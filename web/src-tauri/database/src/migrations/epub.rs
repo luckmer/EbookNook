@@ -69,3 +69,7 @@ INSERT INTO epub_chapters_table (id, chapters) VALUES (?, ?);
 pub const SELECT_EPUB_CHAPTERS_BY_ID: &str = r#"
 SELECT chapters FROM epub_chapters_table WHERE id = ?;
 "#;
+
+pub const DELETE_EPUB_TABLE: &str = r#"
+DELETE FROM epub_table WHERE id = ?;
+"#;

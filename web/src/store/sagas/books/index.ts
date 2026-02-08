@@ -6,7 +6,7 @@ import { actions as uiActions } from '@store/reducers/ui'
 import { invoke } from '@tauri-apps/api/core'
 import { getDocumentLoader } from 'src/libs/document'
 import { all, call, put, takeEvery, takeLatest, takeLeading } from 'typed-redux-saga'
-import { getEpubStructure, updateEpubBookProgress } from './epub'
+import { deleteEpubBook, editEpubBook, getEpubStructure, updateEpubBookProgress } from './epub'
 
 export function* loadState() {
   yield* put(uiActions.setIsLoadingState(true))
@@ -44,7 +44,15 @@ export function* getEpubStructureSaga() {
 }
 
 export function* updateEpubBookProgressSaga() {
-  yield takeLeading(actions.setUpdateEpubBookProgress, updateEpubBookProgress)
+  yield* takeLeading(actions.setUpdateEpubBookProgress, updateEpubBookProgress)
+}
+
+export function* deleteEpubSaga() {
+  yield* takeEvery(actions.deleteEpub, deleteEpubBook)
+}
+
+export function* editEpubSaga() {
+  yield* takeEvery(actions.editEpub, editEpubBook)
 }
 
 export default function* RootSaga() {
@@ -53,5 +61,7 @@ export default function* RootSaga() {
     loadStateSaga(),
     getEpubStructureSaga(),
     updateEpubBookProgressSaga(),
+    deleteEpubSaga(),
+    editEpubSaga(),
   ])
 }

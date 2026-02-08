@@ -1,9 +1,17 @@
+import DefaultButton from '@components/Buttons/DefaultButton'
+import ContentArea from '@components/Inputs/ContentArea'
+import ContentInput from '@components/Inputs/ContentInput'
 import Modal from '@components/Modals/Modal'
 import ModalHeader from '@components/Modals/ModalHeader'
 import Show from '@components/Show'
 import { Typography } from '@components/Typography'
 import clsx from 'clsx'
-import { FC, useEffect, useRef } from 'react'
+import { FC, useEffect, useRef, useState } from 'react'
+import { IoTrashBin } from 'react-icons/io5'
+import { MdEdit } from 'react-icons/md'
+import { NEW_EPUB_BOOK_CONTENT } from '@interfaces/book/enums'
+import DateContentInput from '@components/Inputs/DateContentInput'
+import { DATE_REGEX } from '@web-utils/regex'
 
 export interface IBook {
   bookDescription?: string
@@ -15,12 +23,24 @@ export interface IBook {
 }
 
 export interface IProps {
+  onClickEdit: (newContent: Partial<Record<NEW_EPUB_BOOK_CONTENT, string>>) => void
+  onClickDelete: () => void
   onClickClose: () => void
-  book: IBook
   isOpen: boolean
+  book: IBook
 }
 
-const BookOverviewModal: FC<IProps> = ({ onClickClose, isOpen, book }) => {
+const BookOverviewModal: FC<IProps> = ({
+  onClickClose,
+  onClickDelete,
+  onClickEdit,
+  isOpen,
+  book,
+}) => {
+  const [newContent, setNewContent] = useState<Partial<Record<NEW_EPUB_BOOK_CONTENT, string>>>({})
+  const [isEditing, setIsEditing] = useState(false)
+  const [isError, setIsError] = useState(false)
+
   const refIframe = useRef<HTMLIFrameElement>(null)
   const bookDesc = book.bookDescription
 
@@ -72,6 +92,14 @@ const BookOverviewModal: FC<IProps> = ({ onClickClose, isOpen, book }) => {
     }
   }, [bookDesc, isOpen])
 
+  useEffect(() => {
+    if (isOpen) {
+      setIsEditing(false)
+      setIsError(false)
+      setNewContent({})
+    }
+  }, [isOpen])
+
   return (
     <Modal
       isFooter={false}
@@ -80,48 +108,136 @@ const BookOverviewModal: FC<IProps> = ({ onClickClose, isOpen, book }) => {
       centered
       width={500}
       closable={false}>
-      <div className="flex flex-col gap-[20px] h-full w-full overflow-hidden max-h-[700px]">
+      <div className="flex flex-col  h-full w-full overflow-hidden max-h-[700px]">
         <ModalHeader onClickClose={onClickClose} label="Book overview" />
-        <div className="flex flex-col gap-24 overflow-y-auto w-full flex-1 p-24">
-          <div className="flex flex-row gap-24">
-            <img
-              src={book.cover}
-              alt="cover"
-              loading="lazy"
-              className="rounded-6  max-h-[200px] min-h-[200px] min-w-[130px] max-w-[130px] object-cover bg-neutral-800"
-            />
-            <div className="flex flex-col justify-between py-4">
-              <div className="flex flex-col gap-8">
-                <Typography text="h2">{book?.author || 'Unknown Author'}</Typography>
-                <Typography text="caption" color="secondary">
-                  {book?.title || 'Unknown title'}
-                </Typography>
-              </div>
-              <div className="flex flex-col gap-8">
-                <Typography text="body">{book?.published || 'Unknown date'}</Typography>
-                <Typography text="caption" color="secondary">
-                  {book?.publisher || 'Unknown publisher'}
-                </Typography>
-              </div>
-            </div>
+        <div className="flex flex-col overflow-y-auto w-full flex-1 p-24">
+          <div className="flex flex-row items-center justify-end gap-12 w-full">
+            <DefaultButton
+              onClick={onClickDelete}
+              className="p-6 hover:bg-button-primary-hover rounded-4 duration-150">
+              <IoTrashBin className="text-status-error min-w-18 min-h-18" />
+            </DefaultButton>
+            <DefaultButton
+              onClick={() => {
+                setIsEditing((prev) => !prev)
+              }}
+              className="p-6 hover:bg-button-primary-hover rounded-4 duration-150">
+              <MdEdit className="min-w-18 min-h-18" />
+            </DefaultButton>
           </div>
-          <div className="flex flex-col gap-12">
-            <Typography text="body" color="white">
-              Description
-            </Typography>
-            <Show when={!bookDesc}>
-              <Typography text="caption" color="secondary">
-                No description
-              </Typography>
-            </Show>
-            <div className={clsx('w-full', !bookDesc && 'hidden')}>
-              <iframe
-                title="book-description"
-                ref={refIframe}
-                scrolling="no"
-                className="w-full border-0 transition-all duration-200"
+          <div className="flex flex-col gap-24">
+            <div className="flex flex-row gap-24">
+              <img
+                src={book.cover}
+                alt="cover"
+                loading="lazy"
+                className="rounded-6  max-h-[200px] min-h-[200px] min-w-[130px] max-w-[130px] object-cover bg-neutral-800"
               />
+              <div className="flex flex-col justify-between items-start py-4 w-full">
+                <div className="flex flex-col gap-24 py-4 w-full">
+                  <div className="flex flex-col gap-8 w-full">
+                    <ContentInput
+                      isEditing={isEditing}
+                      placeholder="Author"
+                      value={newContent[NEW_EPUB_BOOK_CONTENT.AUTHOR] ?? book?.author ?? ''}
+                      onChange={(val) => {
+                        setNewContent((prev) => ({ ...prev, [NEW_EPUB_BOOK_CONTENT.AUTHOR]: val }))
+                      }}>
+                      <Typography text="h2">{book?.author || 'Unknown Author'}</Typography>
+                    </ContentInput>
+                    <ContentInput
+                      isEditing={isEditing}
+                      placeholder="Title"
+                      value={newContent[NEW_EPUB_BOOK_CONTENT.TITLE] ?? book?.title ?? ''}
+                      onChange={(val) => {
+                        setNewContent((prev) => ({ ...prev, [NEW_EPUB_BOOK_CONTENT.TITLE]: val }))
+                      }}>
+                      <Typography text="caption" color="secondary">
+                        {book?.title || 'Unknown title'}
+                      </Typography>
+                    </ContentInput>
+                  </div>
+                  <div className="flex flex-col gap-8 w-full">
+                    <DateContentInput
+                      isError={isError}
+                      isEditing={isEditing}
+                      placeholder="Date"
+                      value={newContent[NEW_EPUB_BOOK_CONTENT.PUBLISHED] ?? book?.published ?? ''}
+                      onChange={(val) => {
+                        setIsError(false)
+                        setNewContent((prev) => ({
+                          ...prev,
+                          [NEW_EPUB_BOOK_CONTENT.PUBLISHED]: val,
+                        }))
+                      }}>
+                      <Typography text="body">{book?.published || 'Unknown date'}</Typography>
+                    </DateContentInput>
+                    <ContentInput
+                      isEditing={isEditing}
+                      placeholder="Publisher"
+                      value={newContent[NEW_EPUB_BOOK_CONTENT.PUBLISHER] ?? book?.publisher ?? ''}
+                      onChange={(val) => {
+                        setNewContent((prev) => ({
+                          ...prev,
+                          [NEW_EPUB_BOOK_CONTENT.PUBLISHER]: val,
+                        }))
+                      }}>
+                      <Typography text="caption" color="secondary">
+                        {book?.publisher || 'Unknown publisher'}
+                      </Typography>
+                    </ContentInput>
+                  </div>
+                </div>
+              </div>
             </div>
+            <div className="flex flex-col gap-12">
+              <Show when={!isEditing}>
+                <Typography text="body" color="white">
+                  Description
+                </Typography>
+              </Show>
+              <ContentArea
+                isEditing={isEditing}
+                placeholder="Description"
+                onChange={(val) => {
+                  setNewContent((prev) => ({ ...prev, [NEW_EPUB_BOOK_CONTENT.DESCRIPTION]: val }))
+                }}
+                value={newContent[NEW_EPUB_BOOK_CONTENT.DESCRIPTION] ?? bookDesc ?? ''}>
+                <Show when={!bookDesc}>
+                  <Typography text="caption" color="secondary">
+                    No description
+                  </Typography>
+                </Show>
+              </ContentArea>
+              <div className={clsx('w-full', (!bookDesc || isEditing) && 'hidden')}>
+                <iframe
+                  title="book-description"
+                  ref={refIframe}
+                  scrolling="no"
+                  className="w-full border-0 transition-all duration-200"
+                />
+              </div>
+            </div>
+            <Show when={isEditing}>
+              <div>
+                <DefaultButton
+                  onClick={() => {
+                    const date = newContent[NEW_EPUB_BOOK_CONTENT.PUBLISHED]
+                    if ((date?.trim()?.length ?? 0) > 0) {
+                      if (!date?.match(DATE_REGEX)) {
+                        setIsError(true)
+                        return
+                      }
+                    }
+                    onClickEdit(newContent)
+                  }}
+                  className="px-24 py-8 bg-button-primary-active hover:bg-button-primary-hover rounded-4 duration-150 h-full">
+                  <Typography text="caption" color="secondary">
+                    Save
+                  </Typography>
+                </DefaultButton>
+              </div>
+            </Show>
           </div>
         </div>
       </div>

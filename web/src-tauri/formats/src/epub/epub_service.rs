@@ -1,10 +1,12 @@
+use std::collections::HashMap;
+
 use database::{
-    DatabaseManager, INSERT_EPUB_BOOK, INSERT_EPUB_CHAPTERS, INSERT_EPUB_TOC,
+    DELETE_EPUB_TABLE, DatabaseManager, INSERT_EPUB_BOOK, INSERT_EPUB_CHAPTERS, INSERT_EPUB_TOC,
     SELECT_EPUB_CHAPTERS_BY_ID, SELECT_EPUB_TOC_BY_ID, UPDATE_EPUB_BOOK_PROGRESS,
 };
 
 use sqlx::types::chrono;
-use types::{Book, Chapter, Epub, EpubStructure, Metadata, Progress, Toc};
+use types::{Book, Chapter, Epub, EpubStructure, Metadata, NewEpubBookContent, Progress, Toc};
 
 pub struct EpubService {}
 
@@ -93,7 +95,108 @@ impl EpubService {
 
         Ok(())
     }
-    
+
+    pub async fn delete_epub_book(
+        &self,
+        db: &DatabaseManager,
+        id: String,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        let conn = db.get_pool();
+        sqlx::query(DELETE_EPUB_TABLE)
+            .bind(id)
+            .execute(conn)
+            .await?;
+
+        Ok(())
+    }
+
+    pub async fn edit_epub_book(
+        &self,
+        db: &DatabaseManager,
+        id: String,
+        content: HashMap<NewEpubBookContent, String>,
+    ) -> Result<Epub, Box<dyn std::error::Error>> {
+        let conn = db.get_pool();
+        if content.is_empty() {
+            let row = sqlx::query("SELECT * FROM epub_table WHERE id = ?")
+                .bind(id)
+                .fetch_one(conn)
+                .await?;
+
+            return Ok(self.parse_book(row)?);
+        }
+
+        let now = chrono::Utc::now().timestamp();
+
+        let current_metadata_json: String =
+            sqlx::query_scalar("SELECT metadata FROM epub_table WHERE id = ?")
+                .bind(&id)
+                .fetch_one(conn)
+                .await?;
+
+        let mut metadata: serde_json::Value = serde_json::from_str(&current_metadata_json)?;
+
+        let metadata_obj = metadata.as_object_mut().ok_or("Invalid metadata format")?;
+
+        let mut set_clauses = Vec::new();
+        let mut bindings: Vec<String> = Vec::new();
+
+        for (key, value) in content {
+            match key {
+                NewEpubBookContent::Title => {
+                    set_clauses.push("title = ?");
+                    bindings.push(value.clone());
+                    metadata_obj.insert(
+                        "title".to_string(),
+                        serde_json::Value::String(value.clone()),
+                    );
+                }
+                NewEpubBookContent::Author => {
+                    set_clauses.push("author = ?");
+                    bindings.push(value.clone());
+                    metadata_obj.insert(
+                        "author".to_string(),
+                        serde_json::Value::String(value.clone()),
+                    );
+                }
+                NewEpubBookContent::Description => {
+                    metadata_obj
+                        .insert("description".to_string(), serde_json::Value::String(value));
+                }
+                NewEpubBookContent::Published => {
+                    metadata_obj.insert("published".to_string(), serde_json::Value::String(value));
+                }
+                NewEpubBookContent::Publisher => {
+                    metadata_obj.insert("publisher".to_string(), serde_json::Value::String(value));
+                }
+            }
+        }
+
+        set_clauses.push("metadata = ?");
+        bindings.push(serde_json::to_string(&metadata)?);
+
+        set_clauses.push("last_updated = ?");
+        bindings.push(now.to_string());
+
+        let query = format!(
+            "UPDATE epub_table SET {} WHERE id = ?",
+            set_clauses.join(", ")
+        );
+        let mut sql_query = sqlx::query(&query);
+
+        for binding in bindings {
+            sql_query = sql_query.bind(binding);
+        }
+
+        sql_query.bind(&id).execute(conn).await?;
+
+        let row = sqlx::query("SELECT * FROM epub_table WHERE id = ?")
+            .bind(id)
+            .fetch_one(conn)
+            .await?;
+
+        Ok(self.parse_book(row)?)
+    }
 
     pub async fn get_books(
         &self,
