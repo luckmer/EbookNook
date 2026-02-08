@@ -29,11 +29,18 @@ const BookOverviewModalRoot = () => {
         dispatch(actions.setOpenBookOverviewModal({ status: false, bookId: '' }))
       }}
       onClickDelete={() => {
-        dispatch(bookActions.deleteEpub(book?.book.id ?? ''))
+        const id = book?.book.id
+        if (!id) return
+
+        dispatch(bookActions.deleteEpub(id))
         dispatch(actions.setOpenBookOverviewModal({ status: false, bookId: '' }))
       }}
-      onClickEdit={() => {
-        dispatch(bookActions.editEpub())
+      onClickEdit={(content) => {
+        const id = book?.book.id
+        if (!id) return
+
+        dispatch(bookActions.editEpub({ id, content }))
+        dispatch(actions.setOpenBookOverviewModal({ status: false, bookId: '' }))
       }}
       isOpen={openSettingsModal.status}
     />

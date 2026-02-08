@@ -21,3 +21,10 @@ export const flatData = (data: Toc[], level = 0, el: Toc[] = []): Toc[] => {
   }
   return el
 }
+
+export const formatDate = (value: string) => {
+  const numbers = value.replace(/\D/g, '')
+  if (numbers.length <= 2) return numbers
+  if (numbers.length <= 4) return `${numbers.slice(0, 2)}-${numbers.slice(2)}`
+  return `${numbers.slice(0, 2)}-${numbers.slice(2, 4)}-${numbers.slice(4, 8)}`
+}

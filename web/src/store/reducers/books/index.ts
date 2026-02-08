@@ -1,6 +1,6 @@
 import { Books } from '@bindings/book'
 import { Epub, EpubStructure, Progress } from '@bindings/epub'
-import { BookFormat } from '@interfaces/book/enums'
+import { BookFormat, NEW_EPUB_BOOK_CONTENT } from '@interfaces/book/enums'
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { PayloadType } from '@store/helper'
@@ -82,7 +82,13 @@ export const store = createSlice({
       return state
     },
 
-    editEpub(state) {
+    editEpub(
+      state,
+      _: PayloadAction<{
+        id: string
+        content: Partial<Record<NEW_EPUB_BOOK_CONTENT, string>>
+      }>,
+    ) {
       return state
     },
   },
