@@ -1,5 +1,7 @@
+use std::collections::HashMap;
+
 use database::DatabaseManager;
-use types::{Books, Epub, EpubStructure, Progress};
+use types::{Books, Epub, EpubStructure, NewEpubBookContent, Progress};
 
 use crate::init_epub_service;
 
@@ -76,10 +78,11 @@ impl FormatsService {
         &self,
         db: &DatabaseManager,
         id: String,
+        content: HashMap<NewEpubBookContent, String>,
     ) -> Result<(), Box<dyn std::error::Error>> {
         let epub_service = init_epub_service();
 
-        epub_service.edit_epub_book(db, id).await?;
+        epub_service.edit_epub_book(db, id, content).await?;
 
         Ok(())
     }

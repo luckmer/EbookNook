@@ -54,7 +54,10 @@ export function* deleteEpubBook(action: PayloadAction<PayloadTypes['deleteEpub']
 
 export function* editEpubBook(action: PayloadAction<PayloadTypes['editEpub']>) {
   try {
-    yield* call(invoke, 'edit_epub_book', { id: action.payload })
+    yield* call(invoke, 'edit_epub_book', {
+      id: action.payload.id,
+      content: action.payload.content,
+    })
   } catch (err) {
     console.log(err)
     console.log('failed to edit epub')

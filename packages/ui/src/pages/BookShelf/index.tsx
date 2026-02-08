@@ -12,6 +12,7 @@ export interface IProps {
 }
 
 const BookShelf: FC<IProps> = ({ books, onClickBook, onClickImportBook, onClickDetails }) => {
+  console.log(books)
   return (
     <div className="grid flex-1 grid-cols-3 px-4 sm:px-2 sm:grid-cols-4 md:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-12 gap-12">
       {books.map((book, id) => (

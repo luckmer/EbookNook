@@ -44,15 +44,15 @@ export function* getEpubStructureSaga() {
 }
 
 export function* updateEpubBookProgressSaga() {
-  yield takeLeading(actions.setUpdateEpubBookProgress, updateEpubBookProgress)
+  yield* takeLeading(actions.setUpdateEpubBookProgress, updateEpubBookProgress)
 }
 
 export function* deleteEpubSaga() {
-  yield takeEvery(actions.deleteEpub, deleteEpubBook)
+  yield* takeEvery(actions.deleteEpub, deleteEpubBook)
 }
 
 export function* editEpubSaga() {
-  yield takeEvery(actions.editEpub, editEpubBook)
+  yield* takeEvery(actions.editEpub, editEpubBook)
 }
 
 export default function* RootSaga() {
