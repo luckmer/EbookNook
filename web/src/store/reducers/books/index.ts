@@ -1,5 +1,5 @@
 import { Books } from '@bindings/book'
-import { Epub, EpubStructure, Progress } from '@bindings/epub'
+import { Book, Epub, EpubStructure, Progress } from '@bindings/epub'
 import { BookFormat, NEW_EPUB_BOOK_CONTENT } from '@interfaces/book/enums'
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
@@ -60,6 +60,16 @@ export const store = createSlice({
       return state
     },
 
+    updateEpubBook(state, action: PayloadAction<Book>) {
+      const index = state.books[BookFormat.EPUB].findIndex(
+        (epub) => epub.book.id === action.payload.id,
+      )
+
+      if (index !== -1) {
+        state.books[BookFormat.EPUB][index].book = action.payload
+      }
+    },
+
     setEpubStructure(state, action: PayloadAction<{ structure: EpubStructure; id: string }>) {
       const epubState = state.books[BookFormat.EPUB]
 
@@ -73,11 +83,7 @@ export const store = createSlice({
       return state
     },
 
-    deleteEpub(state, _: PayloadAction<string>) {
-      return state
-    },
-
-    removeEpub(state, action: PayloadAction<string>) {
+    deleteEpub(state, action: PayloadAction<string>) {
       state.books.epub = state.books.epub.filter((epub) => epub.book.id !== action.payload)
       return state
     },

@@ -79,11 +79,11 @@ impl FormatsService {
         db: &DatabaseManager,
         id: String,
         content: HashMap<NewEpubBookContent, String>,
-    ) -> Result<(), Box<dyn std::error::Error>> {
+    ) -> Result<Epub, Box<dyn std::error::Error>> {
         let epub_service = init_epub_service();
 
-        epub_service.edit_epub_book(db, id, content).await?;
+        let response = epub_service.edit_epub_book(db, id, content).await?;
 
-        Ok(())
+        Ok(response)
     }
 }

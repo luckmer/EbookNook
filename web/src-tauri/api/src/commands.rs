@@ -61,7 +61,7 @@ pub async fn edit_epub_book(
     state: State<'_, AppState>,
     id: String,
     content: HashMap<NewEpubBookContent, String>,
-) -> Result<(), String> {
+) -> Result<Epub, String> {
     state
         .format_service
         .edit_epub_book(&state.db, id, content)

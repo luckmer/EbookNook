@@ -1,4 +1,4 @@
-import { EpubStructure } from '@bindings/epub'
+import { Epub, EpubStructure } from '@bindings/epub'
 import { PayloadAction } from '@reduxjs/toolkit'
 import { actions, PayloadTypes } from '@store/reducers/books'
 import { actions as uiActions } from '@store/reducers/ui'
@@ -45,7 +45,6 @@ export function* updateEpubBookProgress(
 export function* deleteEpubBook(action: PayloadAction<PayloadTypes['deleteEpub']>) {
   try {
     yield* call(invoke, 'delete_epub_book', { id: action.payload })
-    yield* put(actions.removeEpub(action.payload))
   } catch (err) {
     console.log(err)
     console.log('failed to remove epub')
@@ -54,10 +53,12 @@ export function* deleteEpubBook(action: PayloadAction<PayloadTypes['deleteEpub']
 
 export function* editEpubBook(action: PayloadAction<PayloadTypes['editEpub']>) {
   try {
-    yield* call(invoke, 'edit_epub_book', {
+    const response = yield* call(invoke<Epub>, 'edit_epub_book', {
       id: action.payload.id,
       content: action.payload.content,
     })
+
+    yield* put(actions.updateEpubBook(response.book))
   } catch (err) {
     console.log(err)
     console.log('failed to edit epub')

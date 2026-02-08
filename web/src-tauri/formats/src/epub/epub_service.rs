@@ -115,12 +115,17 @@ impl EpubService {
         db: &DatabaseManager,
         id: String,
         content: HashMap<NewEpubBookContent, String>,
-    ) -> Result<(), Box<dyn std::error::Error>> {
+    ) -> Result<Epub, Box<dyn std::error::Error>> {
+        let conn = db.get_pool();
         if content.is_empty() {
-            return Ok(());
+            let row = sqlx::query("SELECT * FROM epub_table WHERE id = ?")
+                .bind(id)
+                .fetch_one(conn)
+                .await?;
+
+            return Ok(self.parse_book(row)?);
         }
 
-        let conn = db.get_pool();
         let now = chrono::Utc::now().timestamp();
 
         let current_metadata_json: String =
@@ -141,14 +146,18 @@ impl EpubService {
                 NewEpubBookContent::Title => {
                     set_clauses.push("title = ?");
                     bindings.push(value.clone());
-                    metadata_obj
-                        .insert("title".to_string(), serde_json::Value::String(value.clone()));
+                    metadata_obj.insert(
+                        "title".to_string(),
+                        serde_json::Value::String(value.clone()),
+                    );
                 }
                 NewEpubBookContent::Author => {
                     set_clauses.push("author = ?");
                     bindings.push(value.clone());
-                    metadata_obj
-                        .insert("author".to_string(), serde_json::Value::String(value.clone()));
+                    metadata_obj.insert(
+                        "author".to_string(),
+                        serde_json::Value::String(value.clone()),
+                    );
                 }
                 NewEpubBookContent::Description => {
                     metadata_obj
@@ -179,9 +188,14 @@ impl EpubService {
             sql_query = sql_query.bind(binding);
         }
 
-        sql_query.bind(id).execute(conn).await?;
+        sql_query.bind(&id).execute(conn).await?;
 
-        Ok(())
+        let row = sqlx::query("SELECT * FROM epub_table WHERE id = ?")
+            .bind(id)
+            .fetch_one(conn)
+            .await?;
+
+        Ok(self.parse_book(row)?)
     }
 
     pub async fn get_books(
