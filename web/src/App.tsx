@@ -56,6 +56,9 @@ function App() {
         onChange={(value) => {
           dispatch(actions.setValue(value))
         }}
+        onClickOpenNotebook={() => {
+          dispatch(uiActions.setOpenNotebook(true))
+        }}
         onClickClose={async () => {
           try {
             const appWindow = getCurrentWindow()
