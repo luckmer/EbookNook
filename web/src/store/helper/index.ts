@@ -13,8 +13,8 @@ export type PayloadType<T> = {
   [K in keyof T]: T[K] extends ActionCreatorWithPayload<infer P>
     ? P
     : T[K] extends ActionCreatorWithoutPayload
-    ? undefined
-    : never
+      ? undefined
+      : never
 }
 
 export const createStoreSelectors = <T extends Record<string, any>>(store: {
@@ -24,7 +24,7 @@ export const createStoreSelectors = <T extends Record<string, any>>(store: {
   return Object.keys(store.getInitialState()).reduce((acc, k) => {
     acc[k as keyof T] = createSelector(
       (s: StoreState<T>) => s[store.name],
-      (s: StoreState<T>) => s[k as keyof T]
+      (s: StoreState<T>) => s[k as keyof T],
     )
     return acc
   }, {} as StoreSelectors<T>)

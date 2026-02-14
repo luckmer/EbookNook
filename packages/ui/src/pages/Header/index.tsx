@@ -5,15 +5,16 @@ import { NAVIGATION } from '@interfaces/routes/enums'
 import { FC, memo } from 'react'
 import { BsLayoutSidebarInset } from 'react-icons/bs'
 import { GiHamburgerMenu } from 'react-icons/gi'
-import { CgMenuRound } from 'react-icons/cg'
 import clsx from 'clsx'
 import { Typography } from '@components/Typography'
+import { LuNotebookPen } from 'react-icons/lu'
 
 export interface IProps {
   onClickClose: () => void
   onClickMaximize: () => void
   onClickMinimize: () => void
   onClickSettings: () => void
+  onClickOpenNotebook: () => void
   onClickOpenSidebar: () => void
   onChange: (value: string) => void
   hideHeader: boolean
@@ -27,6 +28,7 @@ export const Header: FC<IProps> = ({
   onClickMaximize,
   onClickMinimize,
   onClickOpenSidebar,
+  onClickOpenNotebook,
   onClickSettings,
   value,
   location,
@@ -72,12 +74,20 @@ export const Header: FC<IProps> = ({
         </div>
       </Show>
       <div className="flex flex-row gap-4 ml-auto" data-tauri-drag-region>
-        <DefaultButton
+        <Show when={!!isReader}>
+          <DefaultButton
+            onClick={onClickOpenNotebook}
+            className="transition-colors hover:bg-button-primary-hover hover:text-text-primary text-text-secondary duration-300 rounded-4 px-6 py-6">
+            <LuNotebookPen className="w-18 h-18 transition-colors duration-200" />
+          </DefaultButton>
+        </Show>
+
+        {/* <DefaultButton
           disabled
           onClick={() => {}}
           className="transition-colors hover:bg-button-primary-hover hover:text-text-primary text-text-secondary duration-300 rounded-4 px-6 py-6">
           <CgMenuRound className="w-18 h-18 transition-colors duration-200" />
-        </DefaultButton>
+        </DefaultButton> */}
 
         <DefaultButton
           onClick={onClickSettings}

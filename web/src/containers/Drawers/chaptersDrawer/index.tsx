@@ -1,6 +1,6 @@
-import ChaptersDrawer from '@pages/chaptersDrawer'
-import { actions as uiActions } from '@store/reducers/ui'
+import ChaptersDrawer from '@pages/Drawers/chaptersDrawer'
 import { actions as bookActions } from '@store/reducers/books'
+import { actions as uiActions } from '@store/reducers/ui'
 import { selectEpubMap } from '@store/selectors/books'
 import { uiSelector } from '@store/selectors/ui'
 import { useEffect, useMemo, useState } from 'react'
