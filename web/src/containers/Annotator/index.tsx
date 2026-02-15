@@ -28,6 +28,7 @@ interface IDetail {
 }
 
 const AnnotatorRoot = () => {
+  const [doc, setDoc] = useState<Document | null>(null)
   const [position, setPosition] = useState<IPosition>(DEFAULT_ANNOTATION_STATE)
   const [showAnnotator, setShowAnnotator] = useState(false)
   const [selectedText, setSelectedText] = useState('')
@@ -42,7 +43,7 @@ const AnnotatorRoot = () => {
     const handleAnnotationClick = ({ detail }: { detail: IDetail }) => {
       const selection = detail.selected
       const text = selection?.toString() ?? ''
-
+      setDoc(detail.doc)
       if (!text.trim().length) {
         setShowAnnotator(false)
         return
@@ -89,7 +90,7 @@ const AnnotatorRoot = () => {
     }
 
     emitter.on('annotationClick', handleAnnotationClick)
-    emitter.on('annotationMouseDown', () => {
+    emitter.on('restartAnnotator', () => {
       setPosition(DEFAULT_ANNOTATION_STATE)
       setShowAnnotator(false)
       setSelectedText('')
@@ -130,6 +131,12 @@ const AnnotatorRoot = () => {
           dispatch(annotationActions.setAnnotation({ id: bookId, annotation: selectedText }))
           setPosition(DEFAULT_ANNOTATION_STATE)
           setShowAnnotator(false)
+          if (doc) {
+            const selection = doc.getSelection()
+            if (selection) {
+              selection.removeAllRanges()
+            }
+          }
         }}
         modalPosition={modalPosition}
         pointPosition={pointPosition}

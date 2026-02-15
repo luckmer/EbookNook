@@ -1,5 +1,6 @@
 import Drawer from '@components/Drawer'
 import Dropdown from '@components/Dropdown'
+import Show from '@components/Show'
 import { Typography } from '@components/Typography'
 import { FC, useEffect, useState } from 'react'
 import { LuNotebookPen } from 'react-icons/lu'
@@ -31,7 +32,9 @@ const NotebookDrawer: FC<IProps> = ({ onClickClose, isOpen, data }) => {
           <Typography text="body">Notebook</Typography>
         </div>
         <div className="h-full flex flex-col gap-12">
-          <Typography text="caption">Excerpts</Typography>
+          <Show when={data.length > 0}>
+            <Typography text="caption">Excerpts</Typography>
+          </Show>
           <div className=" flex flex-col gap-12">
             {data.map((item, index) => (
               <Dropdown
