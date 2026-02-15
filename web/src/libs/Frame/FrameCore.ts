@@ -1,4 +1,5 @@
 import { ISettingsState } from '@interfaces/settings/interfaces'
+import { Annotations } from '@libs/annotations'
 import { getStyles, setStylesImportant } from './utils'
 
 export class Frame {
@@ -284,6 +285,7 @@ export class Frame {
           this.observer.observe(this.element)
 
           this.progressCallback?.(this.currentPage, this.lockedTotalPages, this.element.scrollLeft)
+          new Annotations(this.document, this.iframe)
           resolve()
         }
       })

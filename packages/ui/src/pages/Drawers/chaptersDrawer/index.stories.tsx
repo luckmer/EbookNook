@@ -3,7 +3,7 @@ import ChaptersDrawer from '.'
 
 const meta: Meta<typeof ChaptersDrawer> = {
   component: ChaptersDrawer,
-  title: 'Pages/ChaptersDrawer',
+  title: 'Pages/Drawers/ChaptersDrawer',
 }
 
 export default meta

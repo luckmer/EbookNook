@@ -1,10 +1,10 @@
+import { type Toc } from '@bindings/epub'
 import DefaultButton from '@components/Buttons/DefaultButton'
 import Show from '@components/Show'
 import { Typography } from '@components/Typography'
 import clsx from 'clsx'
 import { FC, memo, useMemo, useState } from 'react'
 import { IoIosArrowUp } from 'react-icons/io'
-import { type Toc } from '@bindings/epub'
 
 export interface IProps {
   onClick: (href: string) => void
@@ -17,7 +17,7 @@ const Toc: FC<IProps> = ({ item, level, onClick }) => {
 
   const hasSubitems = useMemo(
     () => Array.isArray(item.subitems) && item.subitems.length > 0,
-    [item.subitems]
+    [item.subitems],
   )
 
   return (
@@ -25,7 +25,7 @@ const Toc: FC<IProps> = ({ item, level, onClick }) => {
       <DefaultButton
         className={clsx(
           'pl-6 group h-[35px] w-full flex items-center ',
-          'hover:bg-hover-greyBlue-200 transition-colors duration-300 opacity-80 hover:bg-button-primary-hover rounded-6'
+          'hover:bg-hover-greyBlue-200 transition-colors duration-300 opacity-80 hover:bg-button-primary-hover rounded-6',
         )}
         onClick={() => {
           onClick(item.href)
@@ -43,7 +43,7 @@ const Toc: FC<IProps> = ({ item, level, onClick }) => {
               <IoIosArrowUp
                 className={clsx(
                   'transition-all duration-300 ease-in-out opacity-20 group-hover:opacity-100 min-w-[14px] min-h-[14px] max-w-[14px] max-h-[14px]',
-                  open ? 'rotate-x-180 opacity-100' : ''
+                  open ? 'rotate-x-180 opacity-100' : '',
                 )}
               />
             </div>
@@ -57,7 +57,7 @@ const Toc: FC<IProps> = ({ item, level, onClick }) => {
         <div
           className={clsx(
             'overflow-hidden transition-all duration-300 ease-in-out',
-            open ? 'block' : 'hidden'
+            open ? 'block' : 'hidden',
           )}>
           <div className="pl-12 transition-all duration-300 ease-in-out">
             {item.subitems.map((sub, index) => (

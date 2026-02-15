@@ -1,12 +1,12 @@
 import DefaultButton from '@components/Buttons/DefaultButton'
 import DefaultInput from '@components/Inputs/DefaultInput'
 import Show from '@components/Show'
+import { Typography } from '@components/Typography'
 import { NAVIGATION } from '@interfaces/routes/enums'
+import clsx from 'clsx'
 import { FC, memo } from 'react'
 import { BsLayoutSidebarInset } from 'react-icons/bs'
 import { GiHamburgerMenu } from 'react-icons/gi'
-import clsx from 'clsx'
-import { Typography } from '@components/Typography'
 import { LuNotebookPen } from 'react-icons/lu'
 
 export interface IProps {

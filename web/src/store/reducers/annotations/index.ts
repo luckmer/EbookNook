@@ -14,8 +14,9 @@ export const store = createSlice({
   name: annotationsStore,
   initialState: defaultState,
   reducers: {
-    setAnnotation(state, action: PayloadAction<{ id: string; annotations: string[] }>) {
-      state.annotations[action.payload.id] = action.payload.annotations
+    setAnnotation(state, action: PayloadAction<{ id: string; annotation: string }>) {
+      if (!state.annotations[action.payload.id]) state.annotations[action.payload.id] = []
+      state.annotations[action.payload.id].push(action.payload.annotation)
     },
   },
 })

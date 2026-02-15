@@ -16,12 +16,13 @@ const NotebookDrawerRoot = () => {
   const bookId = useMemo(() => location?.state?.id, [location])
 
   const annotations = useMemo(() => {
-    // return Object.values(annotationsMap[bookId] ?? {})
+    return Object.values(annotationsMap[bookId] ?? {})
   }, [bookId, annotationsMap])
 
   return (
     <NotebookDrawer
       isOpen={isOpen}
+      data={annotations}
       onClickClose={() => {
         dispatch(uiActions.setOpenNotebook(false))
       }}

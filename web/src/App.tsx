@@ -1,7 +1,9 @@
+import Annotator from '@containers/Annotator'
 import Header from '@pages/Header'
 import { actions as bookActions } from '@store/reducers/books/index'
 import { actions } from '@store/reducers/search'
 import { actions as uiActions } from '@store/reducers/ui'
+import { selectEpubMap } from '@store/selectors/books'
 import { searchSelector } from '@store/selectors/search'
 import { uiSelector } from '@store/selectors/ui'
 import '@styles/import.css'
@@ -10,7 +12,6 @@ import { useEffect, useLayoutEffect, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Route, Routes, useLocation } from 'react-router-dom'
 import { routes } from './routes'
-import { selectEpubMap } from '@store/selectors/books'
 
 function App() {
   const isSettingsOpen = useSelector(uiSelector.openSettingsModal)
@@ -84,7 +85,8 @@ function App() {
           }
         }}
       />
-      <div className="overflow-hidden h-full w-full">
+      <div className="overflow-hidden h-full w-full flex flex-col">
+        <Annotator />
         <Routes>
           {routes.map((route) => (
             <Route key={route.path} path={route.path} element={route.element()} />
