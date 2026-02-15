@@ -98,23 +98,31 @@ const ReaderRoot = () => {
       viewRef.current.setStyles(settings)
       setLoading(true)
 
-      if (selectedChapter) {
-        viewRef.current.display(selectedChapter).then(() => {
-          setLoading(false)
-        })
-        return
-      }
+      const promise = new Promise<Document>(async (resolve, reject) => {
+        const view = viewRef.current
 
-      if (book?.book.progress.slice(0, 2)?.every((p) => p.length > 0)) {
-        viewRef.current.loadProgress(book.book.progress).then(() => {
-          setLoading(false)
-        })
-        return
-      }
+        if (!view) {
+          reject('')
+          return
+        }
 
-      viewRef.current.display().then(() => {
-        setLoading(false)
+        if (selectedChapter) {
+          await view.display(selectedChapter)
+          resolve(view.frame.document)
+          return
+        }
+
+        if (book?.book.progress.slice(0, 2)?.every((p) => p.length > 0)) {
+          await view.loadProgress(book.book.progress)
+          resolve(view.frame.document)
+          return
+        }
+
+        await view.display()
+        resolve(view.frame.document)
       })
+
+      promise.finally(() => setLoading(false))
     }
   }, [selectedChapter, isFetchingStructure, book?.book.id])
 
