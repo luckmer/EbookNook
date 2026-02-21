@@ -71,7 +71,6 @@ const ReaderRoot = () => {
   )
 
   useEffect(() => {
-    if (!book?.chapters.length || !book?.toc.length) return
     if (book && !isFetchingStructure && renderedBookIdRef.current !== book.book.id) {
       if (viewRef.current) viewRef.current.destroy()
 
@@ -92,7 +91,7 @@ const ReaderRoot = () => {
         renderedBookIdRef.current = null
       }
     }
-  }, [book?.book.id, book?.chapters, book?.toc, isFetchingStructure, location.state?.id])
+  }, [book?.book.id, isFetchingStructure, location.state?.id])
 
   useEffect(() => {
     if (viewRef.current && !isFetchingStructure) {
@@ -117,7 +116,7 @@ const ReaderRoot = () => {
         setLoading(false)
       })
     }
-  }, [selectedChapter, isFetchingStructure, book?.book.id, book?.chapters, book?.toc])
+  }, [selectedChapter, isFetchingStructure, book?.book.id])
 
   useEffect(() => {
     if (!loading) {
