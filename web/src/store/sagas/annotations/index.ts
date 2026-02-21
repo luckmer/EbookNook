@@ -4,7 +4,6 @@ import { actions as uiActions } from '@store/reducers/ui'
 import { annotationsSelector } from '@store/selectors/annotations'
 import { selectEpubMap } from '@store/selectors/books'
 import { invoke } from '@tauri-apps/api/core'
-
 import { all, call, put, select, takeEvery, takeLatest } from 'typed-redux-saga'
 
 export function* getAnnotationStructure(
@@ -32,7 +31,6 @@ export function* getAnnotationStructure(
       id: book?.book.id,
     })
 
-    console.log('got data', annotations)
     yield* put(actions.setAnnotations({ id: action.payload, annotations }))
   } catch (err) {
     console.log('err', err)
