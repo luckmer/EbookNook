@@ -12,6 +12,7 @@ type Story = StoryObj<typeof NotebookDrawer>
 const data = new Array(20).fill(0).map(() => ({
   label: 'Chapter 1',
   description: 'Chapter 1',
+  id: '2',
 }))
 
 export const Default: Story = {
@@ -19,6 +20,7 @@ export const Default: Story = {
     return (
       <NotebookDrawer
         data={data}
+        onClickDelete={() => {}}
         onClickClose={() => {}}
         isOpen={args.isOpen}
         isLoader={args.isLoader}

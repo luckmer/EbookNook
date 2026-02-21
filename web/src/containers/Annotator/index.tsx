@@ -148,14 +148,14 @@ const AnnotatorRoot = () => {
           setShowAnnotator(false)
           removeSelection()
         }}
-        onClickCustomCopy={() => {
-          dispatch(uiActions.setOpenNotebook(true))
+        // onClickCustomCopy={() => {
+        //   dispatch(uiActions.setOpenNotebook(true))
 
-          setPosition(DEFAULT_ANNOTATION_STATE)
-          setShowAnnotator(false)
+        //   setPosition(DEFAULT_ANNOTATION_STATE)
+        //   setShowAnnotator(false)
 
-          removeSelection()
-        }}
+        //   removeSelection()
+        // }}
         modalPosition={modalPosition}
         pointPosition={pointPosition}
       />

@@ -13,14 +13,14 @@ export interface IProps {
   modalPosition: Record<string, string>
   pointPosition: Record<string, string | number>
   onClickCopy: () => void
-  onClickCustomCopy: () => void
+  // onClickCustomCopy: () => void
 }
 
 const Annotator: FC<IProps> = ({
   modalPosition,
   pointPosition,
   onClickCopy,
-  onClickCustomCopy,
+  // onClickCustomCopy,
 }) => {
   return (
     <div
