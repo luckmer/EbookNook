@@ -3,7 +3,7 @@ import EmptyBookShelf from './index'
 
 const meta: Meta<typeof EmptyBookShelf> = {
   component: EmptyBookShelf,
-  title: 'Pages/EmptyBookShelf',
+  title: 'Components/EmptyBookShelf',
 }
 
 export default meta

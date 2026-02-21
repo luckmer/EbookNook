@@ -1,10 +1,10 @@
-import EmptyLibrary from '@pages/EmptyBookShelf'
-import { FC, memo } from 'react'
 import { Book as IBook } from '@bindings/epub'
-import Show from '@components/Show'
-import BookShelf from '@pages/BookShelf'
+import BookShelf from '@components/BookShelf'
+import EmptyLibrary from '@components/EmptyBookShelf'
 import EmptyResult from '@components/EmptyResult'
+import Show from '@components/Show'
 import Spin from '@components/Spin'
+import { FC, memo } from 'react'
 
 export interface IProps {
   onClick: (file: File) => void

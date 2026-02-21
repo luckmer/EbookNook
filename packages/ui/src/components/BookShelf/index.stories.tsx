@@ -3,7 +3,7 @@ import BookShelf from '.'
 
 const meta: Meta<typeof BookShelf> = {
   component: BookShelf,
-  title: 'Pages/BookShelf',
+  title: 'Components/BookShelf',
 }
 
 export default meta
