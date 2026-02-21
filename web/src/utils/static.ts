@@ -1,4 +1,4 @@
-export const POPUP_WIDTH = 100
+export const POPUP_WIDTH = 50
 export const POPUP_HEIGHT = 50
 export const TRIANGLE_SIZE = 8
 export const PADDING = 20

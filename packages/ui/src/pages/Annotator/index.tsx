@@ -1,6 +1,6 @@
 import DefaultButton from '@components/Buttons/DefaultButton'
 import { FC } from 'react'
-import { FiCopy, FiEdit } from 'react-icons/fi'
+import { FiCopy } from 'react-icons/fi'
 
 export interface IModalPosition {
   top: string
@@ -34,11 +34,11 @@ const Annotator: FC<IProps> = ({
           className="transition-colors hover:bg-button-primary-hover hover:text-text-primary text-text-secondary duration-300 rounded-4 px-6 py-6">
           <FiCopy className="w-18 h-18 transition-colors duration-200" />
         </DefaultButton>
-        <DefaultButton
+        {/* <DefaultButton
           onClick={onClickCustomCopy}
           className="transition-colors hover:bg-button-primary-hover hover:text-text-primary text-text-secondary duration-300 rounded-4 px-6 py-6">
           <FiEdit className="w-18 h-18 transition-colors duration-200" />
-        </DefaultButton>
+        </DefaultButton> */}
       </div>
     </div>
   )
