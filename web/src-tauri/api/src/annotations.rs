@@ -28,13 +28,14 @@ pub async fn get_annotations_structure_by_id(
 }
 
 #[tauri::command]
-pub async fn delete_annotation_structure(
+pub async fn delete_annotation_by_id(
     state: State<'_, AppState>,
+    book_id: String,
     id: String,
 ) -> Result<(), String> {
     state
         .annotations_service
-        .delete_annotation(&state.db, id)
+        .delete_annotation(&state.db, id, book_id)
         .await
         .map_err(|e| e.to_string())
 }

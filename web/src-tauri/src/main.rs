@@ -45,7 +45,7 @@ fn main() {
             api::epub::edit_epub_book,
             api::annotations::add_annotation_structure,
             api::annotations::get_annotations_structure_by_id,
-            api::annotations::delete_annotation_structure
+            api::annotations::delete_annotation_by_id
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -25,9 +25,18 @@ export const store = createSlice({
       if (!state.annotations[action.payload.id]) state.annotations[action.payload.id] = []
       state.annotations[action.payload.id] = action.payload.annotations
     },
-
     getAnnotationStructure(state, _: PayloadAction<string>) {
       return state
+    },
+    deleteAnnotationById(state, action: PayloadAction<{ id: string; bookId: string }>) {
+      const id = action.payload.id
+      for (const key of Object.keys(state.annotations)) {
+        const index = state.annotations[key].findIndex((a) => a.id === id)
+        if (index !== -1) {
+          state.annotations[key].splice(index, 1)
+          break
+        }
+      }
     },
   },
 })

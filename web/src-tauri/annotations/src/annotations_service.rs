@@ -1,6 +1,6 @@
 use database::{
-    DELETE_ANNOTATION_TABLE, DatabaseManager, INSERT_ANNOTATIONS_BOOK, SELECT_ANNOTATION_ELEMENT,
-    SELECT_ANNOTATIONS_BY_ID, UPDATE_ANNOTATIONS_BOOK,
+    DatabaseManager, INSERT_ANNOTATIONS_BOOK, SELECT_ANNOTATION_ELEMENT, SELECT_ANNOTATIONS_BY_ID,
+    UPDATE_ANNOTATIONS_BOOK,
 };
 
 use types::Annotation;
@@ -58,7 +58,22 @@ impl AnnotationsService {
         &self,
         db: &DatabaseManager,
         id: String,
+        book_id: String,
     ) -> Result<(), Box<dyn std::error::Error>> {
+        let conn = db.get_pool();
+
+        let mut annotations = self.get_annotations_by_id(db, book_id.clone()).await?;
+
+        annotations.retain(|a| a.id != id);
+
+        let json = serde_json::to_string(&annotations)?;
+
+        sqlx::query(UPDATE_ANNOTATIONS_BOOK)
+            .bind(&json)
+            .bind(&book_id)
+            .execute(conn)
+            .await?;
+
         Ok(())
     }
 

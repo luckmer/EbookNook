@@ -54,6 +54,17 @@ export function* setAnnotation(action: PayloadAction<PayloadTypes['setAnnotation
   yield* put(uiActions.setIsFetchingStructure(false))
 }
 
+export function* deleteAnnotationById(action: PayloadAction<PayloadTypes['deleteAnnotationById']>) {
+  try {
+    yield* call(invoke, 'delete_annotation_by_id', {
+      bookId: action.payload.bookId,
+      id: action.payload.id,
+    })
+  } catch (err) {
+    console.log('err', err)
+  }
+}
+
 export function* getAnnotationStructureSaga() {
   yield* takeLatest(actions.getAnnotationStructure, getAnnotationStructure)
 }
@@ -62,6 +73,10 @@ export function* setAnnotationSaga() {
   yield* takeEvery(actions.setAnnotation, setAnnotation)
 }
 
+export function* deleteAnnotationByIdSaga() {
+  yield* takeEvery(actions.deleteAnnotationById, deleteAnnotationById)
+}
+
 export default function* RootSaga() {
-  yield all([getAnnotationStructureSaga(), setAnnotationSaga()])
+  yield all([getAnnotationStructureSaga(), setAnnotationSaga(), deleteAnnotationByIdSaga()])
 }

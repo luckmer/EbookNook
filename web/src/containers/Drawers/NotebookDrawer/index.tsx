@@ -1,4 +1,5 @@
 import NotebookDrawer from '@pages/Drawers/NotebookDrawer'
+import { actions as annotationActions } from '@store/reducers/annotations'
 import { actions as uiActions } from '@store/reducers/ui'
 import { annotationsSelector } from '@store/selectors/annotations'
 import { uiSelector } from '@store/selectors/ui'
@@ -27,6 +28,9 @@ const NotebookDrawerRoot = () => {
       isLoader={isLoader}
       onClickClose={() => {
         dispatch(uiActions.setOpenNotebook(false))
+      }}
+      onClickDelete={(id) => {
+        dispatch(annotationActions.deleteAnnotationById({ id, bookId }))
       }}
     />
   )

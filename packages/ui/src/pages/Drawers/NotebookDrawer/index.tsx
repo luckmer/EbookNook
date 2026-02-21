@@ -1,3 +1,5 @@
+import { Annotations } from '@bindings/annotations'
+import DefaultButton from '@components/Buttons/DefaultButton'
 import Drawer from '@components/Drawer'
 import Dropdown from '@components/Dropdown'
 import Show from '@components/Show'
@@ -6,19 +8,15 @@ import { Skeleton } from 'antd'
 import { FC, useEffect, useState } from 'react'
 import { LuNotebookPen } from 'react-icons/lu'
 
-export interface IAnnotation {
-  label: string
-  description: string
-}
-
 export interface IProps {
+  onClickDelete: (id: string) => void
   onClickClose: () => void
   isOpen: boolean
-  data: IAnnotation[]
+  data: Annotations
   isLoader: boolean
 }
 
-const NotebookDrawer: FC<IProps> = ({ onClickClose, isOpen, data, isLoader }) => {
+const NotebookDrawer: FC<IProps> = ({ onClickClose, onClickDelete, isOpen, data, isLoader }) => {
   const [openDropdownIndex, setOpenDropdownIndex] = useState<number | null>(null)
 
   const handleToggleDropdown = (index: number) => {
@@ -51,6 +49,15 @@ const NotebookDrawer: FC<IProps> = ({ onClickClose, isOpen, data, isLoader }) =>
                   isOpen={openDropdownIndex === index}
                   onToggle={() => handleToggleDropdown(index)}>
                   <Typography text="caption">{item.description}</Typography>
+                  <div className="w-full flex items-center justify-end pt-12">
+                    <DefaultButton
+                      onClick={() => {
+                        setOpenDropdownIndex(null)
+                        onClickDelete(item.id)
+                      }}>
+                      <Typography color="error">Delete</Typography>
+                    </DefaultButton>
+                  </div>
                 </Dropdown>
               ))}
             </div>
