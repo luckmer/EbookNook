@@ -11,6 +11,7 @@ const ChaptersDrawerRoot = () => {
   const [cache, setCache] = useState('')
   const booksMap = useSelector(selectEpubMap)
   const isOpen = useSelector(uiSelector.openChaptersDrawer)
+  const isLoader = useSelector(uiSelector.isFetchingStructure)
   const navigate = useNavigate()
 
   const location = useLocation()
@@ -33,6 +34,7 @@ const ChaptersDrawerRoot = () => {
       icon={book?.book.metadata?.cover}
       title={book?.book.title ?? '--'}
       toc={book?.toc ?? []}
+      isLoader={isLoader}
       isOpen={isOpen}
       onClickBack={() => {
         dispatch(uiActions.setOpenChaptersDrawer(false))

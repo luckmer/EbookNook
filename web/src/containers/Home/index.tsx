@@ -1,4 +1,5 @@
 import Home from '@pages/Home'
+import { actions as annotationActions } from '@store/reducers/annotations'
 import { actions } from '@store/reducers/books'
 import { actions as uiActions } from '@store/reducers/ui'
 import { filteredBooks } from '@store/selectors/aggregated/books'
@@ -34,6 +35,7 @@ const HomeRoot = () => {
       onClickBook={(id) => {
         navigate('reader', { state: { id } })
         dispatch(actions.getEpubStructure(id))
+        dispatch(annotationActions.getAnnotationStructure(id))
         dispatch(uiActions.setHideHeader(true))
       }}
     />

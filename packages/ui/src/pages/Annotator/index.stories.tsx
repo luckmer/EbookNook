@@ -29,6 +29,7 @@ export const BannersStory: Story = {
           width: 0,
           height: 0,
         }}
+        onClickCustomCopy={() => {}}
         onClickCopy={() => {}}
       />
     )

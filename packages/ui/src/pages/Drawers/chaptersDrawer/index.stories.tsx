@@ -10,10 +10,11 @@ export default meta
 type Story = StoryObj<typeof ChaptersDrawer>
 
 export const Default: Story = {
-  render: () => {
+  render: (args) => {
     return (
       <ChaptersDrawer
         isOpen
+        isLoader={args.isLoader}
         onClickBack={() => {}}
         onClick={() => {}}
         onClickClose={() => {}}
@@ -64,4 +65,8 @@ export const Default: Story = {
       />
     )
   },
+}
+
+Default.args = {
+  isLoader: false,
 }

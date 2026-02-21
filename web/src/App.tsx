@@ -1,5 +1,6 @@
 import Annotator from '@containers/Annotator'
 import Header from '@pages/Header'
+import { actions as annotationActions } from '@store/reducers/annotations/index'
 import { actions as bookActions } from '@store/reducers/books/index'
 import { actions } from '@store/reducers/search'
 import { actions as uiActions } from '@store/reducers/ui'
@@ -34,6 +35,7 @@ function App() {
       const book = booksMap[bookId]
       if (book) {
         dispatch(bookActions.getEpubStructure(book.book.id))
+        dispatch(annotationActions.getAnnotationStructure(book.book.id))
       }
     }
   }, [booksMap])

@@ -6,6 +6,7 @@ edition = "2024"
 [dependencies]
 tauri = { workspace = true }
 database = { path = "../database" }
+annotations = { path= "../annotations" }
 formats = { path = "../formats" }
 types = { path = "../types" }
 state = { path = "../state" }

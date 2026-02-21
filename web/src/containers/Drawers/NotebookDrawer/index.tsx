@@ -8,6 +8,7 @@ import { useLocation } from 'react-router-dom'
 
 const NotebookDrawerRoot = () => {
   const annotationsMap = useSelector(annotationsSelector.annotations)
+  const isLoader = useSelector(uiSelector.isFetchingAnnotations)
   const isOpen = useSelector(uiSelector.openNotebook)
 
   const location = useLocation()
@@ -23,6 +24,7 @@ const NotebookDrawerRoot = () => {
     <NotebookDrawer
       isOpen={isOpen}
       data={annotations}
+      isLoader={isLoader}
       onClickClose={() => {
         dispatch(uiActions.setOpenNotebook(false))
       }}

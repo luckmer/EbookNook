@@ -13,9 +13,15 @@ export interface IProps {
   modalPosition: Record<string, string>
   pointPosition: Record<string, string | number>
   onClickCopy: () => void
+  onClickCustomCopy: () => void
 }
 
-const Annotator: FC<IProps> = ({ modalPosition, pointPosition, onClickCopy }) => {
+const Annotator: FC<IProps> = ({
+  modalPosition,
+  pointPosition,
+  onClickCopy,
+  onClickCustomCopy,
+}) => {
   return (
     <div
       className="annotator-popup fixed z-50 bg-surface-100 shadow-lg rounded-lg flex items-center justify-center rounded-6"
@@ -29,7 +35,7 @@ const Annotator: FC<IProps> = ({ modalPosition, pointPosition, onClickCopy }) =>
           <FiCopy className="w-18 h-18 transition-colors duration-200" />
         </DefaultButton>
         <DefaultButton
-          onClick={() => {}}
+          onClick={onClickCustomCopy}
           className="transition-colors hover:bg-button-primary-hover hover:text-text-primary text-text-secondary duration-300 rounded-4 px-6 py-6">
           <FiEdit className="w-18 h-18 transition-colors duration-200" />
         </DefaultButton>

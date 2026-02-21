@@ -9,13 +9,19 @@ const meta: Meta<typeof NotebookDrawer> = {
 export default meta
 type Story = StoryObj<typeof NotebookDrawer>
 
+const data = new Array(20).fill(0).map(() => ({
+  label: 'Chapter 1',
+  description: 'Chapter 1',
+}))
+
 export const Default: Story = {
   render: (args) => {
     return (
       <NotebookDrawer
-        data={['Chapter 1', 'Chapter 2', 'Chapter 3', 'Chapter 4', 'Chapter 5']}
+        data={data}
         onClickClose={() => {}}
         isOpen={args.isOpen}
+        isLoader={args.isLoader}
       />
     )
   },
@@ -23,4 +29,5 @@ export const Default: Story = {
 
 Default.args = {
   isOpen: true,
+  isLoader: false,
 }

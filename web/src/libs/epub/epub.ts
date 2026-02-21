@@ -1,10 +1,9 @@
-import { Frame } from '@libs/Frame/FrameCore'
+import { Chapter, Epub as IEpub, Progress, Toc } from '@bindings/epub'
+import { IProgressInfo } from '@interfaces/index'
 import { ISettingsState } from '@interfaces/settings/interfaces'
-import { Chapter, Progress, Toc } from '@bindings/epub'
-import { Epub as IEpub } from '@bindings/epub'
+import { Frame } from '@libs/Frame/FrameCore'
 import { flatData } from '@utils/index'
 import { STATIC_UNIT } from './lib/static'
-import { IProgressInfo } from '@interfaces/index'
 
 export interface IEpubChapter extends Chapter {
   chapterIndex: number
@@ -39,6 +38,7 @@ export class Epub {
         .trim()
         .split(/\s+/)
         .filter((w) => w.length > 0)
+
       const wordCount = words.length
       const chapter = { ...content, offset: wordAcc, len: wordCount }
       wordAcc += wordCount

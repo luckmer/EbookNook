@@ -2,7 +2,6 @@ import { Books } from '@bindings/book'
 import { PayloadAction } from '@reduxjs/toolkit'
 import { actions, PayloadTypes } from '@store/reducers/books'
 import { actions as uiActions } from '@store/reducers/ui'
-
 import { invoke } from '@tauri-apps/api/core'
 import { getDocumentLoader } from 'src/libs/document'
 import { all, call, put, takeEvery, takeLatest, takeLeading } from 'typed-redux-saga'

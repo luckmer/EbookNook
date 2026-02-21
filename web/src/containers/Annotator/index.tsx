@@ -11,9 +11,10 @@ import {
   POPUP_WIDTH,
   TRIANGLE_SIZE,
 } from '@utils/static'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { useLocation } from 'react-router-dom'
+import { v7 } from 'uuid'
 
 interface IPosition {
   x: number
@@ -123,20 +124,37 @@ const AnnotatorRoot = () => {
     }
   }, [position.triangleX])
 
+  const removeSelection = useCallback(() => {
+    if (doc) {
+      const selection = doc.getSelection()
+      if (selection) {
+        selection.removeAllRanges()
+      }
+    }
+  }, [doc])
+
   return (
     <Show when={showAnnotator}>
       <Annotator
         onClickCopy={() => {
           dispatch(uiActions.setOpenNotebook(true))
-          dispatch(annotationActions.setAnnotation({ id: bookId, annotation: selectedText }))
+          dispatch(
+            annotationActions.setAnnotation({
+              id: bookId,
+              annotation: { label: selectedText, description: selectedText, id: v7() },
+            }),
+          )
           setPosition(DEFAULT_ANNOTATION_STATE)
           setShowAnnotator(false)
-          if (doc) {
-            const selection = doc.getSelection()
-            if (selection) {
-              selection.removeAllRanges()
-            }
-          }
+          removeSelection()
+        }}
+        onClickCustomCopy={() => {
+          dispatch(uiActions.setOpenNotebook(true))
+
+          setPosition(DEFAULT_ANNOTATION_STATE)
+          setShowAnnotator(false)
+
+          removeSelection()
         }}
         modalPosition={modalPosition}
         pointPosition={pointPosition}

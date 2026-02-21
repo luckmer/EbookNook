@@ -71,6 +71,7 @@ const ReaderRoot = () => {
   )
 
   useEffect(() => {
+    if (!book?.chapters.length || !book?.toc.length) return
     if (book && !isFetchingStructure && renderedBookIdRef.current !== book.book.id) {
       if (viewRef.current) viewRef.current.destroy()
 
@@ -91,40 +92,32 @@ const ReaderRoot = () => {
         renderedBookIdRef.current = null
       }
     }
-  }, [book?.book.id, isFetchingStructure, location.state?.id])
+  }, [book?.book.id, book?.chapters, book?.toc, isFetchingStructure, location.state?.id])
 
   useEffect(() => {
     if (viewRef.current && !isFetchingStructure) {
       viewRef.current.setStyles(settings)
       setLoading(true)
 
-      const promise = new Promise<Document>(async (resolve, reject) => {
-        const view = viewRef.current
+      if (selectedChapter) {
+        viewRef.current.display(selectedChapter).then(() => {
+          setLoading(false)
+        })
+        return
+      }
 
-        if (!view) {
-          reject('')
-          return
-        }
+      if (book?.book.progress.slice(0, 2)?.every((p) => p.length > 0)) {
+        viewRef.current.loadProgress(book.book.progress).then(() => {
+          setLoading(false)
+        })
+        return
+      }
 
-        if (selectedChapter) {
-          await view.display(selectedChapter)
-          resolve(view.frame.document)
-          return
-        }
-
-        if (book?.book.progress.slice(0, 2)?.every((p) => p.length > 0)) {
-          await view.loadProgress(book.book.progress)
-          resolve(view.frame.document)
-          return
-        }
-
-        await view.display()
-        resolve(view.frame.document)
+      viewRef.current.display().then(() => {
+        setLoading(false)
       })
-
-      promise.finally(() => setLoading(false))
     }
-  }, [selectedChapter, isFetchingStructure, book?.book.id])
+  }, [selectedChapter, isFetchingStructure, book?.book.id, book?.chapters, book?.toc])
 
   useEffect(() => {
     if (!loading) {
