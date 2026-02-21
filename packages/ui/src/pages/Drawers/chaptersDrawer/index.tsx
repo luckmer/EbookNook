@@ -1,10 +1,12 @@
+import { type Toc as IToc } from '@bindings/epub'
 import DefaultButton from '@components/Buttons/DefaultButton'
 import Drawer from '@components/Drawer'
+import Show from '@components/Show'
 import Toc from '@components/Toc'
 import { Typography } from '@components/Typography'
+import { Skeleton } from 'antd'
 import { FC } from 'react'
 import { IoLibraryOutline } from 'react-icons/io5'
-import { type Toc as IToc } from '@bindings/epub'
 export interface IProps {
   onClick: (href: string) => void
   onClickClose: () => void
@@ -14,6 +16,7 @@ export interface IProps {
   title: string
   author: string
   toc: IToc[]
+  isLoader: boolean
 }
 
 const ChaptersDrawer: FC<IProps> = ({
@@ -25,6 +28,7 @@ const ChaptersDrawer: FC<IProps> = ({
   icon,
   title,
   author,
+  isLoader,
 }) => {
   return (
     <Drawer onClickClose={onClickClose} isOpen={isOpen} placement="left">
@@ -36,23 +40,27 @@ const ChaptersDrawer: FC<IProps> = ({
             <IoLibraryOutline className="w-24 h-24 transition-colors duration-200" />
           </DefaultButton>
         </div>
-        <div className="flex flex-row gap-12">
-          <img
-            src={icon}
-            className="w-48 h-[64px] object-cover rounded-4 pointer-events-none select-none"
-          />
-          <div className="flex flex-col gap-6">
-            <Typography>{title}</Typography>
-            <Typography text="small" color="secondary">
-              {author}
-            </Typography>
+        <Show when={!isLoader} fallback={<Skeleton active />}>
+          <div className="flex flex-row gap-12">
+            <img
+              src={icon}
+              className="w-48 h-[64px] object-cover rounded-4 pointer-events-none select-none"
+            />
+            <div className="flex flex-col gap-6">
+              <Typography>{title}</Typography>
+              <Typography text="small" color="secondary">
+                {author}
+              </Typography>
+            </div>
           </div>
-        </div>
+        </Show>
       </div>
       <div className="py-12">
-        {toc.map((el, index) => (
-          <Toc key={index} item={el} level={0} onClick={onClick} />
-        ))}
+        <Show when={!isLoader} fallback={<Skeleton active />}>
+          {toc.map((el, index) => (
+            <Toc key={index} item={el} level={0} onClick={onClick} />
+          ))}
+        </Show>
       </div>
     </Drawer>
   )

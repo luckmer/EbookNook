@@ -6,3 +6,4 @@ edition = "2024"
 [dependencies]
 database = { path = "../database" }
 formats = { path = "../formats" }
+annotations = { path = "../annotations" }

@@ -3,17 +3,18 @@ import ChaptersDrawer from '.'
 
 const meta: Meta<typeof ChaptersDrawer> = {
   component: ChaptersDrawer,
-  title: 'Pages/ChaptersDrawer',
+  title: 'Pages/Drawers/ChaptersDrawer',
 }
 
 export default meta
 type Story = StoryObj<typeof ChaptersDrawer>
 
 export const Default: Story = {
-  render: () => {
+  render: (args) => {
     return (
       <ChaptersDrawer
         isOpen
+        isLoader={args.isLoader}
         onClickBack={() => {}}
         onClick={() => {}}
         onClickClose={() => {}}
@@ -64,4 +65,8 @@ export const Default: Story = {
       />
     )
   },
+}
+
+Default.args = {
+  isLoader: false,
 }

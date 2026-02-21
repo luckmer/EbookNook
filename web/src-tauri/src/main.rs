@@ -1,6 +1,6 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
-use api::commands;
+use annotations::init_annotations_service;
 use database::service::init_database;
 use formats::init_format_service;
 use state::AppState;
@@ -17,6 +17,7 @@ fn main() {
                 let db_manager = init_database(handle).await;
 
                 let state = AppState {
+                    annotations_service: init_annotations_service(),
                     format_service: init_format_service(),
                     db: db_manager,
                 };
@@ -36,12 +37,15 @@ fn main() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
-            commands::get_books,
-            commands::add_epub_book,
-            commands::get_epub_structure_by_id,
-            commands::set_epub_book_progress,
-            commands::delete_epub_book,
-            commands::edit_epub_book,
+            api::books::get_books,
+            api::epub::add_epub_book,
+            api::epub::get_epub_structure_by_id,
+            api::epub::set_epub_book_progress,
+            api::epub::delete_epub_book,
+            api::epub::edit_epub_book,
+            api::annotations::add_annotation_structure,
+            api::annotations::get_annotations_structure_by_id,
+            api::annotations::delete_annotation_by_id
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

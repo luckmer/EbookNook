@@ -1,4 +1,4 @@
-use crate::{EPUB_BOOK_TABLE, EPUB_CHAPTERS_TABLE, EPUB_TOC_TABLE};
+use crate::{ANNOTATIONS_TABLE, EPUB_BOOK_TABLE, EPUB_CHAPTERS_TABLE, EPUB_TOC_TABLE};
 use sqlx::sqlite::{SqliteConnectOptions, SqliteJournalMode, SqlitePoolOptions, SqliteSynchronous};
 use sqlx::{Pool, Sqlite, SqlitePool};
 use std::fs;
@@ -41,12 +41,13 @@ impl DatabaseManager {
     }
 
     async fn run_migrations(&self) -> Result<(), Box<dyn std::error::Error>> {
-            sqlx::query("PRAGMA foreign_keys = ON;")
+        sqlx::query("PRAGMA foreign_keys = ON;")
             .execute(&self.pool)
             .await?;
         sqlx::query(EPUB_BOOK_TABLE).execute(&self.pool).await?;
         sqlx::query(EPUB_TOC_TABLE).execute(&self.pool).await?;
         sqlx::query(EPUB_CHAPTERS_TABLE).execute(&self.pool).await?;
+        sqlx::query(ANNOTATIONS_TABLE).execute(&self.pool).await?;
 
         Ok(())
     }

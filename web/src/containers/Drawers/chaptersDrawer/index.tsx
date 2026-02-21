@@ -1,6 +1,6 @@
-import ChaptersDrawer from '@pages/chaptersDrawer'
-import { actions as uiActions } from '@store/reducers/ui'
+import ChaptersDrawer from '@pages/Drawers/chaptersDrawer'
 import { actions as bookActions } from '@store/reducers/books'
+import { actions as uiActions } from '@store/reducers/ui'
 import { selectEpubMap } from '@store/selectors/books'
 import { uiSelector } from '@store/selectors/ui'
 import { useEffect, useMemo, useState } from 'react'
@@ -11,6 +11,7 @@ const ChaptersDrawerRoot = () => {
   const [cache, setCache] = useState('')
   const booksMap = useSelector(selectEpubMap)
   const isOpen = useSelector(uiSelector.openChaptersDrawer)
+  const isLoader = useSelector(uiSelector.isFetchingStructure)
   const navigate = useNavigate()
 
   const location = useLocation()
@@ -33,6 +34,7 @@ const ChaptersDrawerRoot = () => {
       icon={book?.book.metadata?.cover}
       title={book?.book.title ?? '--'}
       toc={book?.toc ?? []}
+      isLoader={isLoader}
       isOpen={isOpen}
       onClickBack={() => {
         dispatch(uiActions.setOpenChaptersDrawer(false))

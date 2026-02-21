@@ -1,4 +1,5 @@
 import { ISettingsState } from '@interfaces/settings/interfaces'
+import { Annotations } from '@libs/annotations'
 import { getStyles, setStylesImportant } from './utils'
 
 export class Frame {
@@ -19,6 +20,7 @@ export class Frame {
   private isNavigating = false
   private lockedTotalPages = 0
   private isInitialLoad = true
+  private annotations?: Annotations
 
   constructor() {
     this.element = document.createElement('div')
@@ -253,6 +255,7 @@ export class Frame {
   }
 
   async loadChapter(content: string) {
+    this.annotations?.destroy()
     return this.enqueue(async () => {
       this.removeScrollListener()
       this.currentPage = 1
@@ -284,6 +287,7 @@ export class Frame {
           this.observer.observe(this.element)
 
           this.progressCallback?.(this.currentPage, this.lockedTotalPages, this.element.scrollLeft)
+          this.annotations = new Annotations(this.document, this.iframe)
           resolve()
         }
       })
@@ -429,6 +433,7 @@ export class Frame {
   }
 
   destroy() {
+    this.annotations?.destroy()
     this.observer.disconnect()
     this.removeScrollListener()
     if (this.blobUrl) {

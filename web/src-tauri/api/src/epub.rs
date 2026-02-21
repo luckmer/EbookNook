@@ -2,16 +2,7 @@ use std::collections::HashMap;
 
 use state::AppState;
 use tauri::State;
-use types::{Books, Epub, EpubStructure, NewEpubBookContent, Progress};
-
-#[tauri::command]
-pub async fn get_books(state: State<'_, AppState>) -> Result<Books, String> {
-    state
-        .format_service
-        .get_books(&state.db)
-        .await
-        .map_err(|e| e.to_string())
-}
+use types::{Epub, EpubStructure, NewEpubBookContent, Progress};
 
 #[tauri::command]
 pub async fn add_epub_book(state: State<'_, AppState>, epub: Epub) -> Result<(), String> {

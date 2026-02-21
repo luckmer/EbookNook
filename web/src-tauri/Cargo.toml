@@ -28,6 +28,7 @@ tauri-build = { version = "2", features = [
 [dependencies]
 database = { path = "./database" }
 formats = { path = "./formats" }
+annotations = { path = "./annotations" }
 search = { path = "./search" }
 utils = { path = "./utils" }
 api = { path = "./api" }
@@ -46,6 +47,7 @@ sqlx = { version = "0.8.6", features = [
   "chrono",
   "sqlite",
   "runtime-tokio-rustls",
+  "macros",
 ] }
 ts-rs = "11.1.0"
 tauri-plugin-fs = "2"
@@ -61,6 +63,7 @@ sqlx = { version = "0.8.6", features = [
   "chrono",
   "sqlite",
   "runtime-tokio-rustls",
+  "macros",
 ] }
 
 tauri = { version = "2", features = [
@@ -75,4 +78,5 @@ members = [
   "utils",
   "types",
   "state",
+  "annotations",
 ]

@@ -1,3 +1,7 @@
-pub mod commands;
+pub mod annotations;
+pub mod books;
+pub mod epub;
 
-pub use commands::*;
+pub use annotations::*;
+pub use books::*;
+pub use epub::*;
