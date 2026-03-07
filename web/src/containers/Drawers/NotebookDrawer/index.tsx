@@ -6,14 +6,12 @@ import { uiSelector } from '@store/selectors/ui'
 import { useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation } from 'react-router-dom'
-import { v7 } from 'uuid'
 
 const NotebookDrawerRoot = () => {
   const annotationsMap = useSelector(annotationsSelector.annotations)
   const isLoader = useSelector(uiSelector.isFetchingAnnotations)
   const annotationId = useSelector(annotationsSelector.newAnnotationId)
   const isOpen = useSelector(uiSelector.openNotebook)
-
   const location = useLocation()
   const dispatch = useDispatch()
 
@@ -64,7 +62,7 @@ const NotebookDrawerRoot = () => {
             annotation: {
               label,
               description,
-              id: annotationId ?? v7(),
+              id: annotationId,
               annotated: true,
             },
           }),
