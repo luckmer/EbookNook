@@ -141,21 +141,37 @@ const AnnotatorRoot = () => {
           dispatch(
             annotationActions.setAnnotation({
               id: bookId,
-              annotation: { label: selectedText, description: selectedText, id: v7() },
+              annotation: {
+                label: selectedText,
+                description: selectedText,
+                id: v7(),
+                annotated: false,
+              },
             }),
           )
           setPosition(DEFAULT_ANNOTATION_STATE)
           setShowAnnotator(false)
           removeSelection()
         }}
-        // onClickCustomCopy={() => {
-        //   dispatch(uiActions.setOpenNotebook(true))
-
-        //   setPosition(DEFAULT_ANNOTATION_STATE)
-        //   setShowAnnotator(false)
-
-        //   removeSelection()
-        // }}
+        onClickAddNote={() => {
+          dispatch(uiActions.setOpenNotebook(true))
+          const id = v7()
+          dispatch(annotationActions.setAnnotationId(id))
+          dispatch(
+            annotationActions.setCustomAnnotation({
+              id: bookId,
+              annotation: {
+                label: selectedText,
+                description: selectedText,
+                id,
+                annotated: true,
+              },
+            }),
+          )
+          setPosition(DEFAULT_ANNOTATION_STATE)
+          setShowAnnotator(false)
+          removeSelection()
+        }}
         modalPosition={modalPosition}
         pointPosition={pointPosition}
       />

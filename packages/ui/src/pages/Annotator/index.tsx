@@ -1,6 +1,6 @@
 import DefaultButton from '@components/Buttons/DefaultButton'
 import { FC } from 'react'
-import { FiCopy } from 'react-icons/fi'
+import { FiCopy, FiEdit } from 'react-icons/fi'
 
 export interface IModalPosition {
   top: string
@@ -13,15 +13,10 @@ export interface IProps {
   modalPosition: Record<string, string>
   pointPosition: Record<string, string | number>
   onClickCopy: () => void
-  // onClickCustomCopy: () => void
+  onClickAddNote: () => void
 }
 
-const Annotator: FC<IProps> = ({
-  modalPosition,
-  pointPosition,
-  onClickCopy,
-  // onClickCustomCopy,
-}) => {
+const Annotator: FC<IProps> = ({ modalPosition, pointPosition, onClickCopy, onClickAddNote }) => {
   return (
     <div
       className="annotator-popup fixed z-50 bg-surface-100 shadow-lg rounded-lg flex items-center justify-center rounded-6"
@@ -34,11 +29,11 @@ const Annotator: FC<IProps> = ({
           className="transition-colors hover:bg-button-primary-hover hover:text-text-primary text-text-secondary duration-300 rounded-4 px-6 py-6">
           <FiCopy className="w-18 h-18 transition-colors duration-200" />
         </DefaultButton>
-        {/* <DefaultButton
-          onClick={onClickCustomCopy}
+        <DefaultButton
+          onClick={onClickAddNote}
           className="transition-colors hover:bg-button-primary-hover hover:text-text-primary text-text-secondary duration-300 rounded-4 px-6 py-6">
           <FiEdit className="w-18 h-18 transition-colors duration-200" />
-        </DefaultButton> */}
+        </DefaultButton>
       </div>
     </div>
   )
