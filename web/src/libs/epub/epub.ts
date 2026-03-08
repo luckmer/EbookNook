@@ -3,6 +3,7 @@ import { IProgressInfo } from '@interfaces/index'
 import { ISettingsState } from '@interfaces/settings/interfaces'
 import { Frame } from '@libs/Frame/FrameCore'
 import { flatData } from '@utils/index'
+import { AnchorContent } from './AnchorContent'
 import { STATIC_UNIT } from './lib/static'
 
 export interface IEpubChapter extends Chapter {
@@ -15,11 +16,12 @@ export interface IChapter extends Chapter {
 }
 
 export class Epub {
-  private totalPages: number = 0
-  private currentStaticPage: number = 1
+  anchorContent = new AnchorContent()
+  frame = new Frame()
+  totalPages: number = 0
+  currentStaticPage: number = 1
   chapterByPath: Record<string, IChapter> = {}
   chapters: IChapter[] = []
-  frame = new Frame()
   totalWords = 0
   lastPath = ''
   toc: Toc[] = []
@@ -28,9 +30,10 @@ export class Epub {
     this.parseBook()
     this.calculateTotalPages()
     this.frame.onLinkClick((href) => this.handleLinkClick(href))
+    this.anchorContent.init(this.frame)
   }
 
-  private parseBook() {
+  parseBook(): void {
     let wordAcc = 0
     this.chapters = this.book.chapters.map((content) => {
       const text = content.content.replace(/<[^>]*>/g, '')
@@ -53,7 +56,7 @@ export class Epub {
     this.toc = flatData(this.book.toc)
   }
 
-  private calculateTotalPages() {
+  calculateTotalPages(): void {
     this.totalPages = 0
 
     for (const chapter of this.chapters) {
@@ -62,7 +65,7 @@ export class Epub {
     }
   }
 
-  private getPagesBefore(chapterIndex: number): number {
+  getPagesBefore(chapterIndex: number): number {
     let pagesBefore = 0
 
     for (let i = 0; i < chapterIndex; i++) {
@@ -74,7 +77,7 @@ export class Epub {
     return pagesBefore
   }
 
-  private updateStaticPage(currentActualPage: number, totalActualPages: number) {
+  updateStaticPage(currentActualPage: number, totalActualPages: number): void {
     const chapter = this.chapterByPath[this.lastPath]
     if (!chapter) return
 
@@ -96,11 +99,11 @@ export class Epub {
     this.currentStaticPage = pagesBefore + currentPageInChapter
   }
 
-  private formatHref = (href: string) => {
+  formatHref = (href: string): string => {
     return href.split('/').pop()!.split('#')[0]
   }
 
-  private handleLinkClick(href: string) {
+  handleLinkClick(href: string): void {
     if (href.startsWith('#')) {
       const id = href.substring(1)
       const anchor = this.getHTMLFragment(this.frame.document, id)
@@ -138,13 +141,13 @@ export class Epub {
     }
   }
 
-  private getHTMLFragment(doc: Document, id: string) {
+  getHTMLFragment(doc: Document, id: string): Element | null {
     return (
       doc.querySelector(`#${CSS.escape(id)}`) || doc.querySelector(`[name="${CSS.escape(id)}"]`)
     )
   }
 
-  progress(callback: (data: IProgressInfo) => void) {
+  progress(callback: (data: IProgressInfo) => void): void {
     this.frame.progress((curr, tot, offset) => {
       const chapter = this.chapterByPath[this.lastPath]
 
@@ -180,7 +183,7 @@ export class Epub {
     })
   }
 
-  async display(href?: string, lastPage = false) {
+  async display(href?: string, lastPage = false): Promise<void> {
     if (!href) {
       const path = this.formatHref(this.chapters[0].href)
       const chapter = this.chapterByPath[path]
@@ -234,7 +237,7 @@ export class Epub {
     this.frame.scrollToPage(targetPage)
   }
 
-  async loadProgress(progress: Progress) {
+  async loadProgress(progress: Progress): Promise<void> {
     const [chapterHref, savedOffset] = progress
 
     const path = this.formatHref(chapterHref)
@@ -254,7 +257,8 @@ export class Epub {
     this.frame.scrollToOffset(+savedOffset)
   }
 
-  nextPage() {
+  nextPage(): void {
+    this.unAnchor()
     if (this.frame.getCurrentPage() < this.frame.getTotalPages()) {
       this.frame.scrollToPage(this.frame.getCurrentPage() + 1)
     } else {
@@ -262,7 +266,8 @@ export class Epub {
     }
   }
 
-  prevPage() {
+  prevPage(): void {
+    this.unAnchor()
     if (this.frame.getCurrentPage() > 1) {
       this.frame.scrollToPage(this.frame.getCurrentPage() - 1)
     } else {
@@ -270,37 +275,53 @@ export class Epub {
     }
   }
 
-  async nextChapter() {
+  async nextChapter(): Promise<void> {
+    this.unAnchor()
     const idx = this.chapters.findIndex((c) => this.formatHref(c.href) === this.lastPath)
     if (idx !== -1 && this.chapters[idx + 1]) {
       await this.display(this.chapters[idx + 1].href)
     }
   }
 
-  async prevChapter(toLast = false) {
+  async prevChapter(toLast = false): Promise<void> {
+    this.unAnchor()
     const idx = this.chapters.findIndex((c) => this.formatHref(c.href) === this.lastPath)
     if (idx !== -1 && this.chapters[idx - 1]) {
       await this.display(this.chapters[idx - 1].href, toLast)
     }
   }
 
-  setStyles(s: ISettingsState) {
+  setStyles(s: ISettingsState): void {
     this.frame.setStyles(s)
   }
 
-  renderTo(s: string) {
+  renderTo(s: string): void {
     this.frame.attachTo(s)
   }
 
-  destroy() {
-    this.frame.destroy()
-  }
-
-  public getTotalPagesCount(): number {
+  getTotalPagesCount(): number {
     return this.totalPages
   }
 
-  public getCurrentStaticPage(): number {
+  getCurrentStaticPage(): number {
     return this.currentStaticPage
+  }
+
+  async anchor(anchorId: string, text: string): Promise<void> {
+    const [, , bookChapter] = anchorId.split('#')
+    const chapter = this.chapterByPath[bookChapter]
+    if (!chapter) return
+    this.lastPath = bookChapter
+    await this.frame.loadChapter(chapter.content)
+    await this.anchorContent.anchor(text)
+  }
+
+  unAnchor(): void {
+    this.anchorContent.unAnchor()
+  }
+
+  destroy(): void {
+    this.unAnchor()
+    this.frame.destroy()
   }
 }

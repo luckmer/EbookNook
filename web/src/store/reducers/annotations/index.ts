@@ -4,12 +4,24 @@ import { PayloadType } from '@store/helper'
 
 export const annotationsStore = 'annotationsStore'
 
+export interface ISelectedAnnotation {
+  id: string
+  text: string
+}
+
 export interface IAnnotationsState {
-  newAnnotationId: string
   annotations: Record<string, Annotations>
+  selectedAnnotation: ISelectedAnnotation
+  newAnnotationId: string
+}
+
+export const defaultSelectedAnnotation = {
+  id: '',
+  text: '',
 }
 
 const defaultState: IAnnotationsState = {
+  selectedAnnotation: defaultSelectedAnnotation,
   newAnnotationId: '',
   annotations: {},
 }
@@ -52,6 +64,14 @@ export const store = createSlice({
     setAnnotations(state, action: PayloadAction<{ id: string; annotations: Annotations }>) {
       if (!state.annotations[action.payload.id]) state.annotations[action.payload.id] = []
       state.annotations[action.payload.id] = action.payload.annotations
+      return state
+    },
+    setSelectedAnnotation(state, action: PayloadAction<ISelectedAnnotation>) {
+      state.selectedAnnotation = action.payload
+      return state
+    },
+    setResetSelectedAnnotation(state) {
+      state.selectedAnnotation = defaultSelectedAnnotation
       return state
     },
     setAnnotationId(state, action: PayloadAction<string>) {

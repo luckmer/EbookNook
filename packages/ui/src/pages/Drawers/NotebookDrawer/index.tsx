@@ -14,7 +14,7 @@ import { LuNotebookPen } from 'react-icons/lu'
 export interface IProps {
   onClickSave: (id: string, label: string) => void
   onClickDelete: (id: string) => void
-  onClickFocus: (text: string) => void
+  onClickFocus: (text: string, id: string) => void
   onClickCancel: () => void
   onClickClose: () => void
   isOpen: boolean
@@ -98,7 +98,7 @@ const NotebookDrawer: FC<IProps> = ({
                     label={item.label}
                     onClickFocus={() => {
                       if (isEditing) return
-                      onClickFocus(item.description)
+                      onClickFocus(item.description, item.id)
                     }}
                     placeholder="Add your notes here..."
                     value={noteLabel}
@@ -109,7 +109,7 @@ const NotebookDrawer: FC<IProps> = ({
                         <div
                           onClick={() => {
                             if (isEditing) return
-                            onClickFocus(item.description)
+                            onClickFocus(item.description, item.id)
                           }}
                           className="pt-12 cursor-pointer">
                           <Typography text="caption" class="cursor-pointer">

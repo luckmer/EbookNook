@@ -49,8 +49,9 @@ const NotebookDrawerRoot = () => {
           dispatch(annotationActions.setAnnotationId(''))
         }
       }}
-      onClickFocus={() => {
+      onClickFocus={(text, id) => {
         dispatch(uiActions.setOpenNotebook(false))
+        dispatch(annotationActions.setSelectedAnnotation({ id, text }))
       }}
       onClickSave={(description, label) => {
         dispatch(annotationActions.setAnnotationId(''))
