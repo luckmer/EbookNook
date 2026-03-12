@@ -7,6 +7,7 @@ pub struct Annotation {
     pub id: String,
     pub label: String,
     pub description: String,
+    pub annotated: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, TS)]

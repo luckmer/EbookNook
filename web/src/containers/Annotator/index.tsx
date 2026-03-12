@@ -3,6 +3,7 @@ import { getEventEmitter } from '@libs/eventEmitter'
 import Annotator from '@pages/Annotator'
 import { actions as annotationActions } from '@store/reducers/annotations'
 import { actions as uiActions } from '@store/reducers/ui'
+import { selectEpubMap } from '@store/selectors/books'
 import {
   DEFAULT_ANNOTATION_STATE,
   GAP,
@@ -12,7 +13,7 @@ import {
   TRIANGLE_SIZE,
 } from '@utils/static'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useLocation } from 'react-router-dom'
 import { v7 } from 'uuid'
 
@@ -29,6 +30,7 @@ interface IDetail {
 }
 
 const AnnotatorRoot = () => {
+  const booksMap = useSelector(selectEpubMap)
   const [doc, setDoc] = useState<Document | null>(null)
   const [position, setPosition] = useState<IPosition>(DEFAULT_ANNOTATION_STATE)
   const [showAnnotator, setShowAnnotator] = useState(false)
@@ -36,7 +38,8 @@ const AnnotatorRoot = () => {
   const dispatch = useDispatch()
   const location = useLocation()
 
-  const bookId = useMemo(() => location?.state?.id, [location])
+  const bookId = useMemo(() => location?.state?.id.trim(), [location])
+  const book = useMemo(() => booksMap[bookId], [bookId, booksMap])
 
   useEffect(() => {
     const emitter = getEventEmitter()
@@ -141,21 +144,49 @@ const AnnotatorRoot = () => {
           dispatch(
             annotationActions.setAnnotation({
               id: bookId,
-              annotation: { label: selectedText, description: selectedText, id: v7() },
+              annotation: {
+                label: selectedText,
+                description: selectedText,
+                id: v7(),
+                annotated: false,
+              },
             }),
           )
           setPosition(DEFAULT_ANNOTATION_STATE)
           setShowAnnotator(false)
           removeSelection()
         }}
-        // onClickCustomCopy={() => {
-        //   dispatch(uiActions.setOpenNotebook(true))
+        onClickAddNote={() => {
+          const progress = book?.book.progress
 
-        //   setPosition(DEFAULT_ANNOTATION_STATE)
-        //   setShowAnnotator(false)
+          if (!progress) {
+            setPosition(DEFAULT_ANNOTATION_STATE)
+            setShowAnnotator(false)
+            removeSelection()
+            return
+          }
 
-        //   removeSelection()
-        // }}
+          const [chapterHref] = progress
+          dispatch(uiActions.setOpenNotebook(true))
+
+          const id = `${v7()}#${bookId}#${chapterHref}`
+
+          dispatch(annotationActions.setAnnotationId(id))
+          dispatch(
+            annotationActions.setCustomAnnotation({
+              id: bookId,
+              annotation: {
+                label: selectedText,
+                description: selectedText,
+                id,
+                annotated: true,
+              },
+            }),
+          )
+          setPosition(DEFAULT_ANNOTATION_STATE)
+          setShowAnnotator(false)
+          removeSelection()
+        }}
         modalPosition={modalPosition}
         pointPosition={pointPosition}
       />

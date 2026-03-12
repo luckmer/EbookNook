@@ -10,27 +10,64 @@ import { useLocation } from 'react-router-dom'
 const NotebookDrawerRoot = () => {
   const annotationsMap = useSelector(annotationsSelector.annotations)
   const isLoader = useSelector(uiSelector.isFetchingAnnotations)
+  const annotationId = useSelector(annotationsSelector.newAnnotationId)
   const isOpen = useSelector(uiSelector.openNotebook)
-
   const location = useLocation()
   const dispatch = useDispatch()
 
   const bookId = useMemo(() => location?.state?.id, [location])
 
   const annotations = useMemo(() => {
-    return Object.values(annotationsMap[bookId] ?? {})
+    return Object.values(annotationsMap[bookId] ?? {}).filter((el) => !el.annotated)
+  }, [bookId, annotationsMap])
+
+  const notes = useMemo(() => {
+    return Object.values(annotationsMap[bookId] ?? {}).filter((el) => !!el.annotated)
   }, [bookId, annotationsMap])
 
   return (
     <NotebookDrawer
       isOpen={isOpen}
       data={annotations}
+      notes={notes}
+      noteId={annotationId}
       isLoader={isLoader}
       onClickClose={() => {
+        if (annotationId.trim().length > 0) {
+          dispatch(annotationActions.deleteAnnotationById({ id: annotationId, bookId }))
+          dispatch(annotationActions.setAnnotationId(''))
+        }
         dispatch(uiActions.setOpenNotebook(false))
       }}
       onClickDelete={(id) => {
         dispatch(annotationActions.deleteAnnotationById({ id, bookId }))
+      }}
+      onClickCancel={() => {
+        dispatch(uiActions.setOpenNotebook(false))
+        if (annotationId.trim().length > 0) {
+          dispatch(annotationActions.deleteAnnotationById({ id: annotationId, bookId }))
+          dispatch(annotationActions.setAnnotationId(''))
+        }
+      }}
+      onClickFocus={(text, id) => {
+        dispatch(uiActions.setOpenNotebook(false))
+        dispatch(annotationActions.setSelectedAnnotation({ id, text }))
+      }}
+      onClickSave={(description, label) => {
+        dispatch(annotationActions.setAnnotationId(''))
+        dispatch(uiActions.setOpenNotebook(false))
+        dispatch(
+          annotationActions.setAnnotation({
+            id: bookId,
+            updateAnnotation: true,
+            annotation: {
+              label,
+              description,
+              id: annotationId,
+              annotated: true,
+            },
+          }),
+        )
       }}
     />
   )

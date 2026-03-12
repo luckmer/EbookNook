@@ -13,6 +13,7 @@ export const BannersStory: Story = {
   render: () => {
     return (
       <Annotator
+        onClickAddNote={() => {}}
         modalPosition={{
           top: `${0}px`,
           left: `${0}px`,
