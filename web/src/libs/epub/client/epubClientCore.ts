@@ -1,3 +1,4 @@
+import { Book } from '@bindings/epub'
 import { BookFormat } from '@interfaces/book/enums'
 import { IBookState } from '@interfaces/book/interfaces'
 import { rstr2hex } from '@utils/index'
@@ -5,7 +6,6 @@ import { EpubContentParser } from '../lib/chapters'
 import { EpubMetadataParser } from '../lib/epubMetadata'
 import { EpubTocParser } from '../lib/toc'
 import { ZipParser } from '../lib/zipParser'
-import { Book } from '@bindings/epub'
 
 export default class EpubClientCore {
   private metadataParser = new EpubMetadataParser()
@@ -26,7 +26,7 @@ export default class EpubClientCore {
       format: BookFormat.EPUB,
       id: `${rstr2hex(metadata.author)}-${rstr2hex(metadata.title)}-${rstr2hex(
         Date.now().toString(),
-      )} `,
+      )}`,
       title: metadata.title,
       author: metadata.author,
       sourceTitle: metadata.title,

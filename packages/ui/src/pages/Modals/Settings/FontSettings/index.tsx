@@ -38,7 +38,7 @@ const FontSettings: FC<IProps> = ({
   ]
 
   return (
-    <div className="flex flex-col gap-[36px] h-full min-h-[552px]  w-full">
+    <div className="flex flex-col gap-[36px] h-full w-full">
       <div className="flex flex-row gap-12 items-center justify-between px-24">
         <Typography text="body">Font</Typography>
         <DefaultButton

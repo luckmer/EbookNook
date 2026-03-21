@@ -3,8 +3,7 @@ import Show from '@components/Show'
 import { Typography } from '@components/Typography'
 import clsx from 'clsx'
 import { FC } from 'react'
-import { IoMdClose } from 'react-icons/io'
-import { IoIosArrowBack } from 'react-icons/io'
+import { IoIosArrowBack, IoMdClose } from 'react-icons/io'
 
 export interface IProps {
   onClickOpen?: () => void
@@ -15,7 +14,9 @@ export interface IProps {
 
 const ModalHeader: FC<IProps> = ({ label, onClickClose, onClickOpen, open }) => {
   return (
-    <div className="flex flex-row gap-12 items-center justify-between border-b border-border-modal p-16">
+    <div
+      className="flex flex-row gap-12 items-center justify-between border-b border-border-modal p-16"
+      data-tauri-drag-region>
       <div className="flex flex-row gap-12 items-center">
         <Show when={typeof onClickOpen !== 'undefined'}>
           <DefaultButton

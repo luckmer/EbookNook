@@ -3,24 +3,23 @@ import { Annotations } from '@libs/annotations'
 import { getStyles, setStylesImportant } from './utils'
 
 export class Frame {
-  private observer: ResizeObserver
+  observer: ResizeObserver
   element: HTMLDivElement
-  private iframe: HTMLIFrameElement
-  private spacer: HTMLDivElement
-  private viewportWidth = 0
-  private viewportHeight = 0
-  private currentPage = 1
-  private totalPages = 1
-  private padding = 20
-  private queue: Promise<void> = Promise.resolve()
-  private progressCallback?: (current: number, total: number, offset: number) => void
-  private linkClickCallback?: (href: string) => void
-  private blobUrl?: string
-  private chapterStyles: Partial<ISettingsState> = {}
-  private isNavigating = false
-  private lockedTotalPages = 0
-  private isInitialLoad = true
-  private annotations?: Annotations
+  iframe: HTMLIFrameElement
+  spacer: HTMLDivElement
+  viewportWidth = 0
+  viewportHeight = 0
+  currentPage = 1
+  totalPages = 1
+  padding = 20
+  progressCallback?: (current: number, total: number, offset: number) => void
+  linkClickCallback?: (href: string) => void
+  blobUrl?: string
+  chapterStyles: Partial<ISettingsState> = {}
+  isNavigating = false
+  lockedTotalPages = 0
+  isInitialLoad = true
+  annotations?: Annotations
 
   constructor() {
     this.element = document.createElement('div')
@@ -74,7 +73,7 @@ export class Frame {
     return this.iframe.contentDocument!
   }
 
-  private setImageSize() {
+  setImageSize(): void {
     const doc = this.document
     if (!doc?.body) return
 
@@ -97,25 +96,18 @@ export class Frame {
     }
   }
 
-  progress(callback: (current: number, total: number, offset: number) => void) {
+  progress(callback: (current: number, total: number, offset: number) => void): void {
     this.progressCallback = callback
     callback(this.currentPage, this.lockedTotalPages || this.totalPages, this.element.scrollLeft)
   }
 
-  private enqueue(action: () => Promise<void>) {
-    this.queue = this.queue.then(() => action()).catch(console.error)
-    return this.queue
+  attachTo(selector: string): void {
+    const container = document.querySelector(selector)
+    if (!container) throw new Error("Can't find container")
+    container.appendChild(this.element)
   }
 
-  attachTo(selector: string) {
-    return this.enqueue(async () => {
-      const container = document.querySelector(selector)
-      if (!container) throw new Error("Can't find container")
-      container.appendChild(this.element)
-    })
-  }
-
-  setStyles(styles: ISettingsState) {
+  setStyles(styles: ISettingsState): void {
     try {
       const oldTotalPages = this.lockedTotalPages || this.totalPages
       const positionPercentage =
@@ -138,7 +130,7 @@ export class Frame {
     }
   }
 
-  private applyStyles() {
+  applyStyles(): void {
     const doc = this.document
     if (!doc) return
 
@@ -198,11 +190,11 @@ export class Frame {
     })
   }
 
-  onLinkClick(callback: (href: string) => void) {
+  onLinkClick(callback: (href: string) => void): void {
     this.linkClickCallback = callback
   }
 
-  attachLinkHandler() {
+  attachLinkHandler(): void {
     const doc = this.document
     if (!doc) return
 
@@ -216,9 +208,9 @@ export class Frame {
     })
   }
 
-  private onElementScroll?: () => void
+  onElementScroll?: () => void
 
-  private attachScrollListener() {
+  attachScrollListener(): void {
     this.removeScrollListener()
 
     this.onElementScroll = () => {
@@ -247,54 +239,52 @@ export class Frame {
     this.element.addEventListener('scroll', this.onElementScroll, { passive: true })
   }
 
-  private removeScrollListener() {
+  removeScrollListener(): void {
     if (this.onElementScroll) {
       this.element.removeEventListener('scroll', this.onElementScroll)
       this.onElementScroll = undefined
     }
   }
 
-  async loadChapter(content: string) {
+  async loadChapter(content: string): Promise<void> {
     this.annotations?.destroy()
-    return this.enqueue(async () => {
-      this.removeScrollListener()
-      this.currentPage = 1
-      this.totalPages = 1
-      this.isInitialLoad = true
+    this.removeScrollListener()
+    this.currentPage = 1
+    this.totalPages = 1
+    this.isInitialLoad = true
 
-      const blob = new Blob([content], { type: 'text/html' })
-      if (this.blobUrl) URL.revokeObjectURL(this.blobUrl)
-      this.blobUrl = URL.createObjectURL(blob)
-      this.iframe.src = this.blobUrl
-      this.iframe.style.opacity = '0'
+    const blob = new Blob([content], { type: 'text/html' })
+    if (this.blobUrl) URL.revokeObjectURL(this.blobUrl)
+    this.blobUrl = URL.createObjectURL(blob)
+    this.iframe.src = this.blobUrl
+    this.iframe.style.opacity = '0'
 
-      await new Promise<void>((resolve) => {
-        this.iframe.onload = async () => {
-          this.viewportWidth = this.element.clientWidth || 1
-          this.viewportHeight = this.element.clientHeight || 1
+    await new Promise<void>((resolve) => {
+      this.iframe.onload = async () => {
+        this.viewportWidth = this.element.clientWidth || 1
+        this.viewportHeight = this.element.clientHeight || 1
 
-          this.applyStyles()
-          this.setImageSize()
-          this.document.body.appendChild(this.spacer)
-          await this.document.fonts.ready
+        this.applyStyles()
+        this.setImageSize()
+        this.document.body.appendChild(this.spacer)
+        await this.document.fonts.ready
 
-          this.expand()
+        this.expand()
 
-          this.attachScrollListener()
-          this.attachLinkHandler()
-          this.iframe.style.opacity = '1'
+        this.attachScrollListener()
+        this.attachLinkHandler()
+        this.iframe.style.opacity = '1'
 
-          this.observer.observe(this.element)
+        this.observer.observe(this.element)
 
-          this.progressCallback?.(this.currentPage, this.lockedTotalPages, this.element.scrollLeft)
-          this.annotations = new Annotations(this.document, this.iframe)
-          resolve()
-        }
-      })
+        this.progressCallback?.(this.currentPage, this.lockedTotalPages, this.element.scrollLeft)
+        this.annotations = new Annotations(this.document, this.iframe)
+        resolve()
+      }
     })
   }
 
-  expand() {
+  expand(): void {
     const doc = this.document
     if (!doc?.body) return
 
@@ -358,7 +348,7 @@ export class Frame {
     this.scrollToPage(this.currentPage)
   }
 
-  public scrollToPage(page: number) {
+  scrollToPage(page: number): void {
     const maxPage = this.lockedTotalPages || this.totalPages
     this.currentPage = Math.max(1, Math.min(page, maxPage))
 
@@ -369,11 +359,11 @@ export class Frame {
     this.progressCallback?.(this.currentPage, maxPage, this.element.scrollLeft)
   }
 
-  public getTotalScrollWidth(): number {
+  getTotalScrollWidth(): number {
     return this.getTotalPages() * this.viewportWidth
   }
 
-  public scrollToOffset(offset: number) {
+  scrollToOffset(offset: number): void {
     const maxOffset = this.getTotalScrollWidth() - this.viewportWidth
     const clampedOffset = Math.max(0, Math.min(offset, maxOffset))
 
@@ -389,7 +379,7 @@ export class Frame {
     )
   }
 
-  private handleResize() {
+  handleResize(): void {
     if (!this.document?.body) return
 
     const newWidth = this.element.clientWidth || 1
@@ -411,28 +401,28 @@ export class Frame {
     this.scrollToPage(newPage)
   }
 
-  public nextPage() {
+  nextPage(): void {
     const maxPage = this.lockedTotalPages || this.totalPages
     if (this.currentPage < maxPage) {
       this.scrollToPage(this.currentPage + 1)
     }
   }
 
-  public prevPage() {
+  prevPage(): void {
     if (this.currentPage > 1) {
       this.scrollToPage(this.currentPage - 1)
     }
   }
 
-  getCurrentPage() {
+  getCurrentPage(): number {
     return this.currentPage
   }
 
-  getTotalPages() {
+  getTotalPages(): number {
     return this.lockedTotalPages || this.totalPages
   }
 
-  destroy() {
+  destroy(): void {
     this.annotations?.destroy()
     this.observer.disconnect()
     this.removeScrollListener()

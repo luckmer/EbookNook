@@ -20,6 +20,7 @@ export const typography = cva('not-italic select-none', {
       disabled: 'text-text-disabled',
       white: 'text-text-primary',
       secondary: 'text-text-secondary',
+      blue: 'text-accent-blue',
       error: 'text-status-error',
       muted: 'text-text-muted',
     },

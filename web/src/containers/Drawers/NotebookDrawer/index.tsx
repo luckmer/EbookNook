@@ -8,29 +8,83 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useLocation } from 'react-router-dom'
 
 const NotebookDrawerRoot = () => {
-  const annotationsMap = useSelector(annotationsSelector.annotations)
+  const selectedAnnotation = useSelector(annotationsSelector.selectedAnnotation)
+  const highlightsMap = useSelector(annotationsSelector.highlights)
+  const notesMap = useSelector(annotationsSelector.notes)
   const isLoader = useSelector(uiSelector.isFetchingAnnotations)
+  const editingNoteId = useSelector(annotationsSelector.editingNoteId)
   const isOpen = useSelector(uiSelector.openNotebook)
-
   const location = useLocation()
   const dispatch = useDispatch()
 
   const bookId = useMemo(() => location?.state?.id, [location])
 
-  const annotations = useMemo(() => {
-    return Object.values(annotationsMap[bookId] ?? {})
-  }, [bookId, annotationsMap])
+  const highlights = useMemo(() => {
+    return highlightsMap[bookId] ?? []
+  }, [bookId, highlightsMap])
+
+  const notes = useMemo(() => {
+    return notesMap[bookId] ?? []
+  }, [notesMap, bookId])
 
   return (
     <NotebookDrawer
       isOpen={isOpen}
-      data={annotations}
+      highlights={highlights}
+      notes={notes}
+      editingNoteId={editingNoteId ?? ''}
       isLoader={isLoader}
+      onClickDeleteHighlight={(id) => {
+        dispatch(annotationActions.deleteHighlightById({ id, bookId }))
+      }}
+      onClickDeleteNote={(id) => {
+        dispatch(annotationActions.deleteNoteById({ id, bookId }))
+        if (selectedAnnotation !== null && selectedAnnotation.anchorId === id) {
+          dispatch(annotationActions.setSelectedAnnotation(null))
+        }
+      }}
       onClickClose={() => {
+        if (editingNoteId !== null) {
+          dispatch(annotationActions.deleteNoteById({ id: editingNoteId, bookId }))
+          dispatch(annotationActions.setEditingNoteId(null))
+        }
         dispatch(uiActions.setOpenNotebook(false))
       }}
-      onClickDelete={(id) => {
-        dispatch(annotationActions.deleteAnnotationById({ id, bookId }))
+      onClickCancel={() => {
+        dispatch(uiActions.setOpenNotebook(false))
+        if (editingNoteId !== null) {
+          dispatch(annotationActions.deleteNoteById({ id: editingNoteId, bookId }))
+          dispatch(annotationActions.setEditingNoteId(null))
+        }
+      }}
+      onClickFocusNote={(note) => {
+        dispatch(uiActions.setOpenNotebook(false))
+        dispatch(
+          annotationActions.setSelectedAnnotation({
+            anchorId: note.id,
+            anchor: {
+              normEnd: note.normEnd,
+              normStart: note.normStart,
+              text: note.description,
+            },
+          }),
+        )
+      }}
+      onClickSave={(label, note) => {
+        if (editingNoteId === null) {
+          return
+        }
+        dispatch(annotationActions.setEditingNoteId(null))
+        dispatch(
+          annotationActions.saveNote({
+            id: bookId,
+            note: {
+              ...note,
+              id: editingNoteId,
+              label,
+            },
+          }),
+        )
       }}
     />
   )
