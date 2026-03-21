@@ -66,7 +66,7 @@ export function* getAnnotationStructureById(
 export function* setHighlight(action: PayloadAction<PayloadTypes['setHighlight']>) {
   try {
     yield* call(invoke, 'add_highlight_structure', {
-      Highlight: action.payload.highlight,
+      highlight: action.payload.highlight,
       id: action.payload.id,
     })
   } catch (err) {

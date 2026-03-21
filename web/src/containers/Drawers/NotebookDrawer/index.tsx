@@ -74,9 +74,7 @@ const NotebookDrawerRoot = () => {
         if (editingNoteId === null) {
           return
         }
-
         dispatch(annotationActions.setEditingNoteId(null))
-        dispatch(uiActions.setOpenNotebook(false))
         dispatch(
           annotationActions.saveNote({
             id: bookId,
