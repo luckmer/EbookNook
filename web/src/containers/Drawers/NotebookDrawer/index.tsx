@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useLocation } from 'react-router-dom'
 
 const NotebookDrawerRoot = () => {
+  const selectedAnnotation = useSelector(annotationsSelector.selectedAnnotation)
   const highlightsMap = useSelector(annotationsSelector.highlights)
   const notesMap = useSelector(annotationsSelector.notes)
   const isLoader = useSelector(uiSelector.isFetchingAnnotations)
@@ -38,6 +39,9 @@ const NotebookDrawerRoot = () => {
       }}
       onClickDeleteNote={(id) => {
         dispatch(annotationActions.deleteNoteById({ id, bookId }))
+        if (selectedAnnotation !== null && selectedAnnotation.anchorId === id) {
+          dispatch(annotationActions.setSelectedAnnotation(null))
+        }
       }}
       onClickClose={() => {
         if (editingNoteId !== null) {

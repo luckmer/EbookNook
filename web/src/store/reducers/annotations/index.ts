@@ -56,7 +56,7 @@ export const store = createSlice({
     getAnnotationStructure(state, _: PayloadAction<string>) {
       return state
     },
-    setSelectedAnnotation(state, action: PayloadAction<ISelectedAnnotation>) {
+    setSelectedAnnotation(state, action: PayloadAction<ISelectedAnnotation | null>) {
       state.selectedAnnotation = action.payload
       return state
     },
