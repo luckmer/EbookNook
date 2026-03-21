@@ -1,5 +1,5 @@
 import Show from '@components/Show'
-import { IAnnotation } from '@libs/epub/AnchorContent'
+import { IAnnotation } from '@libs/AnchorContent'
 import { getEventEmitter } from '@libs/eventEmitter'
 import Annotator from '@pages/Annotator'
 import { actions as annotationActions } from '@store/reducers/annotations'

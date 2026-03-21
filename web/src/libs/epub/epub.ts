@@ -3,7 +3,7 @@ import { IProgressInfo } from '@interfaces/index'
 import { ISettingsState } from '@interfaces/settings/interfaces'
 import { Frame } from '@libs/Frame/FrameCore'
 import { flatData } from '@utils/index'
-import { AnchorContent } from './AnchorContent'
+import { AnchorContent } from '../AnchorContent'
 import { STATIC_UNIT } from './lib/static'
 
 export interface IEpubChapter extends Chapter {

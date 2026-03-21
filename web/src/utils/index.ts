@@ -1,5 +1,5 @@
 import { Toc } from '@bindings/epub'
-import { IAnnotation, IGetNodeContent } from '@libs/epub/AnchorContent'
+import { IAnnotation, IGetNodeContent } from '@libs/AnchorContent'
 import {
   COMMA_REGEX,
   DOUBLE_QUOTES_REGEX,
