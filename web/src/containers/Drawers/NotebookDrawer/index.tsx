@@ -36,7 +36,9 @@ const NotebookDrawerRoot = () => {
       onClickDeleteHighlight={(id) => {
         dispatch(annotationActions.deleteHighlightById({ id, bookId }))
       }}
-      onClickDeleteNote={() => {}}
+      onClickDeleteNote={(id) => {
+        dispatch(annotationActions.deleteNoteById({ id, bookId }))
+      }}
       onClickClose={() => {
         if (editingNoteId !== null) {
           dispatch(annotationActions.deleteNoteById({ id: editingNoteId, bookId }))
