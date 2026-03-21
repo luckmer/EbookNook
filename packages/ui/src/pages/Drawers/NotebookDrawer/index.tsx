@@ -1,4 +1,5 @@
-import { Annotations } from '@bindings/annotations'
+import { Highlights } from '@bindings/highlights'
+import { Note, Notes } from '@bindings/notes'
 import DefaultButton from '@components/Buttons/DefaultButton'
 import Drawer from '@components/Drawer'
 import Dropdown from '@components/Dropdowns/Dropdown'
@@ -12,29 +13,31 @@ import { FC, useCallback, useEffect, useState } from 'react'
 import { LuNotebookPen } from 'react-icons/lu'
 
 export interface IProps {
-  onClickSave: (id: string, label: string) => void
-  onClickDelete: (id: string) => void
-  onClickFocus: (text: string, id: string) => void
+  onClickSave: (id: string, note: Note) => void
+  onClickDeleteHighlight: (id: string) => void
+  onClickDeleteNote: (id: string) => void
+  onClickFocusNote: (note: Note) => void
   onClickCancel: () => void
   onClickClose: () => void
   isOpen: boolean
-  data: Annotations
-  notes: Annotations
+  highlights: Highlights
+  notes: Notes
   isLoader: boolean
-  noteId: string
+  editingNoteId: string
 }
 
 const NotebookDrawer: FC<IProps> = ({
   onClickClose,
-  onClickDelete,
+  onClickDeleteHighlight,
+  onClickDeleteNote,
   onClickCancel,
-  onClickFocus,
+  onClickFocusNote,
   onClickSave,
   isOpen,
-  data,
+  highlights,
   notes,
   isLoader,
-  noteId,
+  editingNoteId,
 }) => {
   const [openDropdownIndex, setOpenDropdownIndex] = useState<number | null>(null)
   const [noteLabel, setNoteLabel] = useState('')
@@ -43,17 +46,25 @@ const NotebookDrawer: FC<IProps> = ({
     if (isOpen) {
       setOpenDropdownIndex(null)
     }
-    if (isOpen && noteId.trim().length > 0) {
+    if (isOpen && editingNoteId.trim().length > 0) {
       setNoteLabel('')
     }
-  }, [isOpen, noteId])
+  }, [editingNoteId])
 
-  const handleDelete = useCallback(
+  const handleDeleteHighlight = useCallback(
     (id: string) => {
       setOpenDropdownIndex(null)
-      onClickDelete(id)
+      onClickDeleteHighlight(id)
     },
-    [onClickDelete],
+    [onClickDeleteHighlight],
+  )
+
+  const handleDeleteNote = useCallback(
+    (id: string) => {
+      setOpenDropdownIndex(null)
+      onClickDeleteNote(id)
+    },
+    [onClickDeleteNote],
   )
 
   return (
@@ -65,11 +76,11 @@ const NotebookDrawer: FC<IProps> = ({
             <Typography text="body">Notebook</Typography>
           </div>
           <div className="h-full flex flex-col gap-12">
-            <Show when={data.length > 0}>
+            <Show when={highlights.length > 0}>
               <Typography text="caption">Excerpts</Typography>
             </Show>
             <div className="flex flex-col gap-12">
-              {data.map((item, index) => (
+              {highlights.map((item, index) => (
                 <Dropdown
                   key={item.id}
                   label={item.label}
@@ -77,7 +88,7 @@ const NotebookDrawer: FC<IProps> = ({
                   onToggle={() => setOpenDropdownIndex((prev) => (prev === index ? null : index))}>
                   <Typography text="caption">{item.description}</Typography>
                   <div className="w-full flex items-center justify-end pt-12 gap-12">
-                    <DefaultButton onClick={() => handleDelete(item.id)}>
+                    <DefaultButton onClick={() => handleDeleteHighlight(item.id)}>
                       <Typography color="error">Delete</Typography>
                     </DefaultButton>
                   </div>
@@ -91,14 +102,14 @@ const NotebookDrawer: FC<IProps> = ({
             </Show>
             <div className="flex flex-col gap-12">
               {notes.map((item) => {
-                const isEditing = noteId.includes(item.id)
+                const isEditing = editingNoteId.includes(item.id)
                 return (
                   <NoteDropdown
                     key={item.id}
                     label={item.label}
                     onClickFocus={() => {
                       if (isEditing) return
-                      onClickFocus(item.description, item.id)
+                      onClickFocusNote(item)
                     }}
                     placeholder="Add your notes here..."
                     value={noteLabel}
@@ -109,7 +120,7 @@ const NotebookDrawer: FC<IProps> = ({
                         <div
                           onClick={() => {
                             if (isEditing) return
-                            onClickFocus(item.description, item.id)
+                            onClickFocusNote(item)
                           }}
                           className="pt-12 cursor-pointer">
                           <Typography text="caption" class="cursor-pointer">
@@ -125,7 +136,7 @@ const NotebookDrawer: FC<IProps> = ({
                             when={isEditing}
                             fallback={
                               <div className="flex flex-row items-center gap-12">
-                                <DefaultButton onClick={() => handleDelete(item.id)}>
+                                <DefaultButton onClick={() => handleDeleteNote(item.id)}>
                                   <Typography color="error">Delete</Typography>
                                 </DefaultButton>
                               </div>
@@ -140,7 +151,7 @@ const NotebookDrawer: FC<IProps> = ({
                             <DefaultButton
                               onClick={() => {
                                 setNoteLabel('')
-                                onClickSave(item.description, noteLabel)
+                                onClickSave(noteLabel, item)
                               }}>
                               <Typography color="blue">Save</Typography>
                             </DefaultButton>

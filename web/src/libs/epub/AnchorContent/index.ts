@@ -1,7 +1,13 @@
 import { Frame } from '@libs/Frame/FrameCore'
-import { normalizeText } from '@utils/index'
+import { getNodeContentWalker } from '@utils/index'
 
 export interface ITextNode {
+  rects: {
+    left: number
+    right: number
+    top: number
+    bottom: number
+  }[]
   end: number
   start: number
   node: Node
@@ -10,6 +16,12 @@ export interface ITextNode {
 export interface IGetNodeContent {
   textNodes: Array<ITextNode>
   normFullText: string
+}
+
+export interface IAnnotation {
+  text: string
+  normStart: number
+  normEnd: number
 }
 
 export class AnchorContent {
@@ -24,13 +36,12 @@ export class AnchorContent {
   handleWatchContentPosition(content: HTMLElement): void {
     const frame = this.frame
     if (!frame) return
-
     const elPosition = content.getBoundingClientRect()
     const targetPage = Math.floor(elPosition.left / frame.viewportWidth) + 1
     frame.scrollToPage(targetPage)
   }
 
-  async anchor(text: string): Promise<void> {
+  async anchor(annotation: IAnnotation): Promise<void> {
     this.observer?.disconnect()
     this.unAnchor()
 
@@ -40,86 +51,63 @@ export class AnchorContent {
     const container = frame.document?.defaultView?.frameElement
     if (!container) return
 
-    const content = this.highlightAnchorText(text)
+    const doc = frame.document
+    if (!doc) return
+
+    const nodeContent = getNodeContentWalker(doc)
+
+    const content = this.highlightAnchorText(
+      annotation.normStart,
+      annotation.normEnd,
+      doc,
+      nodeContent,
+    )
     if (!content) return
 
     this.observer = new ResizeObserver(() => this.handleWatchContentPosition(content))
     this.observer.observe(container)
   }
 
-  getNodeContent(doc: Document): IGetNodeContent {
-    const walker = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT)
-    const textNodes: Array<ITextNode> = []
-
-    let normFullText = ''
-
-    while (true) {
-      const node = walker.nextNode()
-      if (!node) break
-
-      const norm = normalizeText(node.textContent ?? '')
-      if (!norm) continue
-
-      textNodes.push({
-        end: normFullText.length + norm.length,
-        start: normFullText.length,
-        node,
-      })
-
-      normFullText += norm + ' '
-    }
-
-    return { normFullText, textNodes }
-  }
-
-  highlightAnchorText(text: string): HTMLElement | null {
-    const frame = this.frame
-    if (!frame) return null
-
-    const doc = frame.document
-    if (!doc?.body) return null
-
-    const nodeContent = this.getNodeContent(doc)
-    const normalizedSearch = normalizeText(text)
-
-    const matchStart = normalizeText(nodeContent.normFullText).indexOf(normalizedSearch)
-    const matchEnd = matchStart + normalizedSearch.length
-
+  private highlightAnchorText(
+    matchStart: number,
+    matchEnd: number,
+    doc: Document,
+    nodeContent: IGetNodeContent,
+  ): HTMLElement | null {
     const nodes = nodeContent.textNodes.filter(
-      ({ start, end }) => end > matchStart && start < matchEnd,
+      ({ start, end }) => end >= matchStart && start < matchEnd,
     )
+
+    if (!nodes.length) return null
 
     let firstMark: HTMLElement | null = null
 
     nodes.forEach((node) => {
-      const sliceStart = Math.max(matchStart, node.start) - node.start
-      const sliceEnd = Math.min(matchEnd, node.end) - node.start
       const textContent = node.node.textContent ?? ''
+      const start = Math.min(Math.max(matchStart, node.start) - node.start, textContent.length)
+      const end = Math.min(Math.min(matchEnd, node.end + 1) - node.start, textContent.length)
+      const lastStart = start === end ? Math.max(0, start - 1) : start
 
-      const safeStart = Math.min(sliceStart, textContent.length)
-      const safeEnd = Math.min(sliceEnd, textContent.length)
-
-      const matched = textContent.slice(safeStart, safeEnd)
-      const before = textContent.slice(0, safeStart)
-      const after = textContent.slice(safeEnd)
-
-      const mark = doc.createElement('mark')
-      mark.style.background = '#4da3ff59'
-      mark.style.color = '#fff'
-      mark.textContent = matched
+      const matched = textContent.slice(lastStart, end)
+      if (!matched) return
 
       const parent = node.node.parentNode
       if (!parent) return
 
-      parent.insertBefore(doc.createTextNode(before), node.node)
+      const mark = doc.createElement('mark')
+      mark.dataset.annotationKey = `${matchStart}-${matchEnd}`
+      mark.style.background = '#4da3ff59'
+      mark.style.color = '#fff'
+      mark.textContent = matched
+
+      parent.insertBefore(doc.createTextNode(textContent.slice(0, lastStart)), node.node)
       parent.insertBefore(mark, node.node)
-      parent.insertBefore(doc.createTextNode(after), node.node)
+      parent.insertBefore(doc.createTextNode(textContent.slice(end)), node.node)
       parent.removeChild(node.node)
 
       if (!firstMark) {
         firstMark = mark
       }
-
       this.marks.push(mark)
     })
 

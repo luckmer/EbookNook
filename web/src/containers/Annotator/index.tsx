@@ -1,9 +1,11 @@
 import Show from '@components/Show'
+import { IAnnotation } from '@libs/epub/AnchorContent'
 import { getEventEmitter } from '@libs/eventEmitter'
 import Annotator from '@pages/Annotator'
 import { actions as annotationActions } from '@store/reducers/annotations'
 import { actions as uiActions } from '@store/reducers/ui'
 import { selectEpubMap } from '@store/selectors/books'
+import { buildAnnotation, getNodeContentWalker } from '@utils/index'
 import {
   DEFAULT_ANNOTATION_STATE,
   GAP,
@@ -30,11 +32,14 @@ interface IDetail {
 }
 
 const AnnotatorRoot = () => {
-  const booksMap = useSelector(selectEpubMap)
-  const [doc, setDoc] = useState<Document | null>(null)
   const [position, setPosition] = useState<IPosition>(DEFAULT_ANNOTATION_STATE)
+  const [notesCoords, setNotesCoords] = useState<IAnnotation | null>(null)
   const [showAnnotator, setShowAnnotator] = useState(false)
+  const [doc, setDoc] = useState<Document | null>(null)
   const [selectedText, setSelectedText] = useState('')
+
+  const booksMap = useSelector(selectEpubMap)
+
   const dispatch = useDispatch()
   const location = useLocation()
 
@@ -47,11 +52,12 @@ const AnnotatorRoot = () => {
     const handleAnnotationClick = ({ detail }: { detail: IDetail }) => {
       const selection = detail.selected
       const text = selection?.toString() ?? ''
-      setDoc(detail.doc)
       if (!text.trim().length) {
         setShowAnnotator(false)
         return
       }
+
+      setDoc(detail.doc)
 
       const range = selection.getRangeAt(0)
 
@@ -88,9 +94,13 @@ const AnnotatorRoot = () => {
         Math.min(targetX - popupX, POPUP_WIDTH - TRIANGLE_SIZE),
       )
 
+      const nodeContent = getNodeContentWalker(detail.doc)
+      const contentCoords = buildAnnotation(range, nodeContent, text)
+
       setPosition({ x: popupX, y: popupY, triangleX })
       setSelectedText(text)
       setShowAnnotator(true)
+      setNotesCoords(contentCoords)
     }
 
     emitter.on('annotationClick', handleAnnotationClick)
@@ -140,15 +150,29 @@ const AnnotatorRoot = () => {
     <Show when={showAnnotator}>
       <Annotator
         onClickCopy={() => {
+          const progress = book?.book.progress
+          const coords = notesCoords
+
+          if (!progress || !coords) {
+            setPosition(DEFAULT_ANNOTATION_STATE)
+            setShowAnnotator(false)
+            removeSelection()
+            return
+          }
+          const [chapterHref] = progress
+
+          const id = `${v7()}#${bookId}#${chapterHref}`
+
           dispatch(uiActions.setOpenNotebook(true))
           dispatch(
-            annotationActions.setAnnotation({
+            annotationActions.setHighlight({
               id: bookId,
-              annotation: {
+              highlight: {
                 label: selectedText,
                 description: selectedText,
-                id: v7(),
-                annotated: false,
+                normStart: coords.normStart,
+                normEnd: coords.normEnd,
+                id,
               },
             }),
           )
@@ -158,8 +182,9 @@ const AnnotatorRoot = () => {
         }}
         onClickAddNote={() => {
           const progress = book?.book.progress
+          const coords = notesCoords
 
-          if (!progress) {
+          if (!progress || !coords) {
             setPosition(DEFAULT_ANNOTATION_STATE)
             setShowAnnotator(false)
             removeSelection()
@@ -171,15 +196,16 @@ const AnnotatorRoot = () => {
 
           const id = `${v7()}#${bookId}#${chapterHref}`
 
-          dispatch(annotationActions.setAnnotationId(id))
+          dispatch(annotationActions.setEditingNoteId(id))
           dispatch(
-            annotationActions.setCustomAnnotation({
+            annotationActions.setCustomNote({
               id: bookId,
-              annotation: {
+              note: {
                 label: selectedText,
-                description: selectedText,
+                description: coords.text,
+                normStart: coords.normStart,
+                normEnd: coords.normEnd,
                 id,
-                annotated: true,
               },
             }),
           )

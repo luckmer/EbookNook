@@ -1,4 +1,5 @@
 import { Toc } from '@bindings/epub'
+import { IAnnotation, IGetNodeContent } from '@libs/epub/AnchorContent'
 import {
   COMMA_REGEX,
   DOUBLE_QUOTES_REGEX,
@@ -50,4 +51,68 @@ export const normalizeText = (text: string) => {
     .replace(QUOTES_REGEX, "'")
     .replace(DOUBLE_QUOTES_REGEX, '"')
     .trim()
+}
+
+export const buildAnnotation = (
+  range: Range,
+  nodeContent: IGetNodeContent,
+  text: string,
+): IAnnotation | null => {
+  const contentFrom = range.startContainer.textContent
+  const contentTo = range.endContainer.textContent
+
+  if (!contentFrom || !contentTo) return null
+
+  const anchorTextNode = nodeContent.textNodes.find((n) => n.node === range.startContainer)
+  const focusTextNode = nodeContent.textNodes.find((n) => n.node === range.endContainer)
+
+  if (!anchorTextNode || !focusTextNode) return null
+
+  const normStart =
+    anchorTextNode.start + normalizeText(contentFrom.slice(0, range.startOffset)).length
+  const normEnd = focusTextNode.start + normalizeText(contentTo.slice(0, range.endOffset)).length
+
+  return {
+    text,
+    normStart: Math.min(normStart, normEnd),
+    normEnd: Math.max(normStart, normEnd),
+  }
+}
+
+export const getNodeContentWalker = (doc: Document) => {
+  const walker = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT)
+  const textNodes = []
+
+  let normFullText = ''
+
+  while (true) {
+    const node = walker.nextNode()
+    if (!node) break
+
+    const norm = normalizeText(node.textContent ?? '')
+    if (!norm) continue
+
+    const range = doc.createRange()
+    range.setStart(node, 0)
+    range.setEnd(node, node.textContent?.length ?? 0)
+    const rects = range.getClientRects()
+
+    textNodes.push({
+      end: normFullText.length + norm.length,
+      start: normFullText.length,
+      rects: Array.from(rects).map((rect) => {
+        return {
+          left: rect.left,
+          right: rect.right,
+          top: rect.top,
+          bottom: rect.bottom,
+        }
+      }),
+      node,
+    })
+
+    normFullText += norm + ' '
+  }
+
+  return { normFullText, textNodes }
 }

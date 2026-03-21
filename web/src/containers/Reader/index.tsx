@@ -120,11 +120,13 @@ const ReaderRoot = () => {
   }, [selectedChapter, isFetchingStructure, book?.book.id])
 
   useEffect(() => {
-    if (selectedAnnotation.text.trim().length > 0) {
+    if (selectedAnnotation !== null) {
       setLoading(true)
-      viewRef.current?.anchor(selectedAnnotation.id, selectedAnnotation.text).finally(() => {
-        setLoading(false)
-      })
+      viewRef.current
+        ?.anchor(selectedAnnotation.anchorId, selectedAnnotation.anchor)
+        .finally(() => {
+          setLoading(false)
+        })
     } else {
       viewRef.current?.unAnchor()
     }

@@ -13,7 +13,8 @@ const data = new Array(20).fill(0).map(() => ({
   label: 'Chapter 1',
   description: 'Chapter 1',
   id: '2',
-  annotated: false,
+  normStart: 2,
+  normEnd: 2,
 }))
 
 const notes = new Array(20).fill(0).map(() => ({
@@ -21,20 +22,23 @@ const notes = new Array(20).fill(0).map(() => ({
   description: 'Chapter 1',
   id: '2',
   annotated: true,
+  normStart: 2,
+  normEnd: 2,
 }))
 
 export const Default: Story = {
   render: (args) => {
     return (
       <NotebookDrawer
-        data={data}
+        highlights={data}
         notes={notes}
-        onClickFocus={() => {}}
-        onClickDelete={() => {}}
+        onClickFocusNote={() => {}}
+        onClickDeleteHighlight={() => {}}
+        onClickDeleteNote={() => {}}
         onClickCancel={() => {}}
         onClickSave={() => {}}
         onClickClose={() => {}}
-        noteId=""
+        editingNoteId=""
         isOpen={args.isOpen}
         isLoader={args.isLoader}
       />

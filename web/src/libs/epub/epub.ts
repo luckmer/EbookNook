@@ -307,13 +307,20 @@ export class Epub {
     return this.currentStaticPage
   }
 
-  async anchor(anchorId: string, text: string): Promise<void> {
+  async anchor(
+    anchorId: string,
+    anchor: {
+      normEnd: number
+      normStart: number
+      text: string
+    },
+  ): Promise<void> {
     const [, , bookChapter] = anchorId.split('#')
     const chapter = this.chapterByPath[bookChapter]
     if (!chapter) return
     this.lastPath = bookChapter
     await this.frame.loadChapter(chapter.content)
-    await this.anchorContent.anchor(text)
+    await this.anchorContent.anchor(anchor)
   }
 
   unAnchor(): void {
