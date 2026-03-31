@@ -1,12 +1,12 @@
+import { ISettingsState } from '@interfaces/settings/interfaces'
 import { combineReducers } from '@reduxjs/toolkit'
+import { persistReducer } from 'redux-persist'
+import { reducers as annotationsReducers, annotationsStore } from './annotations'
 import { reducers as bookReducers, booksStore } from './books'
 import { reducers as searchReducers, searchStore } from './search'
 import { reducers as settingsReducers, settingsStore } from './settings'
-import { reducers as uiReducers, uiStore } from './ui'
-import { reducers as annotationsReducers, annotationsStore } from './annotations'
-import { persistReducer } from 'redux-persist'
 import { persistSettings } from './settings/config'
-import { ISettingsState } from '@interfaces/settings/interfaces'
+import { reducers as uiReducers, uiStore } from './ui'
 
 const Index = combineReducers({
   [settingsStore]: persistReducer<ISettingsState>(persistSettings, settingsReducers),

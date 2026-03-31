@@ -3,6 +3,7 @@ import { Epub } from '@libs/epub/epub'
 import Reader from '@pages/Reader'
 import { actions as BookActions } from '@store/reducers/books'
 import { actions } from '@store/reducers/ui'
+import { annotationsSelector } from '@store/selectors/annotations'
 import { bookSelector, selectEpubMap } from '@store/selectors/books'
 import { settingsConfig } from '@store/selectors/settings'
 import { uiSelector } from '@store/selectors/ui'
@@ -10,8 +11,14 @@ import { debounce } from '@utils/debounce'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation } from 'react-router-dom'
-
 const ReaderRoot = () => {
+  const selectedAnnotation = useSelector(annotationsSelector.selectedAnnotation)
+  const isFetchingStructure = useSelector(uiSelector.isFetchingStructure)
+  const selectedChapter = useSelector(bookSelector.selectedChapter)
+  const hideContent = useSelector(uiSelector.hideHeader)
+  const settings = useSelector(settingsConfig)
+  const booksMap = useSelector(selectEpubMap)
+
   const [bookId, setBookId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [pageInfo, setPageInfo] = useState<IProgressInfo>({
@@ -21,12 +28,6 @@ const ReaderRoot = () => {
     percent: 0,
     offset: 0,
   })
-
-  const isFetchingStructure = useSelector(uiSelector.isFetchingStructure)
-  const selectedChapter = useSelector(bookSelector.selectedChapter)
-  const hideContent = useSelector(uiSelector.hideHeader)
-  const settings = useSelector(settingsConfig)
-  const booksMap = useSelector(selectEpubMap)
 
   const dispatch = useDispatch()
   const location = useLocation()
@@ -117,6 +118,19 @@ const ReaderRoot = () => {
       })
     }
   }, [selectedChapter, isFetchingStructure, book?.book.id])
+
+  useEffect(() => {
+    if (selectedAnnotation !== null) {
+      setLoading(true)
+      viewRef.current
+        ?.anchor(selectedAnnotation.anchorId, selectedAnnotation.anchor)
+        .finally(() => {
+          setLoading(false)
+        })
+    } else {
+      viewRef.current?.unAnchor()
+    }
+  }, [selectedAnnotation])
 
   useEffect(() => {
     if (!loading) {
