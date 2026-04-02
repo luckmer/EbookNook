@@ -1,8 +1,10 @@
 import { Epub } from '@bindings/epub'
 import { Highlights } from '@bindings/highlights'
 import { Notes } from '@bindings/notes'
+import { NOTIFICATION_TYPE } from '@interfaces/notifications/enums'
 import { PayloadAction } from '@reduxjs/toolkit'
 import { actions, PayloadTypes } from '@store/reducers/annotations'
+import { actions as notificationActions } from '@store/reducers/notifications'
 import { actions as uiActions } from '@store/reducers/ui'
 import { annotationsSelector } from '@store/selectors/annotations'
 import { selectEpubMap } from '@store/selectors/books'
@@ -24,6 +26,14 @@ export function* getNotesStructureById(id: string, book: Epub) {
     yield* put(actions.setNotes({ id: id, notes: response }))
   } catch (err) {
     console.log('err', err)
+    yield* put(
+      notificationActions.setNotification({
+        message: 'Failed to get notes structure',
+        type: NOTIFICATION_TYPE.ERROR,
+        duration: 2000,
+        id: Date.now(),
+      }),
+    )
   }
 }
 
@@ -42,6 +52,14 @@ export function* getHighlightsStructureById(id: string, book: Epub) {
     yield* put(actions.setHighlights({ id: id, highlights: response }))
   } catch (err) {
     console.log('err', err)
+    yield* put(
+      notificationActions.setNotification({
+        message: 'Failed to get highlights structure',
+        type: NOTIFICATION_TYPE.ERROR,
+        duration: 2000,
+        id: Date.now(),
+      }),
+    )
   }
 }
 
@@ -71,6 +89,14 @@ export function* setHighlight(action: PayloadAction<PayloadTypes['setHighlight']
     })
   } catch (err) {
     console.log('err', err)
+    yield* put(
+      notificationActions.setNotification({
+        message: 'Failed to add highlight',
+        type: NOTIFICATION_TYPE.ERROR,
+        duration: 2000,
+        id: Date.now(),
+      }),
+    )
   }
 
   yield* put(uiActions.setIsFetchingStructure(false))
@@ -84,6 +110,14 @@ export function* deleteHighlightById(action: PayloadAction<PayloadTypes['deleteH
     })
   } catch (err) {
     console.log('err', err)
+    yield* put(
+      notificationActions.setNotification({
+        message: 'Failed to delete highlight',
+        type: NOTIFICATION_TYPE.ERROR,
+        duration: 2000,
+        id: Date.now(),
+      }),
+    )
   }
 }
 
@@ -95,6 +129,14 @@ export function* deleteNoteById(action: PayloadAction<PayloadTypes['deleteNoteBy
     })
   } catch (err) {
     console.log('err', err)
+    yield* put(
+      notificationActions.setNotification({
+        message: 'Failed to delete note by id',
+        type: NOTIFICATION_TYPE.ERROR,
+        duration: 2000,
+        id: Date.now(),
+      }),
+    )
   }
 }
 
@@ -106,6 +148,14 @@ export function* saveNote(action: PayloadAction<PayloadTypes['saveNote']>) {
     })
   } catch (err) {
     console.log('err', err)
+    yield* put(
+      notificationActions.setNotification({
+        message: 'Failed to add note',
+        type: NOTIFICATION_TYPE.ERROR,
+        duration: 2000,
+        id: Date.now(),
+      }),
+    )
   }
 }
 

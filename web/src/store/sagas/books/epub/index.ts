@@ -1,6 +1,8 @@
 import { Epub, EpubStructure } from '@bindings/epub'
+import { NOTIFICATION_TYPE } from '@interfaces/notifications/enums'
 import { PayloadAction } from '@reduxjs/toolkit'
 import { actions, PayloadTypes } from '@store/reducers/books'
+import { actions as notificationActions } from '@store/reducers/notifications'
 import { actions as uiActions } from '@store/reducers/ui'
 import { selectEpubMap } from '@store/selectors/books'
 import { invoke } from '@tauri-apps/api/core'
@@ -39,6 +41,14 @@ export function* updateEpubBookProgress(
   } catch (err) {
     console.log(err)
     console.log('failed to update epub book progress')
+    yield* put(
+      notificationActions.setNotification({
+        message: 'Failed to update epub book progress',
+        type: NOTIFICATION_TYPE.ERROR,
+        duration: 2000,
+        id: Date.now(),
+      }),
+    )
   }
 }
 
@@ -48,6 +58,14 @@ export function* deleteEpubBook(action: PayloadAction<PayloadTypes['deleteEpub']
   } catch (err) {
     console.log(err)
     console.log('failed to remove epub')
+    yield* put(
+      notificationActions.setNotification({
+        message: 'Failed to remove epub',
+        type: NOTIFICATION_TYPE.ERROR,
+        duration: 2000,
+        id: Date.now(),
+      }),
+    )
   }
 }
 
@@ -62,5 +80,13 @@ export function* editEpubBook(action: PayloadAction<PayloadTypes['editEpub']>) {
   } catch (err) {
     console.log(err)
     console.log('failed to edit epub')
+    yield* put(
+      notificationActions.setNotification({
+        message: 'Failed to edit epub',
+        type: NOTIFICATION_TYPE.ERROR,
+        duration: 2000,
+        id: Date.now(),
+      }),
+    )
   }
 }

@@ -1,12 +1,13 @@
 import { Books } from '@bindings/book'
+import { NOTIFICATION_TYPE } from '@interfaces/notifications/enums'
 import { PayloadAction } from '@reduxjs/toolkit'
 import { actions, PayloadTypes } from '@store/reducers/books'
+import { actions as notificationActions } from '@store/reducers/notifications'
 import { actions as uiActions } from '@store/reducers/ui'
 import { invoke } from '@tauri-apps/api/core'
 import { getDocumentLoader } from 'src/libs/document'
 import { all, call, put, takeEvery, takeLatest, takeLeading } from 'typed-redux-saga'
 import { deleteEpubBook, editEpubBook, getEpubStructure, updateEpubBookProgress } from './epub'
-
 export function* loadState() {
   yield* put(uiActions.setIsLoadingState(true))
   const books = yield* call(invoke<Books>, 'get_books')
@@ -27,6 +28,14 @@ export function* ImportBook(action: PayloadAction<PayloadTypes['importBook']>) {
   } catch (err) {
     console.log(err)
     console.log('failed to open document')
+    yield* put(
+      notificationActions.setNotification({
+        message: 'Failed to open document',
+        type: NOTIFICATION_TYPE.ERROR,
+        duration: 2000,
+        id: Date.now(),
+      }),
+    )
   }
 }
 

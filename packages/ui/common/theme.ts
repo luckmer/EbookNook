@@ -1,7 +1,14 @@
 const theme = {
   extend: {
-    keyframes: {},
-    animation: {},
+    keyframes: {
+      shrink: {
+        from: { transform: 'scaleX(1)' },
+        to: { transform: 'scaleX(0)' },
+      },
+    },
+    animation: {
+      shrink: 'shrink 300ms ease-out forwards',
+    },
     backgroundImage: {},
   },
 
@@ -75,6 +82,34 @@ const theme = {
         hover: '#3D3D3D',
         active: '#292929',
         text: '#FFFFFF',
+      },
+    },
+
+    notification: {
+      success: {
+        accent: '#58D39B',
+        bg: '#58D39B22',
+        border: '#58D39B44',
+      },
+      error: {
+        accent: '#E45C5C',
+        bg: '#E45C5C22',
+        border: '#E45C5C44',
+      },
+      warning: {
+        accent: '#FFAE57',
+        bg: '#FFAE5722',
+        border: '#FFAE5744',
+      },
+      info: {
+        accent: '#4DA3FF',
+        bg: '#4DA3FF22',
+        border: '#4DA3FF44',
+      },
+      neutral: {
+        accent: '#474747',
+        bg: '#2A2A2A',
+        border: '#303030',
       },
     },
 
