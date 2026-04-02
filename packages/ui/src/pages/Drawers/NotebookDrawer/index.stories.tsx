@@ -40,7 +40,8 @@ export const Default: Story = {
         onClickClose={() => {}}
         editingNoteId=""
         isOpen={args.isOpen}
-        isLoader={args.isLoader}
+        isFetchingHighlightsStructure={args.isFetchingHighlightsStructure}
+        isFetchingNotesStructure={args.isFetchingNotesStructure}
       />
     )
   },
@@ -48,5 +49,6 @@ export const Default: Story = {
 
 Default.args = {
   isOpen: true,
-  isLoader: false,
+  isFetchingHighlightsStructure: false,
+  isFetchingNotesStructure: false,
 }

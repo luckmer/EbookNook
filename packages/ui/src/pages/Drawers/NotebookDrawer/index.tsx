@@ -22,7 +22,8 @@ export interface IProps {
   isOpen: boolean
   highlights: Highlights
   notes: Notes
-  isLoader: boolean
+  isFetchingNotesStructure: boolean
+  isFetchingHighlightsStructure: boolean
   editingNoteId: string
 }
 
@@ -36,7 +37,8 @@ const NotebookDrawer: FC<IProps> = ({
   isOpen,
   highlights,
   notes,
-  isLoader,
+  isFetchingNotesStructure,
+  isFetchingHighlightsStructure,
   editingNoteId,
 }) => {
   const [openDropdownIndex, setOpenDropdownIndex] = useState<number | null>(null)
@@ -69,12 +71,12 @@ const NotebookDrawer: FC<IProps> = ({
 
   return (
     <Drawer onClickClose={onClickClose} isOpen={isOpen} placement="right">
-      <Show when={!isLoader} fallback={<Skeleton active avatar />}>
-        <div className="flex flex-col gap-12">
-          <div className="flex w-full items-center justify-center gap-4">
-            <LuNotebookPen className="w-18 h-18 transition-colors duration-200" />
-            <Typography text="body">Notebook</Typography>
-          </div>
+      <div className="flex flex-col gap-12">
+        <div className="flex w-full items-center justify-center gap-4">
+          <LuNotebookPen className="w-18 h-18 transition-colors duration-200" />
+          <Typography text="body">Notebook</Typography>
+        </div>
+        <Show when={!isFetchingHighlightsStructure} fallback={<Skeleton active avatar />}>
           <div className="h-full flex flex-col gap-12">
             <Show when={highlights.length > 0}>
               <Typography text="caption">Excerpts</Typography>
@@ -96,6 +98,8 @@ const NotebookDrawer: FC<IProps> = ({
               ))}
             </div>
           </div>
+        </Show>
+        <Show when={!isFetchingNotesStructure} fallback={<Skeleton active avatar />}>
           <div className="h-full flex flex-col gap-12">
             <Show when={notes.length > 0}>
               <Typography text="caption">Notes</Typography>
@@ -164,8 +168,8 @@ const NotebookDrawer: FC<IProps> = ({
               })}
             </div>
           </div>
-        </div>
-      </Show>
+        </Show>
+      </div>
     </Drawer>
   )
 }
