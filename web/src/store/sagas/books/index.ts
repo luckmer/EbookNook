@@ -16,6 +16,7 @@ export function* loadState() {
 }
 
 export function* ImportBook(action: PayloadAction<PayloadTypes['importBook']>) {
+  yield* put(uiActions.setIsAddingBook(true))
   try {
     const core = yield* call(getDocumentLoader)
     const response = yield* call([core, core.init], action.payload)
@@ -37,6 +38,7 @@ export function* ImportBook(action: PayloadAction<PayloadTypes['importBook']>) {
       }),
     )
   }
+  yield* put(uiActions.setIsAddingBook(false))
 }
 
 export function* ImportBookSaga() {

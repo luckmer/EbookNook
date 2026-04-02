@@ -21,6 +21,9 @@ export const theme: ThemeConfig = {
       colorIcon: '#C9C9C9',
       colorIconHover: '#FFFFFF',
     },
+    Spin: {
+      colorPrimary: '#FFFFFF',
+    },
     Modal: {
       colorBgElevated: '#181818',
       colorText: '#FFFFFF',
