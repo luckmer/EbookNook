@@ -16,7 +16,7 @@ export function* getNotesStructureById(id: string, book: Epub) {
     const notes = yield* select(annotationsSelector.notes)
     const bookNotes = notes[id] ?? []
     if (bookNotes.length > 0) {
-      yield* put(uiActions.setIsFetchingAnnotationsStructure(false))
+      yield* put(uiActions.setIsFetchingNotesStructure(false))
       return
     }
     const response = yield* call(invoke<Notes>, 'get_notes_structure_by_id', {
@@ -42,7 +42,7 @@ export function* getHighlightsStructureById(id: string, book: Epub) {
     const highlights = yield* select(annotationsSelector.highlights)
     const booksHighlights = highlights[id] ?? []
     if (booksHighlights.length > 0) {
-      yield* put(uiActions.setIsFetchingAnnotationsStructure(false))
+      yield* put(uiActions.setIsFetchingHighlightsStructure(false))
       return
     }
 
@@ -69,7 +69,8 @@ export function* getAnnotationStructureById(
   const bookMap = yield* select(selectEpubMap)
   const book = bookMap[action.payload]
   if (!book) {
-    yield* put(uiActions.setIsFetchingAnnotationsStructure(false))
+    yield* put(uiActions.setIsFetchingNotesStructure(false))
+    yield* put(uiActions.setIsFetchingHighlightsStructure(false))
     return
   }
 
@@ -78,7 +79,8 @@ export function* getAnnotationStructureById(
     call(getHighlightsStructureById, action.payload, book),
   ])
 
-  yield* put(uiActions.setIsFetchingAnnotationsStructure(false))
+  yield* put(uiActions.setIsFetchingNotesStructure(false))
+  yield* put(uiActions.setIsFetchingHighlightsStructure(false))
 }
 
 export function* setHighlight(action: PayloadAction<PayloadTypes['setHighlight']>) {
