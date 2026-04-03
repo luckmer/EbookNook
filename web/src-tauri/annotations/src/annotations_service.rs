@@ -118,7 +118,7 @@ impl AnnotationsService {
         let content = Self::fetch_optional(db, SELECT_HIGHLIGHTS_BY_ID, &id).await?;
 
         match content {
-            Some(_) => Self::insert(id, db, json, UPDATE_HIGHLIGHTS_BOOK).await?,
+            Some(_) => Self::insert(json, db, id, UPDATE_HIGHLIGHTS_BOOK).await?,
             None => Self::insert(id, db, json, INSERT_HIGHLIGHTS_BOOK).await?,
         }
 

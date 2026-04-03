@@ -1,0 +1,6 @@
+export enum ANNOTATIONS_STATUS {
+  PENDING = 'PENDING',
+  SUCCESS = 'SUCCESS',
+  ERROR = 'ERROR',
+  IDLE = 'IDLE',
+}

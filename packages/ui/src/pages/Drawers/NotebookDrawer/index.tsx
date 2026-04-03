@@ -1,4 +1,4 @@
-import { Highlights } from '@bindings/highlights'
+import { Highlight } from '@bindings/highlights'
 import { Note, Notes } from '@bindings/notes'
 import DefaultButton from '@components/Buttons/DefaultButton'
 import Drawer from '@components/Drawer'
@@ -6,13 +6,19 @@ import Dropdown from '@components/Dropdowns/Dropdown'
 import NoteDropdown from '@components/Dropdowns/NoteDropdown'
 import Show from '@components/Show'
 import { Typography } from '@components/Typography'
+import { ANNOTATIONS_STATUS } from '@interfaces/annotations/enums'
 import { trimText } from '@web-utils/index'
 import { Skeleton } from 'antd'
 import clsx from 'clsx'
 import { FC, useCallback, useEffect, useState } from 'react'
 import { LuNotebookPen } from 'react-icons/lu'
 
+export interface IHighlight extends Highlight {
+  isPending?: boolean
+}
+
 export interface IProps {
+  getStatus: (id: string) => ANNOTATIONS_STATUS
   onClickSave: (id: string, note: Note) => void
   onClickDeleteHighlight: (id: string) => void
   onClickDeleteNote: (id: string) => void
@@ -20,11 +26,10 @@ export interface IProps {
   onClickCancel: () => void
   onClickClose: () => void
   isOpen: boolean
-  highlights: Highlights
+  highlights: IHighlight[]
   notes: Notes
   isFetchingNotesStructure: boolean
   isFetchingHighlightsStructure: boolean
-  editingNoteId: string
 }
 
 const NotebookDrawer: FC<IProps> = ({
@@ -34,12 +39,12 @@ const NotebookDrawer: FC<IProps> = ({
   onClickCancel,
   onClickFocusNote,
   onClickSave,
+  getStatus,
   isOpen,
   highlights,
   notes,
   isFetchingNotesStructure,
   isFetchingHighlightsStructure,
-  editingNoteId,
 }) => {
   const [openDropdownIndex, setOpenDropdownIndex] = useState<number | null>(null)
   const [noteLabel, setNoteLabel] = useState('')
@@ -48,10 +53,10 @@ const NotebookDrawer: FC<IProps> = ({
     if (isOpen) {
       setOpenDropdownIndex(null)
     }
-    if (isOpen && editingNoteId.trim().length > 0) {
+    if (isOpen) {
       setNoteLabel('')
     }
-  }, [editingNoteId])
+  }, [isOpen])
 
   const handleDeleteHighlight = useCallback(
     (id: string) => {
@@ -86,12 +91,19 @@ const NotebookDrawer: FC<IProps> = ({
                 <Dropdown
                   key={item.id}
                   label={item.label}
+                  isPending={item.isPending}
                   isOpen={openDropdownIndex === index}
                   onToggle={() => setOpenDropdownIndex((prev) => (prev === index ? null : index))}>
                   <Typography text="caption">{item.description}</Typography>
                   <div className="w-full flex items-center justify-end pt-12 gap-12">
-                    <DefaultButton onClick={() => handleDeleteHighlight(item.id)}>
-                      <Typography color="error">Delete</Typography>
+                    <DefaultButton
+                      onClick={() => handleDeleteHighlight(item.id)}
+                      disabled={getStatus(item.id) === ANNOTATIONS_STATUS.PENDING}>
+                      <Typography color="error">
+                        {getStatus(item.id) === ANNOTATIONS_STATUS.PENDING
+                          ? 'Deleting...'
+                          : 'Delete'}
+                      </Typography>
                     </DefaultButton>
                   </div>
                 </Dropdown>
@@ -106,7 +118,7 @@ const NotebookDrawer: FC<IProps> = ({
             </Show>
             <div className="flex flex-col gap-12">
               {notes.map((item) => {
-                const isEditing = editingNoteId.includes(item.id)
+                const isEditing = !item.label.trim().length
                 return (
                   <NoteDropdown
                     key={item.id}
@@ -118,10 +130,12 @@ const NotebookDrawer: FC<IProps> = ({
                     placeholder="Add your notes here..."
                     value={noteLabel}
                     onChange={setNoteLabel}
-                    isEditing={isEditing}>
+                    isEditing={isEditing}
+                    isPending={getStatus(item.id) === ANNOTATIONS_STATUS.PENDING}>
                     {(isOpen) => (
                       <div className="flex flex-col">
                         <div
+                          data-peek="true"
                           onClick={() => {
                             if (isEditing) return
                             onClickFocusNote(item)
@@ -140,12 +154,19 @@ const NotebookDrawer: FC<IProps> = ({
                             when={isEditing}
                             fallback={
                               <div className="flex flex-row items-center gap-12">
-                                <DefaultButton onClick={() => handleDeleteNote(item.id)}>
-                                  <Typography color="error">Delete</Typography>
+                                <DefaultButton
+                                  disabled={getStatus(item.id) === ANNOTATIONS_STATUS.PENDING}
+                                  onClick={() => handleDeleteNote(item.id)}>
+                                  <Typography color="error">
+                                    {getStatus(item.id) === ANNOTATIONS_STATUS.PENDING
+                                      ? 'Deleting...'
+                                      : 'Delete'}
+                                  </Typography>
                                 </DefaultButton>
                               </div>
                             }>
                             <DefaultButton
+                              disabled={getStatus(item.id) === ANNOTATIONS_STATUS.PENDING}
                               onClick={() => {
                                 setNoteLabel('')
                                 onClickCancel()
@@ -153,6 +174,10 @@ const NotebookDrawer: FC<IProps> = ({
                               <Typography color="blue">Cancel</Typography>
                             </DefaultButton>
                             <DefaultButton
+                              disabled={
+                                getStatus(item.id) === ANNOTATIONS_STATUS.PENDING ||
+                                !noteLabel.trim().length
+                              }
                               onClick={() => {
                                 setNoteLabel('')
                                 onClickSave(noteLabel, item)

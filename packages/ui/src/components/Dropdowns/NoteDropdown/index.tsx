@@ -1,7 +1,8 @@
 import DefaultInput from '@components/Inputs/DefaultInput'
 import Show from '@components/Show'
 import { Typography } from '@components/Typography'
-import { FC, useEffect, useRef, useState } from 'react'
+import SkeletonInput from 'antd/es/skeleton/Input'
+import { FC, useLayoutEffect, useRef, useState } from 'react'
 
 interface IProps {
   onChange?: (value: string) => void
@@ -11,6 +12,7 @@ interface IProps {
   children: (isOpen: boolean) => React.ReactNode
   label: string
   isEditing?: boolean
+  isPending?: boolean
 }
 
 const NoteDropdown: FC<IProps> = ({
@@ -19,6 +21,7 @@ const NoteDropdown: FC<IProps> = ({
   placeholder,
   value,
   isEditing,
+  isPending,
   children,
   label,
 }) => {
@@ -26,14 +29,24 @@ const NoteDropdown: FC<IProps> = ({
   const [height, setHeight] = useState<number>(0)
   const [isOpen, setIsOpen] = useState<boolean>(false)
 
-  useEffect(() => {
-    setTimeout(() => {
-      const el = contentRef.current
-      if (!el) return
-      setHeight(
-        isEditing ? el.scrollHeight : isOpen || isEditing ? el.scrollHeight : el.scrollHeight - 28,
-      )
-    }, 100)
+  useLayoutEffect(() => {
+    const el = contentRef.current
+    if (!el) return
+
+    const measure = () => {
+      if (isEditing || isOpen) {
+        setHeight(el.scrollHeight)
+      } else {
+        const excludeEl = el.querySelector('[data-exclude]') as HTMLElement
+        setHeight(el.scrollHeight - (excludeEl?.offsetHeight ?? 0) - 28)
+      }
+    }
+
+    const observer = new ResizeObserver(measure)
+    observer.observe(el)
+    measure()
+
+    return () => observer.disconnect()
   }, [isOpen, isEditing])
 
   return (
@@ -51,12 +64,20 @@ const NoteDropdown: FC<IProps> = ({
               {label}
             </Typography>
           }>
-          <DefaultInput
-            className="h-full w-full py-8 rounded-4 px-12 font-ubuntu"
-            onChange={(value) => onChange?.(value)}
-            value={value ?? ''}
-            placeholder={placeholder ?? '----'}
-          />
+          <Show
+            when={!isPending}
+            fallback={
+              <div style={{ width: '100%', height: '34px' }}>
+                <SkeletonInput active block style={{ height: '34px' }} />
+              </div>
+            }>
+            <DefaultInput
+              className="h-full w-full py-8 rounded-4 px-12 font-ubuntu"
+              onChange={(value) => onChange?.(value)}
+              value={value ?? ''}
+              placeholder={placeholder ?? '----'}
+            />
+          </Show>
         </Show>
       </div>
       <div

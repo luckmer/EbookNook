@@ -13,6 +13,7 @@ import { useEffect, useLayoutEffect, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Route, Routes, useLocation } from 'react-router-dom'
 import { routes } from './routes'
+
 function App() {
   const isSettingsOpen = useSelector(uiSelector.openSettingsModal)
   const isSidebarOpen = useSelector(uiSelector.openChaptersDrawer)
