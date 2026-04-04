@@ -150,6 +150,30 @@ const ReaderRoot = () => {
     }
   }, [book, setBookId])
 
+  const handleWheel = debounce((deltaY: number) => {
+    if (deltaY > 0) {
+      viewRef.current?.nextPage()
+    } else {
+      viewRef.current?.prevPage()
+    }
+  }, 50)
+
+  useEffect(() => {
+    const container = viewRef.current?.frame.document
+    if (!container || loading || !book) return
+
+    const onWheel = (e: WheelEvent) => {
+      handleWheel.clear()
+      handleWheel(e.deltaY)
+    }
+
+    container.addEventListener('wheel', onWheel)
+
+    return () => {
+      container.removeEventListener('wheel', onWheel)
+    }
+  }, [loading, book])
+
   return (
     <Reader
       pageInfo={{
@@ -161,6 +185,10 @@ const ReaderRoot = () => {
       hideContent={hideContent}
       onHideHeader={handleHideHeader}
       onShowHeader={handleShowHeader}
+      onWheel={(deltaY) => {
+        handleWheel.clear?.()
+        handleWheel(deltaY)
+      }}
       onClickNextChapter={() => viewRef.current?.nextChapter()}
       onClickPrevChapter={() => viewRef.current?.prevChapter()}
       onClickPrevPage={() => viewRef.current?.prevPage()}
