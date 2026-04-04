@@ -8,10 +8,12 @@ export enum SETTINGS {
   TEXT_INDENT = 'TEXT_INDENT',
   LINE_HEIGHT = 'LINE_HEIGHT',
   PARAGRAPH_MARGIN = 'PARAGRAPH_MARGIN',
+  LANGUAGE = 'LANGUAGE',
 }
 
 export enum OPTIONS {
   APPEARANCE = 'appearance',
   FONT = 'font',
   LAYOUT = 'layout',
+  LANGUAGE = 'language',
 }

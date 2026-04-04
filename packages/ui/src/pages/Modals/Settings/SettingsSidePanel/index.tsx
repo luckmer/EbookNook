@@ -4,6 +4,7 @@ import { OPTIONS } from '@interfaces/settings/enums'
 import clsx from 'clsx'
 import { FC } from 'react'
 import { useTranslation } from 'react-i18next'
+import { IoLanguageSharp } from 'react-icons/io5'
 import { LuLayoutDashboard } from 'react-icons/lu'
 import { RiFontSize } from 'react-icons/ri'
 
@@ -18,6 +19,7 @@ const SettingsSidePanel: FC<IProps> = ({ option, onClickOption }) => {
   const SIDE_PANEL_ITEMS = [
     { id: OPTIONS.FONT, label: 'font', Icon: RiFontSize },
     { id: OPTIONS.LAYOUT, label: 'layout', Icon: LuLayoutDashboard },
+    { id: OPTIONS.LANGUAGE, label: 'language', Icon: IoLanguageSharp },
   ]
 
   return SIDE_PANEL_ITEMS.map(({ id, label, Icon }) => {

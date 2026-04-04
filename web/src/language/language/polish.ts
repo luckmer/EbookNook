@@ -1,4 +1,4 @@
-import { IDictionary } from '../../interfaces/language/index'
+import { IDictionary } from '@interfaces/language'
 
 export const polish: IDictionary = {
   noResults: 'Brak wyników',
@@ -49,4 +49,6 @@ export const polish: IDictionary = {
   date: 'Rok wydania',
   title: 'Tytuł',
   author: 'Autor',
+  language: 'Język',
+  languageDescription: 'Wybierz swój język',
 }

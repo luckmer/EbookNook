@@ -45,4 +45,6 @@ export type IDictionary = {
   date: string
   title: string
   author: string
+  language: string
+  languageDescription: string
 }

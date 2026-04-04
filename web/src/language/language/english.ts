@@ -1,4 +1,4 @@
-import { IDictionary } from '../../interfaces/language/index'
+import { IDictionary } from '@interfaces/language'
 
 export const english: IDictionary = {
   noResults: 'No results',
@@ -48,4 +48,6 @@ export const english: IDictionary = {
   date: 'Date',
   title: 'Title',
   author: 'Author',
+  language: 'Language',
+  languageDescription: 'Select your language',
 }

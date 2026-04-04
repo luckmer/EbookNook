@@ -73,10 +73,13 @@ importers:
         specifier: 10.0.2
         version: 10.0.2(esbuild@0.25.11)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(rollup@4.52.5)(storybook@10.0.2(@testing-library/dom@10.4.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(vite@7.0.4(@types/node@24.9.2)(jiti@2.6.1)(lightningcss@1.30.2)))(typescript@5.8.3)(vite@7.0.4(@types/node@24.9.2)(jiti@2.6.1)(lightningcss@1.30.2))
       clsx:
-        specifier: ^2.1.1
+        specifier: 2.1.1
         version: 2.1.1
+      country-flag-icons:
+        specifier: 1.6.15
+        version: 1.6.15
       react-icons:
-        specifier: ^5.5.0
+        specifier: 5.5.0
         version: 5.5.0(react@19.1.0)
       storybook:
         specifier: 10.0.2
@@ -1194,6 +1197,9 @@ packages:
   cosmiconfig@7.1.0:
     resolution: {integrity: sha512-AdmX6xUzdNASswsFtmwSt7Vj8po9IuqXm0UXz7QKPuEUmPB4XyjGfaAr2PSuELMwkRMVH1EpIkX5bTZGRB3eCA==}
     engines: {node: '>=10'}
+
+  country-flag-icons@1.6.15:
+    resolution: {integrity: sha512-92HoA8l6DluEidku8tKBftjuFRj4Rv3zDW1lXxCuNnqAxhUSkvso9gM/Afj4F5BnK+wneHIe3ydI+s+4NA29/Q==}
 
   cross-spawn@7.0.6:
     resolution: {integrity: sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA==}
@@ -3359,6 +3365,8 @@ snapshots:
       path-type: 4.0.0
       yaml: 1.10.2
     optional: true
+
+  country-flag-icons@1.6.15: {}
 
   cross-spawn@7.0.6:
     dependencies:
