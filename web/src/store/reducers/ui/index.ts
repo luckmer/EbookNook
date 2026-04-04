@@ -10,9 +10,11 @@ export interface IOpenBookOverviewModal {
 export interface IUiState {
   isFetchingStructure: boolean
   openChaptersDrawer: boolean
-  isFetchingAnnotations: boolean
   openSettingsModal: boolean
   openBookOverviewModal: IOpenBookOverviewModal
+  isFetchingHighlightsStructure: boolean
+  isFetchingNotesStructure: boolean
+  isAddingBook: boolean
   openNotebook: boolean
   isLoadingState: boolean
   hideHeader: boolean
@@ -21,13 +23,15 @@ export interface IUiState {
 const defaultOpenBookOverviewModalState = { status: false, bookId: '' }
 
 const defaultState: IUiState = {
-  isFetchingStructure: true,
-  isFetchingAnnotations: true,
-  openChaptersDrawer: false,
-  openNotebook: false,
   openBookOverviewModal: defaultOpenBookOverviewModalState,
+  isFetchingHighlightsStructure: true,
+  isFetchingNotesStructure: true,
+  isFetchingStructure: true,
+  openChaptersDrawer: false,
   openSettingsModal: false,
   isLoadingState: true,
+  isAddingBook: false,
+  openNotebook: false,
   hideHeader: false,
 }
 
@@ -62,12 +66,20 @@ export const store = createSlice({
       state.isFetchingStructure = action.payload
       return state
     },
-    setIsFetchingAnnotationsStructure(state, action: PayloadAction<boolean>) {
-      state.isFetchingAnnotations = action.payload
+    setIsFetchingHighlightsStructure(state, action: PayloadAction<boolean>) {
+      state.isFetchingHighlightsStructure = action.payload
+      return state
+    },
+    setIsFetchingNotesStructure(state, action: PayloadAction<boolean>) {
+      state.isFetchingNotesStructure = action.payload
       return state
     },
     setOpenNotebook(state, action: PayloadAction<boolean>) {
       state.openNotebook = action.payload
+      return state
+    },
+    setIsAddingBook(state, action: PayloadAction<boolean>) {
+      state.isAddingBook = action.payload
       return state
     },
   },

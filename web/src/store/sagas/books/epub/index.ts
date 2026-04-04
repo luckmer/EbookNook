@@ -1,10 +1,12 @@
 import { Epub, EpubStructure } from '@bindings/epub'
+import { BOOK_STATUS } from '@interfaces/book/enums'
 import { PayloadAction } from '@reduxjs/toolkit'
 import { actions, PayloadTypes } from '@store/reducers/books'
 import { actions as uiActions } from '@store/reducers/ui'
 import { selectEpubMap } from '@store/selectors/books'
 import { invoke } from '@tauri-apps/api/core'
-import { call, put, select } from 'typed-redux-saga'
+import { notify } from '@utils/notification'
+import { all, call, put, select } from 'typed-redux-saga'
 
 export function* getEpubStructure(action: PayloadAction<PayloadTypes['getEpubStructure']>) {
   yield* put(uiActions.setIsFetchingStructure(true))
@@ -39,28 +41,43 @@ export function* updateEpubBookProgress(
   } catch (err) {
     console.log(err)
     console.log('failed to update epub book progress')
+    notify('Failed to update epub book progress', 'error')
   }
 }
 
-export function* deleteEpubBook(action: PayloadAction<PayloadTypes['deleteEpub']>) {
+export function* deleteEpubBook(action: PayloadAction<PayloadTypes['setDeleteEpub']>) {
   try {
+    yield* put(actions.setStatus({ id: action.payload, status: BOOK_STATUS.DELETING }))
     yield* call(invoke, 'delete_epub_book', { id: action.payload })
+
+    yield* all([
+      put(actions.setStatus({ id: action.payload, status: BOOK_STATUS.SUCCESS })),
+      put(actions.deleteEpub(action.payload)),
+    ])
   } catch (err) {
     console.log(err)
     console.log('failed to remove epub')
+    yield* put(actions.setStatus({ id: action.payload, status: BOOK_STATUS.ERROR }))
+    notify('Failed to remove epub', 'error')
   }
 }
 
-export function* editEpubBook(action: PayloadAction<PayloadTypes['editEpub']>) {
+export function* editEpubBook(action: PayloadAction<PayloadTypes['setEditEpub']>) {
   try {
+    yield* put(actions.setStatus({ id: action.payload.id, status: BOOK_STATUS.UPDATING }))
     const response = yield* call(invoke<Epub>, 'edit_epub_book', {
       id: action.payload.id,
       content: action.payload.content,
     })
 
-    yield* put(actions.updateEpubBook(response.book))
+    yield* all([
+      put(actions.setStatus({ id: action.payload.id, status: BOOK_STATUS.SUCCESS })),
+      put(actions.updateEpubBook(response.book)),
+    ])
   } catch (err) {
+    yield* put(actions.setStatus({ id: action.payload.id, status: BOOK_STATUS.ERROR }))
     console.log(err)
     console.log('failed to edit epub')
+    notify('Failed to edit epub', 'error')
   }
 }

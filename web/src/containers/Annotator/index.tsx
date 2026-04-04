@@ -168,6 +168,7 @@ const AnnotatorRoot = () => {
             annotationActions.setHighlight({
               id: bookId,
               highlight: {
+                isPending: true,
                 label: selectedText,
                 description: selectedText,
                 normStart: coords.normStart,
@@ -196,12 +197,11 @@ const AnnotatorRoot = () => {
 
           const id = `${v7()}#${bookId}#${chapterHref}`
 
-          dispatch(annotationActions.setEditingNoteId(id))
           dispatch(
             annotationActions.setCustomNote({
               id: bookId,
               note: {
-                label: selectedText,
+                label: '',
                 description: coords.text,
                 normStart: coords.normStart,
                 normEnd: coords.normEnd,

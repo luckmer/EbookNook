@@ -1,3 +1,4 @@
+import { BOOK_STATUS } from '@interfaces/book/enums'
 import { Meta, StoryObj } from '@storybook/react-vite'
 import BookOverviewModal from '.'
 
@@ -22,6 +23,7 @@ export const Default: Story = {
           title: 'title',
           published: 'published',
           publisher: 'publisher',
+          status: BOOK_STATUS.IDLE,
         }}
         onClickClose={() => {}}
         isOpen={true}

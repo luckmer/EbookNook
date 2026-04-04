@@ -13,6 +13,7 @@ export interface IProps {
   books: IBook[]
   hasBooks: boolean
   isLoadingState: boolean
+  isAddingBook: boolean
 }
 
 const Home: FC<IProps> = ({
@@ -22,6 +23,7 @@ const Home: FC<IProps> = ({
   books,
   hasBooks,
   isLoadingState,
+  isAddingBook,
 }) => {
   return (
     <main className="w-full h-full overflow-y-auto px-24 py-12">
@@ -32,6 +34,7 @@ const Home: FC<IProps> = ({
             <Show when={books.length > 0 && hasBooks} fallback={<EmptyResult />}>
               <BookShelf
                 books={books}
+                isAddingBook={isAddingBook}
                 onClickImportBook={onClick}
                 onClickBook={onClickBook}
                 onClickDetails={onClickDetails}

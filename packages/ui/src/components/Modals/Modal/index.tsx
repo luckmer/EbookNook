@@ -1,5 +1,6 @@
 import { Breakpoint, Modal } from 'antd'
-import { FC, memo, useEffect, useRef } from 'react'
+import clsx from 'clsx'
+import { FC, memo } from 'react'
 
 export interface IProps {
   children: React.ReactNode
@@ -24,48 +25,30 @@ const ModalRoot: FC<IProps> = ({
   width,
   height,
 }) => {
-  let ref = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const modalElement = document.querySelector('.ant-modal') as HTMLElement
-    const antModal = document.querySelector('.ant-modal-content') as HTMLElement
-
-    if (!isFullscreen) {
-      if (modalElement) {
-        modalElement.style.removeProperty('max-width')
-        modalElement.style.removeProperty('margin')
-        modalElement.style.removeProperty('height')
-      }
-
-      if (antModal) {
-        antModal.style.removeProperty('max-height')
-        antModal.style.removeProperty('height')
-      }
-      return
-    }
-
-    if (modalElement) {
-      modalElement.style.setProperty('max-width', '100vw', 'important')
-      modalElement.style.setProperty('margin', '0px', 'important')
-      modalElement.style.setProperty('height', '100vh', 'important')
-    }
-
-    if (antModal) {
-      antModal.style.setProperty('max-height', '100vh', 'important')
-      antModal.style.setProperty('height', '100vh', 'important')
-    }
-  }, [isFullscreen, isOpen])
-
   return (
     <Modal
-      panelRef={ref}
-      footer={isFooter}
       open={isOpen}
-      closable={closable ?? true}
       onCancel={onClickClose}
-      centered={centered}
-      height={height}
-      width={width ?? 700}>
+      footer={isFooter ? undefined : null}
+      closable={closable ?? true}
+      centered={centered && !isFullscreen}
+      width={isFullscreen ? '100vw' : (width ?? 700)}
+      rootClassName={clsx(isFullscreen && 'fullscreen-modal-wrapper')}
+      styles={{
+        content: isFullscreen
+          ? {
+              height: '100vh',
+              borderRadius: 0,
+              padding: 0,
+            }
+          : {},
+        body: isFullscreen
+          ? {
+              flex: 1,
+              overflow: 'auto',
+            }
+          : { height },
+      }}>
       {children}
     </Modal>
   )

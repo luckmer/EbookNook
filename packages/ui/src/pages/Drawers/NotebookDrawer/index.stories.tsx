@@ -1,3 +1,4 @@
+import { ANNOTATIONS_STATUS } from '@interfaces/annotations/enums'
 import { Meta, StoryObj } from '@storybook/react-vite'
 import NotebookDrawer from './index'
 
@@ -38,9 +39,10 @@ export const Default: Story = {
         onClickCancel={() => {}}
         onClickSave={() => {}}
         onClickClose={() => {}}
-        editingNoteId=""
+        getStatus={() => ANNOTATIONS_STATUS.IDLE}
         isOpen={args.isOpen}
-        isLoader={args.isLoader}
+        isFetchingHighlightsStructure={args.isFetchingHighlightsStructure}
+        isFetchingNotesStructure={args.isFetchingNotesStructure}
       />
     )
   },
@@ -48,5 +50,6 @@ export const Default: Story = {
 
 Default.args = {
   isOpen: true,
-  isLoader: false,
+  isFetchingHighlightsStructure: false,
+  isFetchingNotesStructure: false,
 }

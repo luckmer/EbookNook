@@ -1,17 +1,19 @@
 import DefaultButton from '@components/Buttons/DefaultButton'
 import ContentArea from '@components/Inputs/ContentArea'
 import ContentInput from '@components/Inputs/ContentInput'
+import DateContentInput from '@components/Inputs/DateContentInput'
 import Modal from '@components/Modals/Modal'
 import ModalHeader from '@components/Modals/ModalHeader'
 import Show from '@components/Show'
+import Spin from '@components/Spin'
 import { Typography } from '@components/Typography'
+import { useWindowSize } from '@hooks/useWindowSize'
+import { BOOK_STATUS, NEW_EPUB_BOOK_CONTENT } from '@interfaces/book/enums'
+import { DATE_REGEX } from '@web-utils/regex'
 import clsx from 'clsx'
-import { FC, useEffect, useRef, useState } from 'react'
+import { FC, useEffect, useMemo, useRef, useState } from 'react'
 import { IoTrashBin } from 'react-icons/io5'
 import { MdEdit } from 'react-icons/md'
-import { NEW_EPUB_BOOK_CONTENT } from '@interfaces/book/enums'
-import DateContentInput from '@components/Inputs/DateContentInput'
-import { DATE_REGEX } from '@web-utils/regex'
 
 export interface IBook {
   bookDescription?: string
@@ -20,6 +22,7 @@ export interface IBook {
   title?: string
   published?: string
   publisher?: string
+  status: BOOK_STATUS
 }
 
 export interface IProps {
@@ -40,6 +43,8 @@ const BookOverviewModal: FC<IProps> = ({
   const [newContent, setNewContent] = useState<Partial<Record<NEW_EPUB_BOOK_CONTENT, string>>>({})
   const [isEditing, setIsEditing] = useState(false)
   const [isError, setIsError] = useState(false)
+  const { width } = useWindowSize()
+  const isMobile = useMemo(() => width <= 700, [width])
 
   const refIframe = useRef<HTMLIFrameElement>(null)
   const bookDesc = book.bookDescription
@@ -106,26 +111,48 @@ const BookOverviewModal: FC<IProps> = ({
       onClickClose={onClickClose}
       isOpen={isOpen}
       centered
-      width={500}
+      isFullscreen={isMobile}
+      width={isMobile ? '100%' : 500}
+      height={isMobile ? '100%' : undefined}
       closable={false}>
-      <div className="flex flex-col  h-full w-full overflow-hidden max-h-[700px]">
+      <div
+        className={clsx(
+          'flex flex-col  h-full w-full overflow-hidden',
+          isMobile ? 'h-full' : 'max-h-[700px]',
+        )}>
         <ModalHeader onClickClose={onClickClose} label="Book overview" />
-        <div className="flex flex-col overflow-y-auto w-full flex-1 p-24">
-          <div className="flex flex-row items-center justify-end gap-12 w-full">
+        <div className="flex flex-col overflow-hidden w-full flex-1 py-24">
+          <div className="flex flex-row items-center justify-end gap-12 w-full px-24 pb-12">
             <DefaultButton
+              disabled={book.status === BOOK_STATUS.DELETING}
               onClick={onClickDelete}
-              className="p-6 hover:bg-button-primary-hover rounded-4 duration-150">
-              <IoTrashBin className="text-status-error min-w-18 min-h-18" />
+              className={clsx(
+                'p-6  rounded-4 duration-150',
+                book.status !== BOOK_STATUS.DELETING
+                  ? 'hover:bg-button-primary-hover cursor-pointer'
+                  : 'cursor-default!',
+              )}>
+              <Show when={book.status !== BOOK_STATUS.DELETING} fallback={<Spin size={18} />}>
+                <IoTrashBin className="text-status-error min-w-18 min-h-18" />
+              </Show>
             </DefaultButton>
             <DefaultButton
+              disabled={book.status === BOOK_STATUS.UPDATING}
               onClick={() => {
                 setIsEditing((prev) => !prev)
               }}
-              className="p-6 hover:bg-button-primary-hover rounded-4 duration-150">
-              <MdEdit className="min-w-18 min-h-18" />
+              className={clsx(
+                'p-6  rounded-4 duration-150',
+                book.status !== BOOK_STATUS.UPDATING
+                  ? 'hover:bg-button-primary-hover cursor-pointer'
+                  : 'cursor-default!',
+              )}>
+              <Show when={book.status !== BOOK_STATUS.UPDATING} fallback={<Spin size={18} />}>
+                <MdEdit className="min-w-18 min-h-18" />
+              </Show>
             </DefaultButton>
           </div>
-          <div className="flex flex-col gap-24">
+          <div className="flex flex-col gap-24 overflow-y-auto px-24">
             <div className="flex flex-row gap-24">
               <img
                 src={book.cover}
@@ -221,6 +248,7 @@ const BookOverviewModal: FC<IProps> = ({
             <Show when={isEditing}>
               <div>
                 <DefaultButton
+                  disabled={book.status === BOOK_STATUS.UPDATING}
                   onClick={() => {
                     const date = newContent[NEW_EPUB_BOOK_CONTENT.PUBLISHED]
                     if ((date?.trim()?.length ?? 0) > 0) {
@@ -229,12 +257,15 @@ const BookOverviewModal: FC<IProps> = ({
                         return
                       }
                     }
+                    setIsEditing(false)
                     onClickEdit(newContent)
                   }}
                   className="px-24 py-8 bg-button-primary-active hover:bg-button-primary-hover rounded-4 duration-150 h-full">
-                  <Typography text="caption" color="secondary">
-                    Save
-                  </Typography>
+                  <Show when={book.status !== BOOK_STATUS.UPDATING} fallback={<Spin size={16} />}>
+                    <Typography text="caption" color="secondary">
+                      Save
+                    </Typography>
+                  </Show>
                 </DefaultButton>
               </div>
             </Show>

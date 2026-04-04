@@ -3,10 +3,10 @@ import { PayloadAction } from '@reduxjs/toolkit'
 import { actions, PayloadTypes } from '@store/reducers/books'
 import { actions as uiActions } from '@store/reducers/ui'
 import { invoke } from '@tauri-apps/api/core'
+import { notify } from '@utils/notification'
 import { getDocumentLoader } from 'src/libs/document'
 import { all, call, put, takeEvery, takeLatest, takeLeading } from 'typed-redux-saga'
 import { deleteEpubBook, editEpubBook, getEpubStructure, updateEpubBookProgress } from './epub'
-
 export function* loadState() {
   yield* put(uiActions.setIsLoadingState(true))
   const books = yield* call(invoke<Books>, 'get_books')
@@ -15,6 +15,7 @@ export function* loadState() {
 }
 
 export function* ImportBook(action: PayloadAction<PayloadTypes['importBook']>) {
+  yield* put(uiActions.setIsAddingBook(true))
   try {
     const core = yield* call(getDocumentLoader)
     const response = yield* call([core, core.init], action.payload)
@@ -27,7 +28,9 @@ export function* ImportBook(action: PayloadAction<PayloadTypes['importBook']>) {
   } catch (err) {
     console.log(err)
     console.log('failed to open document')
+    notify('Failed to open document', 'error')
   }
+  yield* put(uiActions.setIsAddingBook(false))
 }
 
 export function* ImportBookSaga() {
@@ -47,11 +50,11 @@ export function* updateEpubBookProgressSaga() {
 }
 
 export function* deleteEpubSaga() {
-  yield* takeEvery(actions.deleteEpub, deleteEpubBook)
+  yield* takeEvery(actions.setDeleteEpub, deleteEpubBook)
 }
 
 export function* editEpubSaga() {
-  yield* takeEvery(actions.editEpub, editEpubBook)
+  yield* takeEvery(actions.setEditEpub, editEpubBook)
 }
 
 export default function* RootSaga() {

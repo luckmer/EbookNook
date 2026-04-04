@@ -1,6 +1,6 @@
 import { Books } from '@bindings/book'
 import { Book, Epub, EpubStructure, Progress } from '@bindings/epub'
-import { BookFormat, NEW_EPUB_BOOK_CONTENT } from '@interfaces/book/enums'
+import { BOOK_STATUS, BookFormat, NEW_EPUB_BOOK_CONTENT } from '@interfaces/book/enums'
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { PayloadType } from '@store/helper'
@@ -10,10 +10,12 @@ export const booksStore = 'booksStore'
 export interface IBookState {
   books: Books
   selectedChapter: string
+  statuses: Record<string, BOOK_STATUS>
 }
 
 const defaultState: IBookState = {
   selectedChapter: '',
+  statuses: {},
   books: {
     epub: [],
   },
@@ -22,11 +24,15 @@ const defaultState: IBookState = {
 export const store = createSlice({
   name: booksStore,
   initialState: defaultState,
+
   reducers: {
     load(state) {
       return state
     },
-
+    setStatus(state, action: PayloadAction<{ id: string; status: BOOK_STATUS }>) {
+      state.statuses[action.payload.id] = action.payload.status
+      return state
+    },
     setBooks(state, action: PayloadAction<Books>) {
       state.books = action.payload
       return state
@@ -83,12 +89,16 @@ export const store = createSlice({
       return state
     },
 
+    setDeleteEpub(state, _: PayloadAction<string>) {
+      return state
+    },
+
     deleteEpub(state, action: PayloadAction<string>) {
       state.books.epub = state.books.epub.filter((epub) => epub.book.id !== action.payload)
       return state
     },
 
-    editEpub(
+    setEditEpub(
       state,
       _: PayloadAction<{
         id: string

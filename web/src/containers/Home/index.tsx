@@ -12,6 +12,7 @@ const HomeRoot = () => {
   const dispatch = useDispatch()
   const availableBooks = useSelector(bookSelector.books)
   const isLoadingState = useSelector(uiSelector.isLoadingState)
+  const isAddingBook = useSelector(uiSelector.isAddingBook)
   const books = useSelector(filteredBooks)
 
   const navigate = useNavigate()
@@ -19,6 +20,7 @@ const HomeRoot = () => {
   return (
     <Home
       books={books}
+      isAddingBook={isAddingBook}
       isLoadingState={isLoadingState}
       hasBooks={Object.values(availableBooks).flat().length > 0}
       onClick={async (file) => {
