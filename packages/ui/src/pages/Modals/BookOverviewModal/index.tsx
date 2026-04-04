@@ -7,10 +7,11 @@ import ModalHeader from '@components/Modals/ModalHeader'
 import Show from '@components/Show'
 import Spin from '@components/Spin'
 import { Typography } from '@components/Typography'
+import { useWindowSize } from '@hooks/useWindowSize'
 import { BOOK_STATUS, NEW_EPUB_BOOK_CONTENT } from '@interfaces/book/enums'
 import { DATE_REGEX } from '@web-utils/regex'
 import clsx from 'clsx'
-import { FC, useEffect, useRef, useState } from 'react'
+import { FC, useEffect, useMemo, useRef, useState } from 'react'
 import { IoTrashBin } from 'react-icons/io5'
 import { MdEdit } from 'react-icons/md'
 
@@ -42,6 +43,8 @@ const BookOverviewModal: FC<IProps> = ({
   const [newContent, setNewContent] = useState<Partial<Record<NEW_EPUB_BOOK_CONTENT, string>>>({})
   const [isEditing, setIsEditing] = useState(false)
   const [isError, setIsError] = useState(false)
+  const { width } = useWindowSize()
+  const isMobile = useMemo(() => width <= 700, [width])
 
   const refIframe = useRef<HTMLIFrameElement>(null)
   const bookDesc = book.bookDescription
@@ -108,12 +111,18 @@ const BookOverviewModal: FC<IProps> = ({
       onClickClose={onClickClose}
       isOpen={isOpen}
       centered
-      width={500}
+      isFullscreen={isMobile}
+      width={isMobile ? '100%' : 500}
+      height={isMobile ? '100%' : undefined}
       closable={false}>
-      <div className="flex flex-col  h-full w-full overflow-hidden max-h-[700px]">
+      <div
+        className={clsx(
+          'flex flex-col  h-full w-full overflow-hidden',
+          isMobile ? 'h-full' : 'max-h-[700px]',
+        )}>
         <ModalHeader onClickClose={onClickClose} label="Book overview" />
-        <div className="flex flex-col overflow-y-auto w-full flex-1 p-24">
-          <div className="flex flex-row items-center justify-end gap-12 w-full">
+        <div className="flex flex-col overflow-hidden w-full flex-1 py-24">
+          <div className="flex flex-row items-center justify-end gap-12 w-full px-24 pb-12">
             <DefaultButton
               disabled={book.status === BOOK_STATUS.DELETING}
               onClick={onClickDelete}
@@ -143,7 +152,7 @@ const BookOverviewModal: FC<IProps> = ({
               </Show>
             </DefaultButton>
           </div>
-          <div className="flex flex-col gap-24">
+          <div className="flex flex-col gap-24 overflow-y-auto px-24">
             <div className="flex flex-row gap-24">
               <img
                 src={book.cover}
