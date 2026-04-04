@@ -1,22 +1,25 @@
-import { FC } from 'react'
-import clsx from 'clsx'
 import DefaultButton from '@components/Buttons/DefaultButton'
 import { Typography } from '@components/Typography'
+import { OPTIONS } from '@interfaces/settings/enums'
+import clsx from 'clsx'
+import { FC } from 'react'
+import { useTranslation } from 'react-i18next'
 import { LuLayoutDashboard } from 'react-icons/lu'
 import { RiFontSize } from 'react-icons/ri'
-import { OPTIONS } from '@interfaces/settings/enums'
 
 export interface IProps {
   onClickOption: (option: OPTIONS) => void
   option: OPTIONS
 }
 
-const SIDE_PANEL_ITEMS = [
-  { id: OPTIONS.FONT, label: 'Font', Icon: RiFontSize },
-  { id: OPTIONS.LAYOUT, label: 'Layout', Icon: LuLayoutDashboard },
-]
-
 const SettingsSidePanel: FC<IProps> = ({ option, onClickOption }) => {
+  const { t } = useTranslation()
+
+  const SIDE_PANEL_ITEMS = [
+    { id: OPTIONS.FONT, label: 'font', Icon: RiFontSize },
+    { id: OPTIONS.LAYOUT, label: 'layout', Icon: LuLayoutDashboard },
+  ]
+
   return SIDE_PANEL_ITEMS.map(({ id, label, Icon }) => {
     const isActive = option === id
     return (
@@ -28,7 +31,7 @@ const SettingsSidePanel: FC<IProps> = ({ option, onClickOption }) => {
           isActive ? 'border-accent-blue bg-button-secondary-background' : 'border-transparent',
         )}>
         <Icon className={clsx('h-[18px] w-[18px]', !isActive && 'text-text-secondary')} />
-        <Typography color={isActive ? 'white' : 'secondary'}>{label}</Typography>
+        <Typography color={isActive ? 'white' : 'secondary'}>{t(label)}</Typography>
       </DefaultButton>
     )
   })

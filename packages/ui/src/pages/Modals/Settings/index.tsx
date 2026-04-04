@@ -8,6 +8,7 @@ import { OPTIONS, SETTINGS } from '@interfaces/settings/enums'
 import { ISettingsState } from '@interfaces/settings/interfaces'
 import clsx from 'clsx'
 import { FC, memo, useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import FontSettings from './FontSettings'
 import LayoutSettings from './LayoutSettings'
 import SettingsSidePanel from './SettingsSidePanel'
@@ -20,6 +21,7 @@ export interface IProps {
 }
 
 const Settings: FC<IProps> = ({ isOpen, onClickClose, settings, onClick }) => {
+  const { t } = useTranslation()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [option, setOption] = useState<OPTIONS>(OPTIONS.FONT)
   const { width } = useWindowSize()
@@ -62,7 +64,7 @@ const Settings: FC<IProps> = ({ isOpen, onClickClose, settings, onClick }) => {
       <div className="flex flex-col overflow-hidden h-full relative">
         <ModalHeader
           onClickClose={onClickClose}
-          label="Settings"
+          label={t('settings')}
           onClickOpen={isMobile ? () => setIsMobileMenuOpen(!isMobileMenuOpen) : undefined}
           open={isMobileMenuOpen}
         />

@@ -1,19 +1,21 @@
 import UploadButton from '@components/Buttons/UploadButton'
 import { Typography } from '@components/Typography'
 import { FC, memo } from 'react'
+import { useTranslation } from 'react-i18next'
 
 export interface IProps {
   onClick: (file: File) => void
 }
 
 const EmptyBookShelf: FC<IProps> = ({ onClick }) => {
+  const { t } = useTranslation()
   return (
     <div className="w-full h-full flex items-center justify-center flex-col gap-32 max-w-[600px] mx-auto px-12">
       <Typography text="h1" class="text-[48px]! leading-[50px]">
-        Your library
+        {t('yourLibrary')}
       </Typography>
       <Typography text="body" center>
-        Welcome to your library! Import your books and start reading anytime.
+        {t('yourLibraryDescription')}
       </Typography>
       <div className="flex">
         <UploadButton

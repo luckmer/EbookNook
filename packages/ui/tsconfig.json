@@ -53,6 +53,9 @@
       "@utils/*": [
         "./src/utils/*"
       ],
+      "@language/*": [
+        "../../web/src/language/*"
+      ],
       "@web-utils/*": [
         "../../web/src/utils/*"
       ]
