@@ -248,6 +248,7 @@ const BookOverviewModal: FC<IProps> = ({
                         return
                       }
                     }
+                    setIsEditing(false)
                     onClickEdit(newContent)
                   }}
                   className="px-24 py-8 bg-button-primary-active hover:bg-button-primary-hover rounded-4 duration-150 h-full">
