@@ -1,9 +1,10 @@
 import Show from '@components/Show'
-import { FC, memo } from 'react'
-import DefaultInput from '../DefaultInput'
+import { Typography } from '@components/Typography'
 import { formatDate } from '@web-utils/index'
 import clsx from 'clsx'
-import { Typography } from '@components/Typography'
+import { FC, memo } from 'react'
+import { useTranslation } from 'react-i18next'
+import DefaultInput from '../DefaultInput'
 export interface IProps {
   onChange: (value: string) => void
   isEditing: boolean
@@ -21,6 +22,7 @@ const DateContentInput: FC<IProps> = ({
   isError,
   onChange,
 }) => {
+  const { t } = useTranslation()
   return (
     <Show when={isEditing} fallback={children}>
       <DefaultInput
@@ -34,7 +36,7 @@ const DateContentInput: FC<IProps> = ({
       />
       <Show when={isError ?? false}>
         <Typography color="error" text="small">
-          Please enter a valid date
+          {t('enterValidDate')}
         </Typography>
       </Show>
     </Show>

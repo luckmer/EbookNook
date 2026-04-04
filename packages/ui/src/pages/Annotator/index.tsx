@@ -22,7 +22,7 @@ const Annotator: FC<IProps> = ({ modalPosition, pointPosition, onClickCopy, onCl
       className="annotator-popup fixed z-50 bg-surface-100 shadow-lg rounded-lg flex items-center justify-center rounded-6"
       style={modalPosition}
       onClick={(e) => e.stopPropagation()}>
-      <div className="absolute " style={pointPosition} />
+      <div className="absolute" style={pointPosition} />
       <div className="flex gap-12 items-center justify-center h-full p-3">
         <DefaultButton
           onClick={onClickCopy}

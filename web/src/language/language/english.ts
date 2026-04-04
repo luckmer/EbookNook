@@ -57,4 +57,5 @@ export const english: IDictionary = {
   notes: 'Notes',
   notesPlaceholder: 'Add your notes here',
   cancel: 'Cancel',
+  enterValidDate: 'Please enter a valid date',
 }

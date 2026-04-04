@@ -54,4 +54,5 @@ export type IDictionary = {
   notes: string
   notesPlaceholder: string
   cancel: string
+  enterValidDate: string
 }

@@ -58,4 +58,5 @@ export const polish: IDictionary = {
   notes: 'Notatki',
   notesPlaceholder: 'Dodaj swoje notatki tutaj...',
   cancel: 'Anuluj',
+  enterValidDate: 'Proszę podać prawidłowy rok wydania',
 }
