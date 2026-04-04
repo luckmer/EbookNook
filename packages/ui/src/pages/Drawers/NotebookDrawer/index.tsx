@@ -6,11 +6,12 @@ import Dropdown from '@components/Dropdowns/Dropdown'
 import NoteDropdown from '@components/Dropdowns/NoteDropdown'
 import Show from '@components/Show'
 import { Typography } from '@components/Typography'
+import { useWindowSize } from '@hooks/useWindowSize'
 import { ANNOTATIONS_STATUS } from '@interfaces/annotations/enums'
 import { trimText } from '@web-utils/index'
 import { Skeleton } from 'antd'
 import clsx from 'clsx'
-import { FC, useCallback, useEffect, useState } from 'react'
+import { FC, useCallback, useEffect, useMemo, useState } from 'react'
 import { LuNotebookPen } from 'react-icons/lu'
 
 export interface IHighlight extends Highlight {
@@ -48,6 +49,9 @@ const NotebookDrawer: FC<IProps> = ({
 }) => {
   const [openDropdownIndex, setOpenDropdownIndex] = useState<number | null>(null)
   const [noteLabel, setNoteLabel] = useState('')
+  const { width } = useWindowSize()
+
+  const isMobile = useMemo(() => width <= 700, [width])
 
   useEffect(() => {
     if (isOpen) {
@@ -75,7 +79,11 @@ const NotebookDrawer: FC<IProps> = ({
   )
 
   return (
-    <Drawer onClickClose={onClickClose} isOpen={isOpen} placement="right">
+    <Drawer
+      onClickClose={onClickClose}
+      isOpen={isOpen}
+      placement={isMobile ? 'bottom' : 'right'}
+      height={isMobile ? '80%' : '100%'}>
       <div className="flex flex-col gap-12">
         <div className="flex w-full items-center justify-center gap-4">
           <LuNotebookPen className="w-18 h-18 transition-colors duration-200" />

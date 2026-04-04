@@ -6,16 +6,17 @@ export interface IProps {
   onClickClose: () => void
   isOpen: boolean
   children: React.ReactNode
+  height?: string
 }
 
-const DrawerRoot: FC<IProps> = ({ placement, isOpen, children, onClickClose }) => {
+const DrawerRoot: FC<IProps> = ({ placement, isOpen, children, height, onClickClose }) => {
   return (
     <Drawer
       placement={placement}
       closable={false}
       onClose={onClickClose}
       open={isOpen}
-      height={'100%'}
+      height={height ?? '100%'}
       key={placement}>
       {children}
     </Drawer>

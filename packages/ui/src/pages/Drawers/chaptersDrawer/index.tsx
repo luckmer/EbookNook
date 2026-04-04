@@ -4,8 +4,9 @@ import Drawer from '@components/Drawer'
 import Show from '@components/Show'
 import Toc from '@components/Toc'
 import { Typography } from '@components/Typography'
+import { useWindowSize } from '@hooks/useWindowSize'
 import { Skeleton } from 'antd'
-import { FC } from 'react'
+import { FC, useMemo } from 'react'
 import { IoLibraryOutline } from 'react-icons/io5'
 export interface IProps {
   onClick: (href: string) => void
@@ -30,8 +31,16 @@ const ChaptersDrawer: FC<IProps> = ({
   author,
   isLoader,
 }) => {
+  const { width } = useWindowSize()
+
+  const isMobile = useMemo(() => width <= 700, [width])
+
   return (
-    <Drawer onClickClose={onClickClose} isOpen={isOpen} placement="left">
+    <Drawer
+      onClickClose={onClickClose}
+      isOpen={isOpen}
+      placement={isMobile ? 'bottom' : 'left'}
+      height={isMobile ? '80%' : '100%'}>
       <div className="pb-12 border-b border-border-modal flex flex-col gap-24">
         <div>
           <DefaultButton
