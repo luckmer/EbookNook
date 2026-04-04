@@ -28,7 +28,7 @@ export function* ImportBook(action: PayloadAction<PayloadTypes['importBook']>) {
   } catch (err) {
     console.log(err)
     console.log('failed to open document')
-    notify('Failed to open document')
+    notify('Failed to open document', 'error')
   }
   yield* put(uiActions.setIsAddingBook(false))
 }
@@ -50,11 +50,11 @@ export function* updateEpubBookProgressSaga() {
 }
 
 export function* deleteEpubSaga() {
-  yield* takeEvery(actions.deleteEpub, deleteEpubBook)
+  yield* takeEvery(actions.setDeleteEpub, deleteEpubBook)
 }
 
 export function* editEpubSaga() {
-  yield* takeEvery(actions.editEpub, editEpubBook)
+  yield* takeEvery(actions.setEditEpub, editEpubBook)
 }
 
 export default function* RootSaga() {

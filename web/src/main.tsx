@@ -13,7 +13,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <ConfigProvider theme={theme}>
     <Provider store={store}>
       <BrowserRouter>
-        <Toaster position="top-center" visibleToasts={3} />
+        <Toaster position="top-center" visibleToasts={3} richColors />
         <DrawersRoot />
         <ModalsRoot />
         <App />

@@ -1,17 +1,18 @@
 import DefaultButton from '@components/Buttons/DefaultButton'
 import ContentArea from '@components/Inputs/ContentArea'
 import ContentInput from '@components/Inputs/ContentInput'
+import DateContentInput from '@components/Inputs/DateContentInput'
 import Modal from '@components/Modals/Modal'
 import ModalHeader from '@components/Modals/ModalHeader'
 import Show from '@components/Show'
+import Spin from '@components/Spin'
 import { Typography } from '@components/Typography'
+import { BOOK_STATUS, NEW_EPUB_BOOK_CONTENT } from '@interfaces/book/enums'
+import { DATE_REGEX } from '@web-utils/regex'
 import clsx from 'clsx'
 import { FC, useEffect, useRef, useState } from 'react'
 import { IoTrashBin } from 'react-icons/io5'
 import { MdEdit } from 'react-icons/md'
-import { NEW_EPUB_BOOK_CONTENT } from '@interfaces/book/enums'
-import DateContentInput from '@components/Inputs/DateContentInput'
-import { DATE_REGEX } from '@web-utils/regex'
 
 export interface IBook {
   bookDescription?: string
@@ -20,6 +21,7 @@ export interface IBook {
   title?: string
   published?: string
   publisher?: string
+  status: BOOK_STATUS
 }
 
 export interface IProps {
@@ -113,16 +115,32 @@ const BookOverviewModal: FC<IProps> = ({
         <div className="flex flex-col overflow-y-auto w-full flex-1 p-24">
           <div className="flex flex-row items-center justify-end gap-12 w-full">
             <DefaultButton
+              disabled={book.status === BOOK_STATUS.DELETING}
               onClick={onClickDelete}
-              className="p-6 hover:bg-button-primary-hover rounded-4 duration-150">
-              <IoTrashBin className="text-status-error min-w-18 min-h-18" />
+              className={clsx(
+                'p-6  rounded-4 duration-150',
+                book.status !== BOOK_STATUS.DELETING
+                  ? 'hover:bg-button-primary-hover cursor-pointer'
+                  : 'cursor-default!',
+              )}>
+              <Show when={book.status !== BOOK_STATUS.DELETING} fallback={<Spin size={18} />}>
+                <IoTrashBin className="text-status-error min-w-18 min-h-18" />
+              </Show>
             </DefaultButton>
             <DefaultButton
+              disabled={book.status === BOOK_STATUS.UPDATING}
               onClick={() => {
                 setIsEditing((prev) => !prev)
               }}
-              className="p-6 hover:bg-button-primary-hover rounded-4 duration-150">
-              <MdEdit className="min-w-18 min-h-18" />
+              className={clsx(
+                'p-6  rounded-4 duration-150',
+                book.status !== BOOK_STATUS.UPDATING
+                  ? 'hover:bg-button-primary-hover cursor-pointer'
+                  : 'cursor-default!',
+              )}>
+              <Show when={book.status !== BOOK_STATUS.UPDATING} fallback={<Spin size={18} />}>
+                <MdEdit className="min-w-18 min-h-18" />
+              </Show>
             </DefaultButton>
           </div>
           <div className="flex flex-col gap-24">
@@ -221,6 +239,7 @@ const BookOverviewModal: FC<IProps> = ({
             <Show when={isEditing}>
               <div>
                 <DefaultButton
+                  disabled={book.status === BOOK_STATUS.UPDATING}
                   onClick={() => {
                     const date = newContent[NEW_EPUB_BOOK_CONTENT.PUBLISHED]
                     if ((date?.trim()?.length ?? 0) > 0) {
@@ -232,9 +251,11 @@ const BookOverviewModal: FC<IProps> = ({
                     onClickEdit(newContent)
                   }}
                   className="px-24 py-8 bg-button-primary-active hover:bg-button-primary-hover rounded-4 duration-150 h-full">
-                  <Typography text="caption" color="secondary">
-                    Save
-                  </Typography>
+                  <Show when={book.status !== BOOK_STATUS.UPDATING} fallback={<Spin size={16} />}>
+                    <Typography text="caption" color="secondary">
+                      Save
+                    </Typography>
+                  </Show>
                 </DefaultButton>
               </div>
             </Show>

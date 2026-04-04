@@ -26,7 +26,7 @@ export function* getNotesStructureById(id: string, book: Epub) {
     yield* put(actions.setNotes({ id: id, notes: response }))
   } catch (err) {
     console.log('err', err)
-    notify('Failed to get notes structure')
+    notify('Failed to get notes structure', 'error')
   }
 }
 
@@ -45,7 +45,7 @@ export function* getHighlightsStructureById(id: string, book: Epub) {
     yield* put(actions.setHighlights({ id: id, highlights: response }))
   } catch (err) {
     console.log('err', err)
-    notify('Failed to get highlights structure')
+    notify('Failed to get highlights structure', 'error')
   }
 }
 
@@ -83,7 +83,7 @@ export function* setHighlight(action: PayloadAction<PayloadTypes['setHighlight']
     yield* put(actions.removeHighlightPendingStatus({ id: action.payload.id, highlightId }))
   } catch (err) {
     console.log('err', err)
-    notify('Failed to add highlight')
+    notify('Failed to add highlight', 'error')
     yield* all([
       put(actions.removeHighlightById({ id: highlightId, bookId: action.payload.id })),
       put(actions.setStatus({ id: action.payload.id, status: ANNOTATIONS_STATUS.ERROR })),
@@ -107,7 +107,7 @@ export function* deleteHighlightById(
   } catch (err) {
     console.log('err', err)
     yield* put(actions.setStatus({ id: action.payload.id, status: ANNOTATIONS_STATUS.ERROR }))
-    notify('Failed to delete highlight')
+    notify('Failed to delete highlight', 'error')
   }
 }
 
@@ -124,7 +124,7 @@ export function* deleteNoteById(action: PayloadAction<PayloadTypes['setDeleteNot
     ])
   } catch (err) {
     console.log('err', err)
-    notify('Failed to delete note by id')
+    notify('Failed to delete note by id', 'error')
     yield* all([
       put(actions.setStatus({ id: action.payload.id, status: ANNOTATIONS_STATUS.ERROR })),
     ])
@@ -146,7 +146,7 @@ export function* saveNote(action: PayloadAction<PayloadTypes['setSaveNote']>) {
     ])
   } catch (err) {
     console.log('err', err)
-    notify('Failed to add note')
+    notify('Failed to add note', 'error')
     yield* all([
       put(actions.setStatus({ id: action.payload.note.id, status: ANNOTATIONS_STATUS.ERROR })),
     ])
