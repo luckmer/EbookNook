@@ -51,4 +51,11 @@ export const polish: IDictionary = {
   author: 'Autor',
   language: 'Język',
   languageDescription: 'Wybierz swój język',
+  notebook: 'Notatnik',
+  excerpts: 'Fragmenty',
+  delete: 'Usuń',
+  deleting: 'Usuwanie...',
+  notes: 'Notatki',
+  notesPlaceholder: 'Dodaj swoje notatki tutaj...',
+  cancel: 'Anuluj',
 }

@@ -47,4 +47,11 @@ export type IDictionary = {
   author: string
   language: string
   languageDescription: string
+  notebook: string
+  excerpts: string
+  delete: string
+  deleting: string
+  notes: string
+  notesPlaceholder: string
+  cancel: string
 }

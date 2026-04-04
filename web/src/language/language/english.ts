@@ -50,4 +50,11 @@ export const english: IDictionary = {
   author: 'Author',
   language: 'Language',
   languageDescription: 'Select your language',
+  notebook: 'Notebook',
+  excerpts: 'Excerpts',
+  delete: 'Delete',
+  deleting: 'Deleting...',
+  notes: 'Notes',
+  notesPlaceholder: 'Add your notes here',
+  cancel: 'Cancel',
 }
