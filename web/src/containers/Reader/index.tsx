@@ -185,10 +185,6 @@ const ReaderRoot = () => {
       hideContent={hideContent}
       onHideHeader={handleHideHeader}
       onShowHeader={handleShowHeader}
-      onWheel={(deltaY) => {
-        handleWheel.clear?.()
-        handleWheel(deltaY)
-      }}
       onClickNextChapter={() => viewRef.current?.nextChapter()}
       onClickPrevChapter={() => viewRef.current?.prevChapter()}
       onClickPrevPage={() => viewRef.current?.prevPage()}

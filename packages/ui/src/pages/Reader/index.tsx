@@ -10,7 +10,6 @@ export interface IProps {
   loading: boolean
   onHideHeader: () => void
   onShowHeader: () => void
-  onWheel: (deltaY: number) => void
   onClickNextChapter: () => void
   onClickPrevChapter: () => void
   onClickNextPage: () => void
@@ -28,17 +27,11 @@ const Reader: FC<IProps> = ({
   onClickPrevChapter,
   onClickNextPage,
   onClickPrevPage,
-  onWheel,
 }) => {
   const containerRef = useRef<HTMLDivElement | null>(null)
 
   return (
-    <main
-      className="w-full h-full flex flex-col relative"
-      onWheel={(e) => {
-        e.preventDefault()
-        onWheel(e.deltaY)
-      }}>
+    <main className="w-full h-full flex flex-col relative">
       <EpubNavigation
         onClickNextChapter={onClickNextChapter}
         onClickPrevChapter={onClickPrevChapter}
