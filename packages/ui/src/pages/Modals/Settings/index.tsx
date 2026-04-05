@@ -4,24 +4,37 @@ import ModalHeader from '@components/Modals/ModalHeader'
 import Switch from '@components/Switch'
 import TypographyPreview from '@components/TypographyPreview'
 import { useWindowSize } from '@hooks/useWindowSize'
+import { LANGUAGE } from '@interfaces/language/enums'
 import { OPTIONS, SETTINGS } from '@interfaces/settings/enums'
 import { ISettingsState } from '@interfaces/settings/interfaces'
 import clsx from 'clsx'
 import { FC, memo, useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import FontSettings from './FontSettings'
 import LayoutSettings from './LayoutSettings'
 import SettingsSidePanel from './SettingsSidePanel'
+import LanguageSettings from './languageSettings'
 
 export interface IProps {
   onClickClose: () => void
   onClick: (action: SETTINGS, value: number) => void
+  onClickLanguage: (language: LANGUAGE) => void
   settings: ISettingsState
+  selectedLanguage: LANGUAGE
   isOpen: boolean
 }
 
-const Settings: FC<IProps> = ({ isOpen, onClickClose, settings, onClick }) => {
+const Settings: FC<IProps> = ({
+  isOpen,
+  onClickClose,
+  onClickLanguage,
+  onClick,
+  settings,
+  selectedLanguage,
+}) => {
+  const { t } = useTranslation()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const [option, setOption] = useState<OPTIONS>(OPTIONS.FONT)
+  const [option, setOption] = useState<OPTIONS>(OPTIONS.LANGUAGE)
   const { width } = useWindowSize()
 
   const isMobile = useMemo(() => width <= 700, [width])
@@ -62,7 +75,7 @@ const Settings: FC<IProps> = ({ isOpen, onClickClose, settings, onClick }) => {
       <div className="flex flex-col overflow-hidden h-full relative">
         <ModalHeader
           onClickClose={onClickClose}
-          label="Settings"
+          label={t('settings')}
           onClickOpen={isMobile ? () => setIsMobileMenuOpen(!isMobileMenuOpen) : undefined}
           open={isMobileMenuOpen}
         />
@@ -107,6 +120,12 @@ const Settings: FC<IProps> = ({ isOpen, onClickClose, settings, onClick }) => {
                   paragraphMargin={settings.paragraphMargin}>
                   <TypographyPreview styles={previewStyles} />
                 </LayoutSettings>
+              </Match>
+              <Match when={option === OPTIONS.LANGUAGE}>
+                <LanguageSettings
+                  selectedLanguage={selectedLanguage}
+                  onClickLanguage={(language) => onClickLanguage(language)}
+                />
               </Match>
             </Switch>
           </main>

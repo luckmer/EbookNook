@@ -36,7 +36,7 @@ const ModalHeader: FC<IProps> = ({ label, onClickClose, onClickOpen, open }) => 
       </div>
       <DefaultButton
         onClick={onClickClose}
-        className="  p-4 rounded-4  hover:bg-surface-100 duration-200 ">
+        className="p-4 rounded-4 hover:bg-surface-100 duration-200 ">
         <IoMdClose className="w-[18px] h-[18px]" />
       </DefaultButton>
     </div>

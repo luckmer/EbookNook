@@ -38,6 +38,9 @@
       "@hooks/*": [
         "../packages/ui/src/hooks/*"
       ],
+      "@language/*": [
+        "./src/language/*"
+      ],
       "@static/*": [
         "./src/static/*"
       ],

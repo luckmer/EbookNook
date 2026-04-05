@@ -5,6 +5,7 @@ import { Typography } from '@components/Typography'
 import { NAVIGATION } from '@interfaces/routes/enums'
 import clsx from 'clsx'
 import { FC, memo } from 'react'
+import { useTranslation } from 'react-i18next'
 import { BsLayoutSidebarInset } from 'react-icons/bs'
 import { GiHamburgerMenu } from 'react-icons/gi'
 import { LuNotebookPen } from 'react-icons/lu'
@@ -36,6 +37,7 @@ export const Header: FC<IProps> = ({
   bookName,
   onChange,
 }) => {
+  const { t } = useTranslation()
   const isReader = location.match(NAVIGATION.READER)
 
   return (
@@ -65,7 +67,7 @@ export const Header: FC<IProps> = ({
         <div className="w-full h-full">
           <DefaultInput
             data-tauri-drag-region="false"
-            placeholder="Search"
+            placeholder={t('search')}
             value={value}
             onChange={onChange}
             className="bg-surface-200/30 h-full rounded-6 px-12 font-ubuntu"
@@ -81,13 +83,6 @@ export const Header: FC<IProps> = ({
             <LuNotebookPen className="w-18 h-18 transition-colors duration-200" />
           </DefaultButton>
         </Show>
-
-        {/* <DefaultButton
-          disabled
-          onClick={() => {}}
-          className="transition-colors hover:bg-button-primary-hover hover:text-text-primary text-text-secondary duration-300 rounded-4 px-6 py-6">
-          <CgMenuRound className="w-18 h-18 transition-colors duration-200" />
-        </DefaultButton> */}
 
         <DefaultButton
           onClick={onClickSettings}

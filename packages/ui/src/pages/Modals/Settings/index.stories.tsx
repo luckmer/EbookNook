@@ -1,3 +1,4 @@
+import { LANGUAGE } from '@interfaces/language/enums'
 import { Meta, StoryObj } from '@storybook/react-vite'
 import Settings from '.'
 
@@ -14,6 +15,8 @@ export const Default: Story = {
     return (
       <Settings
         isOpen
+        onClickLanguage={() => {}}
+        selectedLanguage={LANGUAGE.ENGLISH}
         onClick={() => {}}
         onClickClose={() => {}}
         settings={{

@@ -4,6 +4,7 @@ import RangeInput from '@components/Inputs/RangeInput'
 import { Typography } from '@components/Typography'
 import { SETTINGS } from '@interfaces/settings/enums'
 import { FC, memo, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 
 export interface IProps {
   onClick: (action: SETTINGS, value: number) => void
@@ -26,35 +27,36 @@ const LayoutSettings: FC<IProps> = ({
   paragraphMargin,
   children,
 }) => {
+  const { t } = useTranslation()
   const settingsConfig = useMemo(() => {
     return [
       {
-        label: 'Word Spacing',
-        description: 'Control the space between words',
+        label: 'wordSpacing',
+        description: 'wordSpacingDescription',
         min: -5,
         max: 20,
         value: wordSpacing,
         type: SETTINGS.WORD_SPACING,
       },
       {
-        label: 'Letter Spacing',
-        description: 'Control the space between letters',
+        label: 'letterSpacing',
+        description: 'letterSpacingDescription',
         min: -2,
         max: 10,
         value: letterSpacing,
         type: SETTINGS.LETTER_SPACING,
       },
       {
-        label: 'Text Indent',
-        description: 'Set the indentation of the first line',
+        label: 'textIndent',
+        description: 'textIndentDescription',
         min: 0,
         max: 50,
         value: textIndent,
         type: SETTINGS.TEXT_INDENT,
       },
       {
-        label: 'Line Height',
-        description: 'Control the spacing between lines',
+        label: 'lineHeight',
+        description: 'lineHeightDescription',
         min: 1,
         max: 3,
         step: 0.1,
@@ -62,8 +64,8 @@ const LayoutSettings: FC<IProps> = ({
         type: SETTINGS.LINE_HEIGHT,
       },
       {
-        label: 'Paragraph Margin',
-        description: 'Space between paragraphs',
+        label: 'paragraphMargin',
+        description: 'paragraphMarginDescription',
         min: 0,
         max: 50,
         step: 1,
@@ -76,13 +78,13 @@ const LayoutSettings: FC<IProps> = ({
   return (
     <div className="flex flex-col gap-[36px] h-full w-full ">
       <div className="flex flex-row gap-12 items-center justify-between px-24">
-        <Typography text="body">Layout</Typography>
+        <Typography text="body">{t('layout')}</Typography>
         <DefaultButton
           onClick={onClickRestart}
           className="flex items-center gap-4 justify-between px-16 py-8 rounded-6 duration-200 border bg-button-secondary-background hover:bg-base border-button-secondary-background">
           <div className="flex flex-col items-start gap-4">
             <Typography color={'white'} text="caption">
-              Restart to default
+              {t('restartToDefault')}
             </Typography>
           </div>
         </DefaultButton>
@@ -90,7 +92,7 @@ const LayoutSettings: FC<IProps> = ({
       <div className="flex flex-col gap-24 overflow-y-auto px-24">
         {settingsConfig.map((item) => (
           <div className="flex flex-col gap-12" key={item.type}>
-            <ContentMeta label={item.label} description={item.description} />
+            <ContentMeta label={t(item.label)} description={t(item.description)} />
             <RangeInput
               min={item.min}
               max={item.max}
@@ -104,7 +106,7 @@ const LayoutSettings: FC<IProps> = ({
         ))}
         <div className="bg-button-secondary-background p-16 rounded-8 flex flex-col gap-8 ">
           <Typography text="small" color="secondary">
-            Layout preview
+            {t('layoutPreview')}
           </Typography>
           {children}
         </div>

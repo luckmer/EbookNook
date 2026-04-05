@@ -12,6 +12,7 @@ import { trimText } from '@web-utils/index'
 import { Skeleton } from 'antd'
 import clsx from 'clsx'
 import { FC, useCallback, useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { LuNotebookPen } from 'react-icons/lu'
 
 export interface IHighlight extends Highlight {
@@ -47,6 +48,7 @@ const NotebookDrawer: FC<IProps> = ({
   isFetchingNotesStructure,
   isFetchingHighlightsStructure,
 }) => {
+  const { t } = useTranslation()
   const [openDropdownIndex, setOpenDropdownIndex] = useState<number | null>(null)
   const [noteLabel, setNoteLabel] = useState('')
   const { width } = useWindowSize()
@@ -87,12 +89,12 @@ const NotebookDrawer: FC<IProps> = ({
       <div className="flex flex-col gap-12">
         <div className="flex w-full items-center justify-center gap-4">
           <LuNotebookPen className="w-18 h-18 transition-colors duration-200" />
-          <Typography text="body">Notebook</Typography>
+          <Typography text="body">{t('notebook')}</Typography>
         </div>
         <Show when={!isFetchingHighlightsStructure} fallback={<Skeleton active avatar />}>
           <div className="h-full flex flex-col gap-12">
             <Show when={highlights.length > 0}>
-              <Typography text="caption">Excerpts</Typography>
+              <Typography text="caption">{t('excerpts')}</Typography>
             </Show>
             <div className="flex flex-col gap-12">
               {highlights.map((item, index) => (
@@ -109,8 +111,8 @@ const NotebookDrawer: FC<IProps> = ({
                       disabled={getStatus(item.id) === ANNOTATIONS_STATUS.PENDING}>
                       <Typography color="error">
                         {getStatus(item.id) === ANNOTATIONS_STATUS.PENDING
-                          ? 'Deleting...'
-                          : 'Delete'}
+                          ? t('deleting')
+                          : t('delete')}
                       </Typography>
                     </DefaultButton>
                   </div>
@@ -122,7 +124,7 @@ const NotebookDrawer: FC<IProps> = ({
         <Show when={!isFetchingNotesStructure} fallback={<Skeleton active avatar />}>
           <div className="h-full flex flex-col gap-12">
             <Show when={notes.length > 0}>
-              <Typography text="caption">Notes</Typography>
+              <Typography text="caption">{t('notes')}</Typography>
             </Show>
             <div className="flex flex-col gap-12">
               {notes.map((item) => {
@@ -135,7 +137,7 @@ const NotebookDrawer: FC<IProps> = ({
                       if (isEditing) return
                       onClickFocusNote(item)
                     }}
-                    placeholder="Add your notes here..."
+                    placeholder={t('notesPlaceholder')}
                     value={noteLabel}
                     onChange={setNoteLabel}
                     isEditing={isEditing}
@@ -167,8 +169,8 @@ const NotebookDrawer: FC<IProps> = ({
                                   onClick={() => handleDeleteNote(item.id)}>
                                   <Typography color="error">
                                     {getStatus(item.id) === ANNOTATIONS_STATUS.PENDING
-                                      ? 'Deleting...'
-                                      : 'Delete'}
+                                      ? t('deleting')
+                                      : t('delete')}
                                   </Typography>
                                 </DefaultButton>
                               </div>
@@ -179,7 +181,7 @@ const NotebookDrawer: FC<IProps> = ({
                                 setNoteLabel('')
                                 onClickCancel()
                               }}>
-                              <Typography color="blue">Cancel</Typography>
+                              <Typography color="blue">{t('cancel')}</Typography>
                             </DefaultButton>
                             <DefaultButton
                               disabled={
@@ -190,7 +192,7 @@ const NotebookDrawer: FC<IProps> = ({
                                 setNoteLabel('')
                                 onClickSave(noteLabel, item)
                               }}>
-                              <Typography color="blue">Save</Typography>
+                              <Typography color="blue">{t('save')}</Typography>
                             </DefaultButton>
                           </Show>
                         </div>

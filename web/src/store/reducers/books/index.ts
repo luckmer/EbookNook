@@ -1,7 +1,6 @@
 import { Books } from '@bindings/book'
 import { Book, Epub, EpubStructure, Progress } from '@bindings/epub'
 import { BOOK_STATUS, BookFormat, NEW_EPUB_BOOK_CONTENT } from '@interfaces/book/enums'
-
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { PayloadType } from '@store/helper'
 

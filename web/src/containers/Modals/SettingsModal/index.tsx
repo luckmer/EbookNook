@@ -1,7 +1,9 @@
 import { SETTINGS } from '@interfaces/settings/enums'
 import Settings from '@pages/Modals/Settings'
+import { actions as languageActions } from '@store/reducers/language'
 import { actions as settingsActions } from '@store/reducers/settings'
 import { actions } from '@store/reducers/ui'
+import { languageSelector } from '@store/selectors/language'
 import { settingsConfig } from '@store/selectors/settings'
 import { uiSelector } from '@store/selectors/ui'
 import { useDispatch, useSelector } from 'react-redux'
@@ -9,12 +11,17 @@ import { useDispatch, useSelector } from 'react-redux'
 const SettingsModal = () => {
   const openSettingsModal = useSelector(uiSelector.openSettingsModal)
   const settings = useSelector(settingsConfig)
+  const selectedLanguage = useSelector(languageSelector.language)
   const dispatch = useDispatch()
 
   return (
     <Settings
+      selectedLanguage={selectedLanguage}
       isOpen={openSettingsModal}
       settings={settings}
+      onClickLanguage={(language) => {
+        dispatch(languageActions.setLanguage(language))
+      }}
       onClick={(action, value) => {
         switch (action) {
           case SETTINGS.DEFAULT_FONT_SIZE: {

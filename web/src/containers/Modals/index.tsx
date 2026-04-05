@@ -1,6 +1,6 @@
 import { Fragment } from 'react'
-import SettingsModal from './SettingsModal'
 import BookOverviewModal from './BookOverviewModal'
+import SettingsModal from './SettingsModal'
 
 const Modals = () => {
   return (

@@ -5,6 +5,7 @@ import { Typography } from '@components/Typography'
 import { SETTINGS } from '@interfaces/settings/enums'
 import clsx from 'clsx'
 import { FC, memo } from 'react'
+import { useTranslation } from 'react-i18next'
 
 export interface IProps {
   onClick: (action: SETTINGS, value: number) => void
@@ -21,26 +22,27 @@ const FontSettings: FC<IProps> = ({
   onClickRestart,
   children,
 }) => {
+  const { t } = useTranslation()
   const sizePresets = [
-    { label: 'Small', value: 12 },
-    { label: 'Regular', value: 14 },
-    { label: 'Medium', value: 16 },
-    { label: 'Large', value: 20 },
-    { label: 'Extra Large', value: 24 },
+    { label: 'small', value: 12 },
+    { label: 'regular', value: 14 },
+    { label: 'medium', value: 16 },
+    { label: 'large', value: 20 },
+    { label: 'extraLarge', value: 24 },
   ]
 
   const weightPresets = [
-    { label: 'Light', value: 300 },
-    { label: 'Regular', value: 400 },
-    { label: 'Medium', value: 500 },
-    { label: 'Semi Bold', value: 600 },
-    { label: 'Bold', value: 700 },
+    { label: 'light', value: 300 },
+    { label: 'regular', value: 400 },
+    { label: 'medium', value: 500 },
+    { label: 'semiBold', value: 600 },
+    { label: 'bold', value: 700 },
   ]
 
   return (
     <div className="flex flex-col gap-[36px] h-full w-full">
       <div className="flex flex-row gap-12 items-center justify-between px-24">
-        <Typography text="body">Font</Typography>
+        <Typography text="body">{t('font')}</Typography>
         <DefaultButton
           onClick={onClickRestart}
           className={clsx(
@@ -48,14 +50,14 @@ const FontSettings: FC<IProps> = ({
           )}>
           <div className="flex flex-col items-start gap-4">
             <Typography color={'white'} text="caption">
-              Restart to default
+              {t('restartToDefault')}
             </Typography>
           </div>
         </DefaultButton>
       </div>
       <div className="flex flex-col gap-24 overflow-y-auto px-24 h-full">
         <div className="flex flex-col gap-12">
-          <ContentMeta label="Font Size" description="Adjust text size for better readability" />
+          <ContentMeta label={t('fontSize')} description={t('fontSizeDescription')} />
           <div className="flex flex-wrap gap-8 ">
             {sizePresets.map((preset) => (
               <DefaultButton
@@ -71,7 +73,7 @@ const FontSettings: FC<IProps> = ({
                 )}>
                 <div className="flex flex-col items-start gap-4">
                   <Typography color={'white'} text="caption">
-                    {preset.label}
+                    {t(preset.label)}
                   </Typography>
                 </div>
               </DefaultButton>
@@ -88,7 +90,7 @@ const FontSettings: FC<IProps> = ({
           />
         </div>
         <div className="flex flex-col gap-12">
-          <ContentMeta label="Font Weight" description="Control the thickness of text" />
+          <ContentMeta label={t('fontWeight')} description={t('fontWeightDescription')} />
           <div className="flex flex-wrap gap-8">
             {weightPresets.map((preset) => (
               <DefaultButton
@@ -104,7 +106,7 @@ const FontSettings: FC<IProps> = ({
                 )}>
                 <div className="flex flex-col items-start gap-4">
                   <Typography color={'white'} text="caption">
-                    {preset.label}
+                    {t(preset.label)}
                   </Typography>
                 </div>
               </DefaultButton>
@@ -124,7 +126,7 @@ const FontSettings: FC<IProps> = ({
         </div>
         <div className="bg-button-secondary-background p-16 rounded-8 flex flex-col gap-8">
           <Typography text="small" color="secondary">
-            Preview ({defaultFontSize}px, {fontWeight})
+            {t('preview')} ({defaultFontSize}px, {fontWeight})
           </Typography>
           {children}
         </div>
