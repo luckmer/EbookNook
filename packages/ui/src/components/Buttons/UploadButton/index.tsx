@@ -22,7 +22,6 @@ const UploadButton: React.FC<IProps> = ({ label, onClick, className, labelClassN
       <input
         id="epubUpload"
         type="file"
-        accept=".epub"
         onChange={(event) => {
           event.preventDefault()
           const file = event.target.files?.[0]

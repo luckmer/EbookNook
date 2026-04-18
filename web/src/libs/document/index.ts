@@ -1,12 +1,10 @@
-import { DocumentCore } from './documentCore'
+import { DocumentClient } from './document'
 
-let _documentLoader: DocumentCore | undefined
+let _api: DocumentClient | undefined
 
-export const getDocumentLoader = (): DocumentCore => {
-  if (_documentLoader) {
-    return _documentLoader
-  }
+export const getDocumentClient = (): DocumentClient => {
+  if (_api) return _api
+  _api = new DocumentClient()
 
-  _documentLoader = new DocumentCore()
-  return _documentLoader
+  return _api
 }

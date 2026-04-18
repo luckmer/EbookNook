@@ -53,6 +53,9 @@
       "@utils/*": [
         "./src/utils/*"
       ],
+      "@foliate/*": [
+        "../../web/src/foliate/*"
+      ],
       "@language/*": [
         "../../web/src/language/*"
       ],

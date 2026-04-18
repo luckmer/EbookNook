@@ -1,42 +1,94 @@
-import { IProgressInfo } from '@interfaces/index'
-import { Epub } from '@libs/epub/epub'
 import Reader from '@pages/Reader'
-import { actions as BookActions } from '@store/reducers/books'
+import { actions as bookActions } from '@store/reducers/books'
 import { actions } from '@store/reducers/ui'
-import { annotationsSelector } from '@store/selectors/annotations'
-import { bookSelector, selectEpubMap } from '@store/selectors/books'
-import { settingsConfig } from '@store/selectors/settings'
+import { bookSelector } from '@store/selectors/books'
 import { uiSelector } from '@store/selectors/ui'
-import { debounce } from '@utils/debounce'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation } from 'react-router-dom'
+
 const ReaderRoot = () => {
-  const selectedAnnotation = useSelector(annotationsSelector.selectedAnnotation)
-  const isFetchingStructure = useSelector(uiSelector.isFetchingStructure)
+  const [isLoadingStructure, setIsLoadingStructure] = useState(true)
+  const [sectionProgress, setSectionProgress] = useState({ current: 0, total: 0 })
+  const [bookProgress, setBookProgress] = useState({ current: 0, next: 0, total: 0 })
+  const [fraction, setFraction] = useState(0)
+
+  const files = useSelector(bookSelector.files)
   const selectedChapter = useSelector(bookSelector.selectedChapter)
+  const isLoader = useSelector(uiSelector.isFetchingStructure)
   const hideContent = useSelector(uiSelector.hideHeader)
-  const settings = useSelector(settingsConfig)
-  const booksMap = useSelector(selectEpubMap)
-
-  const [bookId, setBookId] = useState<string | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [pageInfo, setPageInfo] = useState<IProgressInfo>({
-    current: 1,
-    total: 1,
-    path: '',
-    percent: 0,
-    offset: 0,
-  })
-
-  const dispatch = useDispatch()
   const location = useLocation()
 
-  const renderedBookIdRef = useRef<string | null>(null)
-  const viewRef = useRef<Epub | null>(null)
+  const bookId = useMemo(() => location?.state?.id, [location])
+  const file = useMemo(() => files[bookId], [bookId, files])
 
-  const id = useMemo(() => location?.state?.id, [location])
-  const book = useMemo(() => booksMap[id], [id, booksMap])
+  const dispatch = useDispatch()
+  const viewRef = useRef<any | null>(null)
+  const isViewCreated = useRef(false)
+
+  useEffect(() => {
+    if (!file) {
+      viewRef?.current?.close()
+      viewRef?.current?.remove()
+      isViewCreated.current = false
+      viewRef.current = null
+      setIsLoadingStructure(true)
+      return
+    }
+
+    if (isViewCreated.current) return
+    isViewCreated.current = true
+
+    const openBook = async () => {
+      await import('@foliate/view.js')
+      const container = document.querySelector('.book-content')
+      if (!container) return
+      const view = document.createElement('foliate-view') as any
+      view.id = `foliate-view-${Date.now()}`
+      view.style.width = '100%'
+      view.style.height = '100vh'
+      container.appendChild(view)
+
+      console.log('book', file)
+      await view.open(file)
+      viewRef.current = view
+      view.renderer.setStyles?.(`
+        * {
+          color: white !important;
+          background: transparent !important;
+        }
+      `)
+      await view.goToFraction(0)
+      setIsLoadingStructure(false)
+    }
+
+    openBook().catch(console.error)
+  }, [file, bookId])
+
+  useEffect(() => {
+    if (viewRef.current && selectedChapter !== '') {
+      viewRef.current.goTo(selectedChapter)
+    }
+  }, [selectedChapter])
+
+  useEffect(() => {
+    if (isLoadingStructure || isLoader || !viewRef.current) return
+
+    const view = viewRef.current
+
+    const handleRelocate = (e: any) => {
+      dispatch(bookActions.setActiveToc(e.detail.tocItem))
+      setSectionProgress(e.detail.section)
+      setBookProgress(e.detail.location)
+      setFraction(e.detail.fraction)
+    }
+
+    view.addEventListener('relocate', handleRelocate)
+
+    return () => {
+      view.removeEventListener('relocate', handleRelocate)
+    }
+  }, [isLoadingStructure, isLoader])
 
   const handleHideHeader = useCallback(() => {
     dispatch(actions.setHideHeader(true))
@@ -46,149 +98,29 @@ const ReaderRoot = () => {
     dispatch(actions.setHideHeader(false))
   }, [dispatch])
 
-  const bookRef = useRef(book)
-
-  useEffect(() => {
-    bookRef.current = book
-  }, [book])
-
-  const debouncedUpdate = useMemo(
-    () =>
-      debounce((info: typeof pageInfo) => {
-        const currentBook = bookRef.current
-        if (!currentBook) return
-
-        const [savedPath, savedOffset] = currentBook.book.progress
-        if (info.path !== savedPath || +info.offset !== +savedOffset) {
-          dispatch(
-            BookActions.setUpdateEpubBookProgress({
-              progress: [info.path, info.offset.toString(), info.percent.toString()],
-              id: currentBook.book.id,
-            }),
-          )
-        }
-      }, 500),
-    [dispatch],
-  )
-
-  useEffect(() => {
-    if (book && !isFetchingStructure && renderedBookIdRef.current !== book.book.id) {
-      if (viewRef.current) viewRef.current.destroy()
-
-      const instance = new Epub(book)
-      instance.renderTo('.book-content')
-      instance.progress((progress) => {
-        setPageInfo(progress)
-      })
-
-      viewRef.current = instance
-      renderedBookIdRef.current = book.book.id
-    }
-
-    return () => {
-      if (!location.state?.id) {
-        viewRef.current?.destroy()
-        viewRef.current = null
-        renderedBookIdRef.current = null
-      }
-    }
-  }, [book?.book.id, isFetchingStructure, location.state?.id])
-
-  useEffect(() => {
-    if (viewRef.current && !isFetchingStructure) {
-      viewRef.current.setStyles(settings)
-      setLoading(true)
-
-      if (selectedChapter) {
-        viewRef.current.display(selectedChapter).then(() => {
-          setLoading(false)
-        })
-        return
-      }
-
-      if (book?.book.progress.slice(0, 2)?.every((p) => p.length > 0)) {
-        viewRef.current.loadProgress(book.book.progress).then(() => {
-          setLoading(false)
-        })
-        return
-      }
-
-      viewRef.current.display().then(() => {
-        setLoading(false)
-      })
-    }
-  }, [selectedChapter, isFetchingStructure, book?.book.id])
-
-  useEffect(() => {
-    if (selectedAnnotation !== null) {
-      setLoading(true)
-      viewRef.current
-        ?.anchor(selectedAnnotation.anchorId, selectedAnnotation.anchor)
-        .finally(() => {
-          setLoading(false)
-        })
-    } else {
-      viewRef.current?.unAnchor()
-    }
-  }, [selectedAnnotation])
-
-  useEffect(() => {
-    if (!loading) {
-      viewRef.current?.setStyles(settings)
-    }
-  }, [settings, loading])
-
-  useEffect(() => {
-    if (pageInfo.path) debouncedUpdate(pageInfo)
-    return () => debouncedUpdate.clear()
-  }, [pageInfo, debouncedUpdate])
-
-  useEffect(() => {
-    if (bookId !== book?.book.id) {
-      setBookId(book?.book.id ?? null)
-      setLoading(true)
-    }
-  }, [book, setBookId])
-
-  const handleWheel = debounce((deltaY: number) => {
-    if (deltaY > 0) {
-      viewRef.current?.nextPage()
-    } else {
-      viewRef.current?.prevPage()
-    }
-  }, 50)
-
-  useEffect(() => {
-    const container = viewRef.current?.frame.document
-    if (!container || loading || !book) return
-
-    const onWheel = (e: WheelEvent) => {
-      handleWheel.clear()
-      handleWheel(e.deltaY)
-    }
-
-    container.addEventListener('wheel', onWheel)
-
-    return () => {
-      container.removeEventListener('wheel', onWheel)
-    }
-  }, [loading, book])
-
   return (
     <Reader
-      pageInfo={{
-        percentage: pageInfo.percent,
-        current: pageInfo.current,
-        total: pageInfo.total,
+      sectionInfo={{
+        current: Math.max(1, sectionProgress.current),
+        total: sectionProgress.total,
       }}
-      loading={loading || !book}
+      pageInfo={{
+        percentage: fraction * 100,
+        current: Math.max(1, bookProgress.current),
+        total: bookProgress.total,
+      }}
+      loading={isLoadingStructure || isLoader}
       hideContent={hideContent}
       onHideHeader={handleHideHeader}
       onShowHeader={handleShowHeader}
-      onClickNextChapter={() => viewRef.current?.nextChapter()}
-      onClickPrevChapter={() => viewRef.current?.prevChapter()}
-      onClickPrevPage={() => viewRef.current?.prevPage()}
-      onClickNextPage={() => viewRef.current?.nextPage()}
+      onClickNextChapter={() => {}}
+      onClickPrevChapter={() => {}}
+      onClickPrevPage={() => {
+        if (viewRef.current) viewRef.current.prev()
+      }}
+      onClickNextPage={() => {
+        if (viewRef.current) viewRef.current.next()
+      }}
     />
   )
 }

@@ -7,6 +7,7 @@ import { FC, memo, useRef } from 'react'
 
 export interface IProps {
   pageInfo: { current: number; total: number; percentage: number }
+  sectionInfo: { current: number; total: number }
   loading: boolean
   onHideHeader: () => void
   onShowHeader: () => void
@@ -20,6 +21,7 @@ export interface IProps {
 const Reader: FC<IProps> = ({
   hideContent,
   pageInfo,
+  sectionInfo,
   loading,
   onHideHeader,
   onShowHeader,
@@ -38,6 +40,11 @@ const Reader: FC<IProps> = ({
         onClickNextPage={onClickNextPage}
         onClickPrevPage={onClickPrevPage}
         hideContent={hideContent}>
+        <div className="absolute bottom-[20px] left-[20px]">
+          <Typography text="small" color="muted">
+            Page {sectionInfo.current} of {sectionInfo.total} Pages
+          </Typography>
+        </div>
         <div className="h-full relative">
           <Show when={loading}>
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
@@ -63,7 +70,7 @@ const Reader: FC<IProps> = ({
           />
         </div>
         <div className="absolute bottom-[20px] right-[20px]">
-          <Typography text="caption" color="muted">
+          <Typography text="small" color="muted">
             {pageInfo.current} / {pageInfo.total} ({pageInfo.percentage.toFixed(2)}%)
           </Typography>
         </div>

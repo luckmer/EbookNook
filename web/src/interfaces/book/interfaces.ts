@@ -1,10 +1,11 @@
-import { Epub } from '@bindings/epub'
+import { IBookDocSectionItem, IBookFile } from '@bindings/book'
 
-import type JSZip from 'jszip'
-export interface IXML {
-  basePath: string
-  doc: Document
-  zip: JSZip
+export interface ISection extends IBookDocSectionItem {
+  createDocument: () => Promise<Document>
 }
 
-export type IBookState = Epub
+export interface IBook extends IBookFile {
+  transformTarget?: EventTarget
+  splitTOCHref(href: string): Array<string | number>
+  getCover(): Promise<Blob | null>
+}

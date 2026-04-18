@@ -1,4 +1,4 @@
-use crate::{EPUB_BOOK_TABLE, EPUB_CHAPTERS_TABLE, EPUB_TOC_TABLE, HIGHLIGHTS_TABLE, NOTES_TABLE};
+// use crate::{EPUB_BOOK_TABLE, EPUB_CHAPTERS_TABLE, EPUB_TOC_TABLE};
 use sqlx::sqlite::{SqliteConnectOptions, SqliteJournalMode, SqlitePoolOptions, SqliteSynchronous};
 use sqlx::{Pool, Sqlite, SqlitePool};
 use std::fs;
@@ -44,11 +44,12 @@ impl DatabaseManager {
         sqlx::query("PRAGMA foreign_keys = ON;")
             .execute(&self.pool)
             .await?;
-        sqlx::query(EPUB_BOOK_TABLE).execute(&self.pool).await?;
-        sqlx::query(EPUB_TOC_TABLE).execute(&self.pool).await?;
-        sqlx::query(EPUB_CHAPTERS_TABLE).execute(&self.pool).await?;
-        sqlx::query(NOTES_TABLE).execute(&self.pool).await?;
-        sqlx::query(HIGHLIGHTS_TABLE).execute(&self.pool).await?;
+
+        // sqlx::query(EPUB_BOOK_TABLE).execute(&self.pool).await?;
+        // sqlx::query(EPUB_TOC_TABLE).execute(&self.pool).await?;
+        // sqlx::query(EPUB_CHAPTERS_TABLE).execute(&self.pool).await?;
+        // sqlx::query(NOTES_TABLE).execute(&self.pool).await?;
+        // sqlx::query(HIGHLIGHTS_TABLE).execute(&self.pool).await?;
         Ok(())
     }
 

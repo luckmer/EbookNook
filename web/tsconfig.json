@@ -65,6 +65,9 @@
       "@common/*": [
         "../packages/ui/common/*"
       ],
+      "@foliate/*": [
+        "./src/foliate/*"
+      ],
       "@pages/*": [
         "../packages/ui/src/pages/*"
       ],
