@@ -20,8 +20,23 @@
       }
     ],
     "security": {
-      "csp": null,
+      "csp": "default-src 'self' ipc:http://ipc.localhost; img-src 'self' asset: asset:// http://asset.localhost",
+      "assetProtocol": {
+        "enable": true,
+        "scope": {
+          "requireLiteralLeadingDot": false,
+          "allow": [
+            "C:/Users/**",
+            "$APPDATA/**",
+            "$DOCUMENT/**",
+            "$DOWNLOAD/**",
+            "/**"
+          ],
+          "deny": []
+        }
+      },
       "capabilities": [
+        "default",
         {
           "identifier": "draggable-window",
           "windows": [
@@ -32,7 +47,41 @@
             "core:window:allow-toggle-maximize",
             "core:window:allow-internal-toggle-maximize",
             "core:window:allow-close",
-            "core:window:allow-minimize"
+            "core:window:allow-minimize",
+            "fs:allow-remove",
+            "fs:allow-copy-file",
+            "fs:allow-mkdir",
+            "fs:allow-exists",
+            "fs:allow-read-file",
+            "fs:allow-write-file",
+            {
+              "identifier": "fs:scope",
+              "allow": [
+                {
+                  "path": "$APPDATA/**"
+                },
+                {
+                  "path": "$DOCUMENT/**"
+                },
+                {
+                  "path": "$DOWNLOAD/**"
+                }
+              ]
+            },
+            {
+              "identifier": "fs:allow-read",
+              "allow": [
+                {
+                  "path": "$APPDATA/**"
+                },
+                {
+                  "path": "$DOCUMENT/**"
+                },
+                {
+                  "path": "$DOWNLOAD/**"
+                }
+              ]
+            }
           ]
         }
       ]

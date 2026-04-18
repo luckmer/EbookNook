@@ -1,7 +1,3 @@
-export enum BookFormat {
-  EPUB = 'epub',
-}
-
 export enum NEW_EPUB_BOOK_CONTENT {
   AUTHOR = 'author',
   DESCRIPTION = 'description',

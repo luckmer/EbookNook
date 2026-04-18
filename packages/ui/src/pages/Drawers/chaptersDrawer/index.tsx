@@ -1,4 +1,4 @@
-import { type Toc as IToc } from '@bindings/epub'
+import { type ITocItem } from '@bindings/book'
 import DefaultButton from '@components/Buttons/DefaultButton'
 import Drawer from '@components/Drawer'
 import Show from '@components/Show'
@@ -16,8 +16,9 @@ export interface IProps {
   icon?: string
   title: string
   author: string
-  toc: IToc[]
+  toc: ITocItem[]
   isLoader: boolean
+  activeToc: ITocItem
 }
 
 const ChaptersDrawer: FC<IProps> = ({
@@ -30,6 +31,7 @@ const ChaptersDrawer: FC<IProps> = ({
   title,
   author,
   isLoader,
+  activeToc,
 }) => {
   const { width } = useWindowSize()
 
@@ -67,7 +69,7 @@ const ChaptersDrawer: FC<IProps> = ({
       <div className="py-12">
         <Show when={!isLoader} fallback={<Skeleton active />}>
           {toc.map((el, index) => (
-            <Toc key={index} item={el} level={0} onClick={onClick} />
+            <Toc key={index} item={el} level={0} onClick={onClick} activeToc={activeToc} />
           ))}
         </Show>
       </div>

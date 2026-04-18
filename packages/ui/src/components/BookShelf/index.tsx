@@ -1,4 +1,4 @@
-import { Book as IBook } from '@bindings/epub'
+import { IBookFile } from '@bindings/book'
 import Book from '@components/Book'
 import UploadButton from '@components/Buttons/UploadButton'
 import Show from '@components/Show'
@@ -12,7 +12,7 @@ export interface IProps {
   onClickDetails: (id: string) => void
   onClickImportBook: (file: File) => void
   isAddingBook: boolean
-  books: IBook[]
+  books: IBookFile[]
 }
 
 const BookShelf: FC<IProps> = ({
@@ -27,9 +27,9 @@ const BookShelf: FC<IProps> = ({
       {books.map((book, id) => (
         <Book
           key={id}
-          progress={book.progress.at(-1) ?? '0'}
+          progress={book.percentageProgress}
           img={book.metadata.cover}
-          title={book.metadata.title}
+          title={book.metadata.title.toString()} // fix it later
           onClickDetails={() => {
             onClickDetails(book.id)
           }}

@@ -1,4 +1,4 @@
-import { Book as IBook } from '@bindings/epub'
+import { IBookFile } from '@bindings/book'
 import BookShelf from '@components/BookShelf'
 import EmptyLibrary from '@components/EmptyBookShelf'
 import EmptyResult from '@components/EmptyResult'
@@ -10,7 +10,7 @@ export interface IProps {
   onClick: (file: File) => void
   onClickBook: (id: string) => void
   onClickDetails: (id: string) => void
-  books: IBook[]
+  books: IBookFile[]
   hasBooks: boolean
   isLoadingState: boolean
   isAddingBook: boolean

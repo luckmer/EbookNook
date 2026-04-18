@@ -40,6 +40,7 @@ const EpubNavigation: FC<IProps> = ({
             <FaChevronLeft className="w-18 h-18 transition-colors duration-200" />
           </DefaultButton>
         </div>
+
         <div className="flex flex-row gap-6">
           <DefaultButton
             onClick={onClickNextPage}

@@ -1,4 +1,4 @@
-import { type Toc } from '@bindings/epub'
+import { type ITocItem } from '@bindings/book'
 import DefaultButton from '@components/Buttons/DefaultButton'
 import Show from '@components/Show'
 import { Typography } from '@components/Typography'
@@ -8,11 +8,12 @@ import { IoIosArrowUp } from 'react-icons/io'
 
 export interface IProps {
   onClick: (href: string) => void
-  item: Toc
+  activeToc: ITocItem
+  item: ITocItem
   level: number
 }
 
-const Toc: FC<IProps> = ({ item, level, onClick }) => {
+const Toc: FC<IProps> = ({ item, level, activeToc, onClick }) => {
   const [open, setOpen] = useState(false)
 
   const hasSubitems = useMemo(
@@ -25,6 +26,7 @@ const Toc: FC<IProps> = ({ item, level, onClick }) => {
       <DefaultButton
         className={clsx(
           'pl-6 group h-[35px] w-full flex items-center ',
+          activeToc.href === item.href && 'bg-button-primary-hover',
           'hover:bg-hover-greyBlue-200 transition-colors duration-300 opacity-80 hover:bg-button-primary-hover rounded-6',
         )}
         onClick={() => {
@@ -36,6 +38,7 @@ const Toc: FC<IProps> = ({ item, level, onClick }) => {
           <Show when={hasSubitems}>
             <div
               onClick={(e) => {
+                if (activeToc.id === item.id) return
                 e.preventDefault()
                 e.stopPropagation()
                 setOpen((prev) => !prev)
@@ -60,8 +63,8 @@ const Toc: FC<IProps> = ({ item, level, onClick }) => {
             open ? 'block' : 'hidden',
           )}>
           <div className="pl-12 transition-all duration-300 ease-in-out">
-            {item.subitems.map((sub, index) => (
-              <Toc key={index} item={sub} level={level++} onClick={onClick} />
+            {(item.subitems ?? []).map((sub, index) => (
+              <Toc key={index} item={sub} level={level++} onClick={onClick} activeToc={activeToc} />
             ))}
           </div>
         </div>

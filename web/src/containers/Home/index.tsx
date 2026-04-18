@@ -1,5 +1,5 @@
 import Home from '@pages/Home'
-import { actions as annotationActions } from '@store/reducers/annotations'
+// import { actions as annotationActions } from '@store/reducers/annotations'
 import { actions } from '@store/reducers/books'
 import { actions as uiActions } from '@store/reducers/ui'
 import { filteredBooks } from '@store/selectors/aggregated/books'
@@ -23,7 +23,7 @@ const HomeRoot = () => {
       isAddingBook={isAddingBook}
       isLoadingState={isLoadingState}
       hasBooks={Object.values(availableBooks).flat().length > 0}
-      onClick={async (file) => {
+      onClick={(file) => {
         dispatch(actions.importBook(file))
       }}
       onClickDetails={(bookId) => {
@@ -36,8 +36,8 @@ const HomeRoot = () => {
       }}
       onClickBook={(id) => {
         navigate('reader', { state: { id } })
-        dispatch(actions.getEpubStructure(id))
-        dispatch(annotationActions.getAnnotationStructure(id))
+        dispatch(actions.setOpenBook(id))
+        // dispatch(annotationActions.getAnnotationStructure(id))
         dispatch(uiActions.setHideHeader(true))
       }}
     />

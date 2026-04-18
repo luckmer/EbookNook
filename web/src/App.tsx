@@ -1,15 +1,14 @@
 import Annotator from '@containers/Annotator'
 import Header from '@pages/Header'
-import { actions as annotationActions } from '@store/reducers/annotations/index'
 import { actions as bookActions } from '@store/reducers/books/index'
 import { actions } from '@store/reducers/search'
 import { actions as uiActions } from '@store/reducers/ui'
-import { selectEpubMap } from '@store/selectors/books'
+import { bookSelector } from '@store/selectors/books'
 import { searchSelector } from '@store/selectors/search'
 import { uiSelector } from '@store/selectors/ui'
 import '@styles/import.css'
 import { getCurrentWindow } from '@tauri-apps/api/window'
-import { useEffect, useLayoutEffect, useMemo } from 'react'
+import { useLayoutEffect, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Route, Routes, useLocation } from 'react-router-dom'
 import { routes } from './routes'
@@ -19,7 +18,7 @@ function App() {
   const isSidebarOpen = useSelector(uiSelector.openChaptersDrawer)
   const searchValue = useSelector(searchSelector.value)
   const hideHeader = useSelector(uiSelector.hideHeader)
-  const booksMap = useSelector(selectEpubMap)
+  const booksMap = useSelector(bookSelector.books)
 
   const dispatch = useDispatch()
 
@@ -29,16 +28,16 @@ function App() {
     dispatch(bookActions.load())
   }, [])
 
-  useEffect(() => {
-    if (location?.state?.id) {
-      const bookId = location.state.id
-      const book = booksMap[bookId]
-      if (book) {
-        dispatch(bookActions.getEpubStructure(book.book.id))
-        dispatch(annotationActions.getAnnotationStructure(book.book.id))
-      }
-    }
-  }, [booksMap])
+  // useEffect(() => {
+  //   if (location?.state?.id) {
+  //     const bookId = location.state.id
+  //     const book = booksMap[bookId]
+  //     if (book) {
+  //       // dispatch(bookActions.getEpubStructure(book.book.id))
+  //       dispatch(annotationActions.getAnnotationStructure(book.book.id))
+  //     }
+  //   }
+  // }, [booksMap])
 
   const bookId = useMemo(() => location?.state?.id, [location])
   const book = useMemo(() => booksMap[bookId], [bookId, booksMap])
@@ -46,7 +45,7 @@ function App() {
   return (
     <div className="w-full h-full flex flex-col gap-4">
       <Header
-        bookName={book?.book.title}
+        bookName={book?.metadata.title.toString()} // fix it later
         hideHeader={hideHeader}
         onClickSettings={() => {
           dispatch(uiActions.setOpenSettingsModal(!isSettingsOpen))
