@@ -1,5 +1,5 @@
 use database::DatabaseManager;
-use types::{Books, FormatType, IBindingsEpubBook, IBookType};
+use types::{Books, FormatType, IBindingsEpubBook, IBookStructure, IBookType};
 
 use crate::init_epub_service;
 
@@ -87,7 +87,16 @@ impl FormatsService {
         db: &DatabaseManager,
         id: String,
         format: FormatType,
-    ) -> Result<(), Box<dyn std::error::Error>> {
-        Ok(())
+    ) -> Result<IBookStructure, Box<dyn std::error::Error>> {
+        match format {
+            FormatType::Epub => {
+                let books_service = init_epub_service();
+                let structure = books_service.get_book_structure_by_id(db, &id).await?;
+                Ok(IBookStructure {
+                    epub: Some(structure),
+                })
+            }
+            _ => Err(format!("unsupported format: {:?}", format).into()),
+        }
     }
 }

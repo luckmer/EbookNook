@@ -164,4 +164,5 @@ pub struct IBindingsEpubBookStructure {
     #[ts(optional)]
     pub toc: Option<Vec<IBindingsEpubToc>>,
     pub sections: Vec<IBindingsEpubSection>,
+    pub format: FormatType,
 }

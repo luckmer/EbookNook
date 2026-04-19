@@ -49,7 +49,6 @@ const ReaderRoot = () => {
       view.style.height = '100vh'
       container.appendChild(view)
 
-      console.log('book', file)
       await view.open(file)
       viewRef.current = view
       view.renderer.setStyles?.(`

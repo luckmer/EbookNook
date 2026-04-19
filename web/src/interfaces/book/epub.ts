@@ -1,4 +1,9 @@
-import { IBindingsEpubRendition, IBindingsEpubSection, IBindingsEpubToc } from '@bindings/epub'
+import {
+  IBindingsEpubBookStructure,
+  IBindingsEpubRendition,
+  IBindingsEpubSection,
+  IBindingsEpubToc,
+} from '@bindings/epub'
 import { FormatType } from '@bindings/format'
 
 export type ILanguageMap = { [key in string]?: string }
@@ -40,3 +45,5 @@ export interface IEpubBookFile {
 export interface IEpubBook extends IEpubBookFile {
   getCover(): Promise<Blob | null>
 }
+
+export type IBookStructure = IBindingsEpubBookStructure

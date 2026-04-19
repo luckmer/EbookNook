@@ -1,4 +1,4 @@
-import { Books, IBookType } from '@bindings/book'
+import { Books, IBookStructure, IBookType } from '@bindings/book'
 import { FormatType } from '@bindings/format'
 import { getAppClient } from '@libs/appService'
 import { getBookAdapterClient } from '@libs/BookAdapter'
@@ -87,8 +87,30 @@ export function* setOpenBook(action: PayloadAction<PayloadTypes['setOpenBook']>)
   yield* put(uiActions.setIsFetchingStructure(false))
 }
 
+export function* getBookStructure(action: PayloadAction<PayloadTypes['getBookStructure']>) {
+  try {
+    const booksResponse = yield* call(invoke<IBookStructure>, 'get_book_structure_by_id', {
+      id: action.payload.id,
+      format: action.payload.format,
+    })
+
+    for (const content of Object.values(booksResponse)) {
+      if (content.format !== action.payload.format) return
+      yield* put(actions.setBookStructure({ id: action.payload.id, structure: content }))
+    }
+  } catch (err) {
+    console.log(err)
+    console.log('failed to open document')
+    notify('Failed to open document', 'error')
+  }
+}
+
 export function* ImportBookSaga() {
   yield* takeEvery(actions.importBook, ImportBook)
+}
+
+export function* getBookStructureSaga() {
+  yield* takeLatest(actions.getBookStructure, getBookStructure)
 }
 
 export function* loadStateSaga() {
@@ -100,5 +122,5 @@ export function* setOpenBookSaga() {
 }
 
 export default function* RootSaga() {
-  yield all([ImportBookSaga(), loadStateSaga(), setOpenBookSaga()])
+  yield all([ImportBookSaga(), loadStateSaga(), setOpenBookSaga(), getBookStructureSaga()])
 }

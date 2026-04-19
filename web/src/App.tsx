@@ -9,7 +9,7 @@ import { searchSelector } from '@store/selectors/search'
 import { uiSelector } from '@store/selectors/ui'
 import '@styles/import.css'
 import { getCurrentWindow } from '@tauri-apps/api/window'
-import { useLayoutEffect, useMemo } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Route, Routes, useLocation } from 'react-router-dom'
 import { routes } from './routes'
@@ -24,21 +24,25 @@ function App() {
   const dispatch = useDispatch()
 
   const location = useLocation()
+  const isLoaded = useRef(false)
 
   useLayoutEffect(() => {
     dispatch(bookActions.load())
   }, [])
 
-  // useEffect(() => {
-  //   if (location?.state?.id) {
-  //     const bookId = location.state.id
-  //     const book = booksMap[bookId]
-  //     if (book) {
-  //       // dispatch(bookActions.getEpubStructure(book.book.id))
-  //       dispatch(annotationActions.getAnnotationStructure(book.book.id))
-  //     }
-  //   }
-  // }, [booksMap])
+  useEffect(() => {
+    if (!location?.state?.id || isLoaded.current) return
+
+    const bookShelf = booksMap[bookState.format]
+    if (!bookShelf) return
+
+    const book = bookShelf[bookState.id]
+    if (book) {
+      isLoaded.current = true
+      dispatch(bookActions.setOpenBook(book.id))
+      dispatch(bookActions.getBookStructure({ id: book.id, format: book.format }))
+    }
+  }, [booksMap])
 
   const bookState: {
     id: string
@@ -58,7 +62,7 @@ function App() {
   return (
     <div className="w-full h-full flex flex-col gap-4">
       <Header
-        bookName={book?.metadata.title.toString()} // fix it later
+        bookName={book?.metadata.title}
         hideHeader={hideHeader}
         onClickSettings={() => {
           dispatch(uiActions.setOpenSettingsModal(!isSettingsOpen))

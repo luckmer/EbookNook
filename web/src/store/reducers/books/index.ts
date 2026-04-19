@@ -2,6 +2,7 @@ import { IBookType } from '@bindings/book'
 import { IBindingsEpubToc } from '@bindings/epub'
 import { FormatType } from '@bindings/format'
 import { BOOK_STATUS } from '@interfaces/book/enums'
+import { IBookStructure } from '@interfaces/book/epub'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { PayloadType } from '@store/helper'
 
@@ -67,6 +68,10 @@ export const store = createSlice({
     setOpenBook(state, _: PayloadAction<string>) {
       return state
     },
+
+    getBookStructure(state, _: PayloadAction<{ id: string; format: FormatType }>) {
+      return state
+    },
     importBook(state, _: PayloadAction<File>) {
       return state
     },
@@ -74,6 +79,26 @@ export const store = createSlice({
       state.activeToc = action.payload
       return state
     },
+
+    setBookStructure(state, action: PayloadAction<{ id: string; structure: IBookStructure }>) {
+      let bookShelf = state.books[action.payload.structure.format]
+
+      if (!bookShelf) {
+        bookShelf = {}
+      }
+
+      let book = bookShelf[action.payload.id]
+
+      if (!book) {
+        return state
+      }
+
+      book.sections = action.payload.structure.sections
+      book.toc = action.payload.structure.toc
+
+      return state
+    },
+
     setFile(state, action: PayloadAction<{ id: string; file: File }>) {
       state.files[action.payload.id] = action.payload.file
       return state

@@ -27,7 +27,7 @@ pub const INSERT_EPUB_BOOK_SECTIONS: &str = r#"
 INSERT OR REPLACE INTO epub_book_sections_table (id, sections) VALUES (?, ?);
 "#;
 
-pub const SELECT_BOOK_SECTION_BY_ID: &str = r#"
+pub const SELECT_EPUB_BOOK_SECTION_BY_ID: &str = r#"
 SELECT sections FROM epub_book_sections_table WHERE id = ?;
 "#;
 
@@ -35,7 +35,7 @@ pub const INSERT_EPUB_BOOK_TOC: &str = r#"
 INSERT OR REPLACE INTO epub_book_toc_table (id, toc) VALUES (?, ?);
 "#;
 
-pub const SELECT_BOOK_TOC_BY_ID: &str = r#"
+pub const SELECT_EPUB_BOOK_TOC_BY_ID: &str = r#"
 SELECT toc FROM epub_book_toc_table WHERE id = ?;
 "#;
 

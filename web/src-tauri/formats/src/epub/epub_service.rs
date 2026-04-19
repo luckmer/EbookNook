@@ -1,9 +1,13 @@
 use database::{
     DatabaseManager, INSERT_EPUB_BOOK, INSERT_EPUB_BOOK_SECTIONS, INSERT_EPUB_BOOK_TOC,
+    SELECT_EPUB_BOOK_SECTION_BY_ID, SELECT_EPUB_BOOK_TOC_BY_ID,
     UPDATE_EPUB_BOOK_PERCENTAGE_PROGRESS, UPDATE_EPUB_BOOK_PROGRESS,
 };
 use sqlx::types::chrono;
-use types::{FormatType, IBindingsEpubBook, IBindingsEpubMetadata, IBindingsEpubRendition};
+use types::{
+    FormatType, IBindingsEpubBook, IBindingsEpubBookStructure, IBindingsEpubMetadata,
+    IBindingsEpubRendition, IBindingsEpubSection, IBindingsEpubToc,
+};
 
 pub struct EpubService {}
 
@@ -137,25 +141,27 @@ impl EpubService {
     pub async fn get_book_structure_by_id(
         &self,
         db: &DatabaseManager,
-        id: String,
-    ) -> Result<(), Box<dyn std::error::Error>> {
-        // let conn = db.get_pool();
+        id: &str,
+    ) -> Result<IBindingsEpubBookStructure, Box<dyn std::error::Error>> {
+        let conn = db.get_pool();
 
-        // let toc_json: String = sqlx::query_scalar(SELECT_BOOK_TOC_BY_ID)
-        //     .bind(id.clone())
-        //     .fetch_one(conn)
-        //     .await?;
+        let toc_json: String = sqlx::query_scalar(SELECT_EPUB_BOOK_TOC_BY_ID)
+            .bind(id)
+            .fetch_one(conn)
+            .await?;
 
-        // let chapters_json: String = sqlx::query_scalar(SELECT_BOOK_SECTION_BY_ID)
-        //     .bind(id.clone())
-        //     .fetch_one(conn)
-        //     .await?;
+        let chapters_json: String = sqlx::query_scalar(SELECT_EPUB_BOOK_SECTION_BY_ID)
+            .bind(id)
+            .fetch_one(conn)
+            .await?;
 
-        // let toc: Option<Vec<ITocItem>> = serde_json::from_str(&toc_json)?;
-        // let sections: Vec<IBookDocSectionItem> = serde_json::from_str(&chapters_json)?;
+        let toc: Option<Vec<IBindingsEpubToc>> = serde_json::from_str(&toc_json)?;
+        let sections: Vec<IBindingsEpubSection> = serde_json::from_str(&chapters_json)?;
 
-        // Ok(IBookStructure { toc, sections })
-
-        Ok(())
+        Ok(IBindingsEpubBookStructure {
+            toc,
+            sections,
+            format: FormatType::Epub,
+        })
     }
 }
