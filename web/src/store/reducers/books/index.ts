@@ -1,4 +1,6 @@
-import { IBookFile, ITocItem } from '@bindings/book'
+import { IBookType } from '@bindings/book'
+import { IBindingsEpubToc } from '@bindings/epub'
+import { FormatType } from '@bindings/format'
 import { BOOK_STATUS } from '@interfaces/book/enums'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { PayloadType } from '@store/helper'
@@ -8,8 +10,8 @@ export const booksStore = 'booksStore'
 export interface IBookState {
   selectedChapter: string
   statuses: Record<string, BOOK_STATUS>
-  books: Record<string, IBookFile>
-  activeToc: ITocItem
+  books: Partial<Record<FormatType, Partial<Record<string, IBookType>>>>
+  activeToc: IBindingsEpubToc
   files: Record<string, File | null>
 }
 
@@ -41,8 +43,15 @@ export const store = createSlice({
       return state
     },
 
-    setBook(state, action: PayloadAction<{ id: string; book: IBookFile }>) {
-      state.books[action.payload.id] = action.payload.book
+    setBook(state, action: PayloadAction<{ id: string; book: IBookType }>) {
+      let bookShelf = state.books[action.payload.book.format]
+
+      if (!bookShelf) {
+        bookShelf = {}
+      }
+
+      bookShelf[action.payload.id] = action.payload.book
+
       return state
     },
 
@@ -61,7 +70,7 @@ export const store = createSlice({
     importBook(state, _: PayloadAction<File>) {
       return state
     },
-    setActiveToc(state, action: PayloadAction<ITocItem>) {
+    setActiveToc(state, action: PayloadAction<IBindingsEpubToc>) {
       state.activeToc = action.payload
       return state
     },
@@ -69,7 +78,10 @@ export const store = createSlice({
       state.files[action.payload.id] = action.payload.file
       return state
     },
-    setBooks(state, action: PayloadAction<Record<string, IBookFile>>) {
+    setBooks(
+      state,
+      action: PayloadAction<Partial<Record<FormatType, Partial<Record<string, IBookType>>>>>,
+    ) {
       state.books = action.payload
       return state
     },

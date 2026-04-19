@@ -13,6 +13,10 @@ export const BannersStory: Story = {
   render: () => {
     return (
       <Reader
+        sectionInfo={{
+          current: 1,
+          total: 20,
+        }}
         onHideHeader={() => {}}
         onShowHeader={() => {}}
         onClickNextChapter={() => {}}

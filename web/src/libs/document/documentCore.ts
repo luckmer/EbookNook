@@ -1,5 +1,5 @@
-import { FormatType } from '@bindings/book'
-import { IBook } from '@interfaces/book/interfaces'
+import { FormatType } from '@bindings/format'
+import { ILocalBookType } from '@interfaces/book/interfaces'
 import { rstr2hex } from '@utils/index'
 
 export default class DocumentClientCore {
@@ -125,7 +125,7 @@ export default class DocumentClientCore {
     }
   }
 
-  async _init(file: File): Promise<IBook> {
+  async _init(file: File): Promise<ILocalBookType> {
     if (typeof file === 'string') file = await this.fetchFile(file)
     if (!file.size) throw new Error('File not found')
 

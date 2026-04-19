@@ -1,3 +1,4 @@
+import { FormatType } from '@bindings/format'
 import Annotator from '@containers/Annotator'
 import Header from '@pages/Header'
 import { actions as bookActions } from '@store/reducers/books/index'
@@ -39,8 +40,20 @@ function App() {
   //   }
   // }, [booksMap])
 
-  const bookId = useMemo(() => location?.state?.id, [location])
-  const book = useMemo(() => booksMap[bookId], [bookId, booksMap])
+  const bookState: {
+    id: string
+    format: FormatType
+  } = useMemo(() => location?.state, [location])
+
+  const book = useMemo(() => {
+    if (!bookState) return
+
+    const bookShelf = booksMap[bookState.format]
+
+    if (!bookShelf) return
+
+    return bookShelf[bookState.id]
+  }, [bookState, booksMap])
 
   return (
     <div className="w-full h-full flex flex-col gap-4">

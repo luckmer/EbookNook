@@ -1,2 +1,3 @@
-pub mod books;
-pub use books::*;
+pub mod epub;
+
+pub use epub::*;

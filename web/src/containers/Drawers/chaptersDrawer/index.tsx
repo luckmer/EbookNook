@@ -1,3 +1,4 @@
+import { FormatType } from '@bindings/format'
 import ChaptersDrawer from '@pages/Drawers/chaptersDrawer'
 import { actions as bookActions } from '@store/reducers/books'
 import { actions as uiActions } from '@store/reducers/ui'
@@ -7,8 +8,13 @@ import { useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation, useNavigate } from 'react-router-dom'
 
+export interface ICache {
+  id: string
+  format: FormatType
+}
+
 const ChaptersDrawerRoot = () => {
-  const [cache, setCache] = useState('')
+  const [cache, setCache] = useState<ICache | null>(null)
   const isOpen = useSelector(uiSelector.openChaptersDrawer)
   const isLoader = useSelector(uiSelector.isFetchingStructure)
   const books = useSelector(bookSelector.books)
@@ -19,55 +25,30 @@ const ChaptersDrawerRoot = () => {
   const location = useLocation()
   const dispatch = useDispatch()
 
-  const bookId = useMemo(() => location?.state?.id, [location])
-  const activeBook = useMemo(() => books[cache], [cache, books])
+  const bookState = useMemo(() => location?.state, [location])
+  const activeBook = useMemo(() => {
+    if (!cache) return
 
-  const bookMetadata = useMemo(() => {
-    return books[cache]
-  }, [books, cache])
+    const bookShelf = books[cache.format]
+
+    if (!bookShelf) return
+
+    return bookShelf[cache.id]
+  }, [cache, books])
 
   useEffect(() => {
-    if (!bookId) return
-    if (bookId !== cache) {
-      setCache(bookId)
+    if (!bookState) return
+    if (bookState.id !== cache?.id || bookState.format !== cache?.format) {
+      setCache(bookState)
     }
-  }, [bookId])
-
-  const author = useMemo(() => {
-    const author = activeBook?.metadata?.author
-
-    if (!author) {
-      return '--'
-    }
-
-    if (typeof author === 'string') {
-      return author
-    }
-
-    return typeof author.name === 'string' ? author.name : '----'
-  }, [activeBook])
-
-  const title = useMemo(() => {
-    const title = activeBook?.metadata?.title
-
-    console.log('title', title)
-    if (!title) {
-      return '--'
-    }
-
-    if (typeof title === 'string') {
-      return title
-    }
-
-    return typeof title.name === 'string' ? title.name : '----'
-  }, [activeBook])
+  }, [bookState])
 
   return (
     <ChaptersDrawer
       activeToc={activeToc}
-      author={author}
-      icon={bookMetadata?.metadata?.cover}
-      title={title}
+      author={activeBook?.metadata?.author ?? '--'}
+      icon={activeBook?.metadata?.cover}
+      title={activeBook?.metadata?.title ?? '--'}
       toc={activeBook?.toc ?? []}
       isLoader={isLoader}
       isOpen={isOpen}

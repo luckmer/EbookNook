@@ -13,42 +13,17 @@ const BookOverviewModalRoot = () => {
   const dispatch = useDispatch()
 
   const book = useMemo(() => {
-    return booksMap[openSettingsModal.bookId]
+    const bookShelf = booksMap[openSettingsModal.format]
+
+    if (!bookShelf) return
+
+    return bookShelf[openSettingsModal.bookId]
   }, [openSettingsModal.bookId, booksMap])
 
   useEffect(() => {
     if (!book) {
-      dispatch(actions.setOpenBookOverviewModal({ status: false, bookId: '' }))
+      dispatch(actions.setOpenBookOverviewModal({ status: false, bookId: '', format: 'EPUB' }))
     }
-  }, [book])
-
-  const author = useMemo(() => {
-    const author = book?.metadata?.author
-
-    if (!author) {
-      return '--'
-    }
-
-    if (typeof author === 'string') {
-      return author
-    }
-
-    return typeof author.name === 'string' ? author.name : '----'
-  }, [book])
-
-  const title = useMemo(() => {
-    const title = book?.metadata?.title
-
-    console.log('title', title)
-    if (!title) {
-      return '--'
-    }
-
-    if (typeof title === 'string') {
-      return title
-    }
-
-    return typeof title.name === 'string' ? title.name : '----'
   }, [book])
 
   return (
@@ -56,14 +31,14 @@ const BookOverviewModalRoot = () => {
       book={{
         bookDescription: book?.metadata?.description,
         cover: book?.metadata?.cover,
-        author: author,
-        title: title,
+        author: book?.metadata.author,
+        title: book?.metadata.title,
         published: book?.metadata?.published,
         publisher: book?.metadata?.publisher,
         status: status[openSettingsModal.bookId] ?? BOOK_STATUS.IDLE,
       }}
       onClickClose={() => {
-        dispatch(actions.setOpenBookOverviewModal({ status: false, bookId: '' }))
+        dispatch(actions.setOpenBookOverviewModal({ status: false, bookId: '', format: 'EPUB' }))
       }}
       onClickDelete={() => {
         // const id = book?.book.id

@@ -1,11 +1,14 @@
-import { IBookDocSectionItem, IBookFile } from '@bindings/book'
+import { FormatType } from '@bindings/format'
+import { IEpubBook } from './epub'
 
-export interface ISection extends IBookDocSectionItem {
-  createDocument: () => Promise<Document>
-}
+export type ILocalBookType = IEpubBook
 
-export interface IBook extends IBookFile {
-  transformTarget?: EventTarget
-  splitTOCHref(href: string): Array<string | number>
-  getCover(): Promise<Blob | null>
+export type ITocItem = { label: string; href: string; subitems?: Array<ITocItem> }
+
+export interface IBookFile {
+  percentageProgress: string
+  format: FormatType
+  cover: string
+  title: string
+  id: string
 }

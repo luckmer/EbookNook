@@ -1,9 +1,10 @@
-// use crate::{EPUB_BOOK_TABLE, EPUB_CHAPTERS_TABLE, EPUB_TOC_TABLE};
 use sqlx::sqlite::{SqliteConnectOptions, SqliteJournalMode, SqlitePoolOptions, SqliteSynchronous};
 use sqlx::{Pool, Sqlite, SqlitePool};
 use std::fs;
 use std::str::FromStr;
 use tauri::{AppHandle, Manager};
+
+use crate::{EPUB_BOOKS_TABLE, EPUB_SECTIONS_TABLE, EPUB_TOC_TABLE};
 
 pub struct DatabaseManager {
     pub pool: Pool<Sqlite>,
@@ -45,11 +46,10 @@ impl DatabaseManager {
             .execute(&self.pool)
             .await?;
 
-        // sqlx::query(EPUB_BOOK_TABLE).execute(&self.pool).await?;
-        // sqlx::query(EPUB_TOC_TABLE).execute(&self.pool).await?;
-        // sqlx::query(EPUB_CHAPTERS_TABLE).execute(&self.pool).await?;
-        // sqlx::query(NOTES_TABLE).execute(&self.pool).await?;
-        // sqlx::query(HIGHLIGHTS_TABLE).execute(&self.pool).await?;
+        sqlx::query(EPUB_BOOKS_TABLE).execute(&self.pool).await?;
+        sqlx::query(EPUB_TOC_TABLE).execute(&self.pool).await?;
+        sqlx::query(EPUB_SECTIONS_TABLE).execute(&self.pool).await?;
+
         Ok(())
     }
 

@@ -66,12 +66,12 @@ const BookOverviewModal: FC<IProps> = ({
 
       const style = doc.createElement('style')
       style.textContent = `
-      body { 
-        margin: 0; padding: 0; color: white; 
-        font-family: system-ui, -apple-system, sans-serif; 
-        font-size: 14px; line-height: 1.5; overflow: hidden; 
-        * { 
-          color: #9CA3AF; 
+      body {
+        margin: 0; padding: 0; color: white;
+        font-family: system-ui, -apple-system, sans-serif;
+        font-size: 14px; line-height: 1.5; overflow: hidden;
+        * {
+          color: #9CA3AF;
         }
       }
     `

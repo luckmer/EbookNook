@@ -1,15 +1,16 @@
-import { IBookFile } from '@bindings/book'
+import { FormatType } from '@bindings/format'
 import BookShelf from '@components/BookShelf'
 import EmptyLibrary from '@components/EmptyBookShelf'
 import EmptyResult from '@components/EmptyResult'
 import Show from '@components/Show'
 import Spin from '@components/Spin'
+import { IBookFile } from '@interfaces/book/interfaces'
 import { FC, memo } from 'react'
 
 export interface IProps {
   onClick: (file: File) => void
-  onClickBook: (id: string) => void
-  onClickDetails: (id: string) => void
+  onClickBook: (id: string, format: FormatType) => void
+  onClickDetails: (id: string, format: FormatType) => void
   books: IBookFile[]
   hasBooks: boolean
   isLoadingState: boolean

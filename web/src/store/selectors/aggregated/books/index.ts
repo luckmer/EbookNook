@@ -1,12 +1,20 @@
-import { IBookFile } from '@bindings/book'
+import { IBookFile } from '@interfaces/book/interfaces'
 import { createSelector } from '@reduxjs/toolkit'
 import { bookSelector } from '@store/selectors/books'
 import { searchSelector } from '@store/selectors/search'
 
 export const booksState = createSelector([bookSelector.books], (books) =>
-  Object.values(books).flat(),
+  Object.values(books)
+    .flatMap((booksByFormat) => Object.values(booksByFormat))
+    .filter((book) => !!book)
+    .map((book) => ({
+      percentageProgress: book.percentageProgress,
+      cover: book.metadata.cover,
+      title: book.metadata.title,
+      format: book.format,
+      id: book.id,
+    })),
 )
-
 export const filteredBooks = createSelector(
   [booksState, searchSelector.value],
   (books, searchValue) => {
@@ -14,16 +22,14 @@ export const filteredBooks = createSelector(
 
     const query = searchValue.toLowerCase()
 
-    return books.reduce((acc, book) => {
-      const title = book.metadata.title
+    const acc: IBookFile[] = []
 
-      const titleString = typeof title === 'string' ? title : Object.values(title).join(' ')
-
-      if (titleString.toLowerCase().includes(query)) {
+    books.forEach((book) => {
+      if (book.title.toLowerCase().includes(query)) {
         acc.push(book)
       }
+    })
 
-      return acc
-    }, [] as IBookFile[])
+    return acc
   },
 )

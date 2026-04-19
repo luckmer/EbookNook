@@ -26,18 +26,18 @@ const HomeRoot = () => {
       onClick={(file) => {
         dispatch(actions.importBook(file))
       }}
-      onClickDetails={(bookId) => {
+      onClickDetails={(bookId, format) => {
         dispatch(
           uiActions.setOpenBookOverviewModal({
             status: true,
+            format,
             bookId,
           }),
         )
       }}
-      onClickBook={(id) => {
-        navigate('reader', { state: { id } })
+      onClickBook={(id, format) => {
+        navigate('reader', { state: { id, format } })
         dispatch(actions.setOpenBook(id))
-        // dispatch(annotationActions.getAnnotationStructure(id))
         dispatch(uiActions.setHideHeader(true))
       }}
     />

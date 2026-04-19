@@ -1,4 +1,5 @@
-import { IBookFile } from '@bindings/book'
+import { Books, IBookType } from '@bindings/book'
+import { FormatType } from '@bindings/format'
 import { getAppClient } from '@libs/appService'
 import { getBookAdapterClient } from '@libs/BookAdapter'
 import { PayloadAction } from '@reduxjs/toolkit'
@@ -13,18 +14,19 @@ import { all, call, put, select, takeEvery, takeLatest } from 'typed-redux-saga'
 export function* loadState() {
   try {
     yield* put(uiActions.setIsLoadingState(true))
-    const booksResponse = yield* call(invoke<IBookFile[]>, 'get_books')
-
-    const books: Record<string, IBookFile> = {}
-
+    const booksResponse = yield* call(invoke<Books>, 'get_books')
     const adapterClient = yield* call(getBookAdapterClient)
 
-    for (let book of booksResponse) {
-      const bookContent = yield* call([adapterClient, adapterClient.getBookImg], book)
-      books[book.id] = bookContent
+    const updatedEpubBooks: Partial<Record<FormatType, Partial<Record<string, IBookType>>>> = {}
+
+    for (const books of Object.values(booksResponse)) {
+      for (const book of books) {
+        const bookContent: IBookType = yield* call([adapterClient, adapterClient.getBookImg], book)
+        updatedEpubBooks[book.format] = { ...updatedEpubBooks[book.format], [book.id]: bookContent }
+      }
     }
 
-    yield* put(actions.setBooks(books))
+    yield* put(actions.setBooks(updatedEpubBooks))
   } catch (err) {
     console.log('failed to get state')
     notify('Failed to open document', 'error')
@@ -51,12 +53,10 @@ export function* ImportBook(action: PayloadAction<PayloadTypes['importBook']>) {
     const adapterClient = yield* call(getBookAdapterClient)
 
     const bookFormat = yield* call([adapterClient, adapterClient.invokeBookFormat], response)
-    // yield* call(invoke<IBookFile>, 'add_book', {
-    //   book: bookFormat,
-    // })
 
-    const bookContent = yield* call([adapterClient, adapterClient.getBookFormat], response)
+    yield* call(invoke<IBookType>, 'add_book', { book: bookFormat })
 
+    const bookContent = yield* call([adapterClient, adapterClient.getBookImg], bookFormat)
     yield* put(actions.setBook({ id: response.id, book: bookContent }))
   } catch (err) {
     console.log(err)
@@ -70,22 +70,12 @@ export function* setOpenBook(action: PayloadAction<PayloadTypes['setOpenBook']>)
   yield* put(uiActions.setIsFetchingStructure(true))
   try {
     const files = yield* select(bookSelector.files)
-
     if (files[action.payload]) {
       yield* put(uiActions.setIsFetchingStructure(false))
       return
     }
 
-    const books = yield* select(bookSelector.books)
-
-    const book = books[action.payload]
-
-    if (!book) {
-      throw new Error('Book not found')
-    }
-
     const appService = yield* call(getAppClient)
-
     const file = yield* call([appService, appService.loadBookFromStorage], action.payload)
 
     yield* put(actions.setFile({ id: action.payload, file: file }))
@@ -94,7 +84,6 @@ export function* setOpenBook(action: PayloadAction<PayloadTypes['setOpenBook']>)
     console.log('failed to open document')
     notify('Failed to open document', 'error')
   }
-
   yield* put(uiActions.setIsFetchingStructure(false))
 }
 

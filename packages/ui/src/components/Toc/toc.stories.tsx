@@ -13,17 +13,19 @@ export const Default: Story = {
   render: () => {
     return (
       <Toc
+        activeToc={{
+          href: 'epub30-overview.xhtml#sec-intro',
+          label: '1. Introduction',
+          subitems: [],
+        }}
         onClick={() => {}}
         item={{
           href: 'epub30-overview.xhtml',
-          id: 'ovw',
           label: 'EPUB 3 Overview',
           subitems: [
             {
               href: 'epub30-overview.xhtml#sec-intro',
-              id: 'epub30-overview.xhtml#sec-intro',
               label: '1. Introduction',
-              parent: 'ovw',
               subitems: new Array(6).fill(0).map(() => ({
                 href: 'epub30-overview.xhtml#sec-intro',
                 id: 'epub30-overview.xhtml#sec-intro',
@@ -34,9 +36,7 @@ export const Default: Story = {
             },
             {
               href: 'epub30-overview.xhtml#sec-intro',
-              id: 'epub30-overview.xhtml#sec-intro',
               label: '1. Introduction',
-              parent: 'ovw',
               subitems: new Array(6).fill(0).map(() => ({
                 href: 'epub30-overview.xhtml#sec-intro',
                 id: 'epub30-overview.xhtml#sec-intro',
@@ -47,9 +47,7 @@ export const Default: Story = {
             },
             {
               href: 'epub30-overview.xhtml#sec-intro',
-              id: 'epub30-overview.xhtml#sec-intro',
               label: '1. Introduction',
-              parent: 'ovw',
               subitems: new Array(6).fill(0).map(() => ({
                 href: 'epub30-overview.xhtml#sec-intro',
                 id: 'epub30-overview.xhtml#sec-intro',
@@ -59,7 +57,6 @@ export const Default: Story = {
               })),
             },
           ],
-          parent: undefined,
         }}
         level={0}
       />

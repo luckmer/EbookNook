@@ -1,7 +1,7 @@
-import { type ITocItem } from '@bindings/book'
 import DefaultButton from '@components/Buttons/DefaultButton'
 import Show from '@components/Show'
 import { Typography } from '@components/Typography'
+import { ITocItem } from '@interfaces/book/interfaces'
 import clsx from 'clsx'
 import { FC, memo, useMemo, useState } from 'react'
 import { IoIosArrowUp } from 'react-icons/io'
@@ -38,7 +38,7 @@ const Toc: FC<IProps> = ({ item, level, activeToc, onClick }) => {
           <Show when={hasSubitems}>
             <div
               onClick={(e) => {
-                if (activeToc.id === item.id) return
+                if (activeToc.href === item.href) return
                 e.preventDefault()
                 e.stopPropagation()
                 setOpen((prev) => !prev)

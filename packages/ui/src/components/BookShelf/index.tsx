@@ -1,15 +1,15 @@
-import { IBookFile } from '@bindings/book'
+import { FormatType } from '@bindings/format'
 import Book from '@components/Book'
 import UploadButton from '@components/Buttons/UploadButton'
 import Show from '@components/Show'
 import Spin from '@components/Spin'
-
+import { IBookFile } from '@interfaces/book/interfaces'
 import { FC, memo } from 'react'
 import { MdAddToPhotos } from 'react-icons/md'
 
 export interface IProps {
-  onClickBook: (id: string) => void
-  onClickDetails: (id: string) => void
+  onClickBook: (id: string, format: FormatType) => void
+  onClickDetails: (id: string, formatType: FormatType) => void
   onClickImportBook: (file: File) => void
   isAddingBook: boolean
   books: IBookFile[]
@@ -28,13 +28,13 @@ const BookShelf: FC<IProps> = ({
         <Book
           key={id}
           progress={book.percentageProgress}
-          img={book.metadata.cover}
-          title={book.metadata.title.toString()} // fix it later
+          img={book.cover}
+          title={book.title}
           onClickDetails={() => {
-            onClickDetails(book.id)
+            onClickDetails(book.id, book.format)
           }}
           onClick={() => {
-            onClickBook(book.id)
+            onClickBook(book.id, book.format)
           }}
         />
       ))}
