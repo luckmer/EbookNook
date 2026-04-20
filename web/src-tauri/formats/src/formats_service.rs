@@ -1,7 +1,7 @@
 use database::DatabaseManager;
-use types::{Books, FormatType, IBindingsEpubBook, IBookStructure, IBookType};
+use types::{Books, FormatType, IBindingsEpubBook, IBindingsMobiBook, IBookStructure, IBookType};
 
-use crate::init_epub_service;
+use crate::{init_epub_service, init_mobi_service};
 
 pub struct FormatsService {}
 
@@ -9,16 +9,13 @@ impl FormatsService {
     pub fn new() -> FormatsService {
         FormatsService {}
     }
-
     pub async fn get_books(
         &self,
         db: &DatabaseManager,
     ) -> Result<Books, Box<dyn std::error::Error>> {
-        let epub_service = init_epub_service();
-
-        let epub = epub_service.get_books(db).await?;
-
-        Ok(Books { epub })
+        let mobi = init_mobi_service().get_books(db).await?;
+        let epub = init_epub_service().get_books(db).await?;
+        Ok(Books { epub, mobi })
     }
 
     pub async fn add_book(
@@ -28,6 +25,7 @@ impl FormatsService {
     ) -> Result<(), Box<dyn std::error::Error>> {
         match book {
             IBookType::Epub(epub) => self.add_epub(db, epub).await?,
+            IBookType::Mobi(mobi) => self.add_mobi(db, mobi).await?,
         }
 
         Ok(())
@@ -40,6 +38,17 @@ impl FormatsService {
     ) -> Result<(), Box<dyn std::error::Error>> {
         let epub_service = init_epub_service();
         epub_service.add_book(db, book).await?;
+
+        Ok(())
+    }
+
+    pub async fn add_mobi(
+        &self,
+        db: &DatabaseManager,
+        book: IBindingsMobiBook,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        let mobi_service = init_mobi_service();
+        mobi_service.add_book(db, book).await?;
 
         Ok(())
     }
@@ -92,9 +101,12 @@ impl FormatsService {
             FormatType::Epub => {
                 let books_service = init_epub_service();
                 let structure = books_service.get_book_structure_by_id(db, &id).await?;
-                Ok(IBookStructure {
-                    epub: Some(structure),
-                })
+                Ok(IBookStructure::Epub(structure))
+            }
+            FormatType::Mobi => {
+                let books_service = init_mobi_service();
+                let structure = books_service.get_book_structure_by_id(db, &id).await?;
+                Ok(IBookStructure::Mobi(structure))
             }
             _ => Err(format!("unsupported format: {:?}", format).into()),
         }

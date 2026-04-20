@@ -42,17 +42,15 @@ export function* ImportBook(action: PayloadAction<PayloadTypes['importBook']>) {
     const appService = yield* call(getAppClient)
 
     const response = yield* call([core, core.init], action.payload)
+    const adapterClient = yield* call(getBookAdapterClient)
 
+    const bookFormat = yield* call([adapterClient, adapterClient.invokeBookFormat], response)
     const bookImg = yield* call([response, response.getCover])
 
     yield* all([
       call([appService, appService.saveCover], response.id, bookImg),
       call([appService, appService.saveBookToStorage], action.payload, response.id),
     ])
-
-    const adapterClient = yield* call(getBookAdapterClient)
-
-    const bookFormat = yield* call([adapterClient, adapterClient.invokeBookFormat], response)
 
     yield* call(invoke<IBookType>, 'add_book', { book: bookFormat })
 
@@ -94,10 +92,7 @@ export function* getBookStructure(action: PayloadAction<PayloadTypes['getBookStr
       format: action.payload.format,
     })
 
-    for (const content of Object.values(booksResponse)) {
-      if (content.format !== action.payload.format) return
-      yield* put(actions.setBookStructure({ id: action.payload.id, structure: content }))
-    }
+    yield* put(actions.setBookStructure({ id: action.payload.id, structure: booksResponse }))
   } catch (err) {
     console.log(err)
     console.log('failed to open document')

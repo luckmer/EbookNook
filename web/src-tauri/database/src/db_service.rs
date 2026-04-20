@@ -4,7 +4,10 @@ use std::fs;
 use std::str::FromStr;
 use tauri::{AppHandle, Manager};
 
-use crate::{EPUB_BOOKS_TABLE, EPUB_SECTIONS_TABLE, EPUB_TOC_TABLE};
+use crate::{
+    EPUB_BOOKS_TABLE, EPUB_SECTIONS_TABLE, EPUB_TOC_TABLE, MOBI_BOOKS_TABLE, MOBI_SECTIONS_TABLE,
+    MOBI_TOC_TABLE,
+};
 
 pub struct DatabaseManager {
     pub pool: Pool<Sqlite>,
@@ -49,6 +52,10 @@ impl DatabaseManager {
         sqlx::query(EPUB_BOOKS_TABLE).execute(&self.pool).await?;
         sqlx::query(EPUB_TOC_TABLE).execute(&self.pool).await?;
         sqlx::query(EPUB_SECTIONS_TABLE).execute(&self.pool).await?;
+
+        sqlx::query(MOBI_BOOKS_TABLE).execute(&self.pool).await?;
+        sqlx::query(MOBI_TOC_TABLE).execute(&self.pool).await?;
+        sqlx::query(MOBI_SECTIONS_TABLE).execute(&self.pool).await?;
 
         Ok(())
     }

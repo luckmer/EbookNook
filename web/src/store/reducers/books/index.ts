@@ -1,8 +1,7 @@
-import { IBookType } from '@bindings/book'
+import { IBookStructure, IBookType } from '@bindings/book'
 import { IBindingsEpubToc } from '@bindings/epub'
 import { FormatType } from '@bindings/format'
 import { BOOK_STATUS } from '@interfaces/book/enums'
-import { IBookStructure } from '@interfaces/book/epub'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { PayloadType } from '@store/helper'
 

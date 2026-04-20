@@ -1,8 +1,7 @@
-import { IBindingsEpubRendition, IBindingsEpubSection, IBindingsEpubToc } from '@bindings/epub'
 import { FormatType } from '@bindings/format'
 import { ILanguage, ILanguageMap } from './types'
 
-export interface IEpubMetadata {
+export interface IMobiMetadata {
   author: string | string[] | ILanguageMap
   title: string | string[] | ILanguageMap
   contributor?: string | string[] | ILanguageMap
@@ -14,28 +13,32 @@ export interface IEpubMetadata {
   published?: string
   modified?: string
   rights?: string
-  editor?: string
   subject?: string | string[] | ILanguageMap
-  isbn?: string
-  subtitle?: string
-  series?: string
-  seriesIndex?: number
-  seriesTotal?: number
 }
 
-export interface IEpubBookFile {
+export interface IBindingsMobiToc {
+  label: string
+  href: string
+  subitems?: Array<IBindingsMobiToc>
+}
+
+export interface IBindingsMobiSection {
+  id: number
+  size: number
+}
+
+export interface IMobiBookFile {
   dir?: string
-  metadata: IEpubMetadata
-  rendition: IBindingsEpubRendition
+  metadata: IMobiMetadata
   percentageProgress: string
   progress: Array<string>
   format: FormatType
-  toc: Array<IBindingsEpubToc>
-  sections: Array<IBindingsEpubSection>
+  toc: Array<IBindingsMobiToc>
+  sections: Array<IBindingsMobiSection>
   id: string
 }
 
-export interface IEpubBook extends IEpubBookFile {
-  format: 'EPUB'
+export interface IMobiBook extends IMobiBookFile {
+  format: 'MOBI'
   getCover(): Promise<Blob | null>
 }

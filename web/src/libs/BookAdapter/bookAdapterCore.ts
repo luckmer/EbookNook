@@ -1,6 +1,8 @@
 import { IBookType as IBindingsBookType } from '@bindings/book'
-import { ILanguageMap } from '@interfaces/book/epub'
+import { IBindingsEpubBook } from '@bindings/epub'
+import { IBindingsMobiBook } from '@bindings/mobi'
 import { ILocalBookType } from '@interfaces/book/interfaces'
+import { ILanguageMap } from '@interfaces/book/types'
 import { getAppClient } from '@libs/appService'
 import { convertFileSrc } from '@tauri-apps/api/core'
 
@@ -24,7 +26,7 @@ export class BookAdapterCore {
   async _invokeBookFormat(content: ILocalBookType): Promise<IBindingsBookType> {
     switch (content.format) {
       case 'EPUB': {
-        return {
+        const epubFormat: IBindingsEpubBook = {
           percentageProgress: content.percentageProgress,
           metadata: {
             author: this._getContent(content.metadata.author),
@@ -57,8 +59,37 @@ export class BookAdapterCore {
           toc: content.toc,
           id: content.id,
         }
+        return epubFormat
       }
-
+      case 'MOBI': {
+        const mobiFormat: IBindingsMobiBook = {
+          id: content.id,
+          format: content.format,
+          percentageProgress: content.percentageProgress,
+          progress: content.progress,
+          metadata: {
+            author: this._getContent(content.metadata.author),
+            title: this._getContent(content.metadata.title),
+            contributor: content.metadata.contributor
+              ? this._getContent(content.metadata.contributor)
+              : undefined,
+            description: content.metadata.description,
+            identifier: content.metadata.identifier,
+            language: content.metadata.language,
+            cover: '',
+            publisher: content.metadata.publisher,
+            published: content.metadata.published,
+            modified: content.metadata.modified,
+            rights: content.metadata.rights,
+            subject: content.metadata.subject
+              ? this._getContent(content.metadata.subject)
+              : undefined,
+          },
+          sections: content.sections,
+          toc: content.toc,
+        }
+        return mobiFormat
+      }
       default: {
         throw new Error('format not implemented')
       }

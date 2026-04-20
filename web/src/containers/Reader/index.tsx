@@ -26,10 +26,19 @@ const ReaderRoot = () => {
   const viewRef = useRef<any | null>(null)
   const isViewCreated = useRef(false)
 
+  const handleRelocate = (e: any) => {
+    dispatch(bookActions.setActiveToc(e.detail.tocItem))
+    setSectionProgress(e.detail.section)
+    setBookProgress(e.detail.location)
+    setFraction(e.detail.fraction)
+  }
+
   useEffect(() => {
     if (!file) {
-      viewRef?.current?.close()
-      viewRef?.current?.remove()
+      if (viewRef.current) {
+        viewRef.current.close()
+        viewRef.current.remove()
+      }
       isViewCreated.current = false
       viewRef.current = null
       setIsLoadingStructure(true)
@@ -43,6 +52,7 @@ const ReaderRoot = () => {
       await import('@foliate/view.js')
       const container = document.querySelector('.book-content')
       if (!container) return
+
       const view = document.createElement('foliate-view') as any
       view.id = `foliate-view-${Date.now()}`
       view.style.width = '100%'
@@ -51,12 +61,16 @@ const ReaderRoot = () => {
 
       await view.open(file)
       viewRef.current = view
+
       view.renderer.setStyles?.(`
         * {
           color: white !important;
           background: transparent !important;
         }
       `)
+
+      view.addEventListener('relocate', handleRelocate)
+
       await view.goToFraction(0)
       setIsLoadingStructure(false)
     }
@@ -69,25 +83,6 @@ const ReaderRoot = () => {
       viewRef.current.goTo(selectedChapter)
     }
   }, [selectedChapter])
-
-  useEffect(() => {
-    if (isLoadingStructure || isLoader || !viewRef.current) return
-
-    const view = viewRef.current
-
-    const handleRelocate = (e: any) => {
-      dispatch(bookActions.setActiveToc(e.detail.tocItem))
-      setSectionProgress(e.detail.section)
-      setBookProgress(e.detail.location)
-      setFraction(e.detail.fraction)
-    }
-
-    view.addEventListener('relocate', handleRelocate)
-
-    return () => {
-      view.removeEventListener('relocate', handleRelocate)
-    }
-  }, [isLoadingStructure, isLoader])
 
   const handleHideHeader = useCallback(() => {
     dispatch(actions.setHideHeader(true))

@@ -26,7 +26,7 @@ const Toc: FC<IProps> = ({ item, level, activeToc, onClick }) => {
       <DefaultButton
         className={clsx(
           'pl-6 group h-[35px] w-full flex items-center ',
-          activeToc.href === item.href && 'bg-button-primary-hover',
+          // activeToc.href === item.href && 'bg-button-primary-hover',
           'hover:bg-hover-greyBlue-200 transition-colors duration-300 opacity-80 hover:bg-button-primary-hover rounded-6',
         )}
         onClick={() => {
@@ -38,7 +38,7 @@ const Toc: FC<IProps> = ({ item, level, activeToc, onClick }) => {
           <Show when={hasSubitems}>
             <div
               onClick={(e) => {
-                if (activeToc.href === item.href) return
+                // if (activeToc.href === item.href) return
                 e.preventDefault()
                 e.stopPropagation()
                 setOpen((prev) => !prev)

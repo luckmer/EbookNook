@@ -111,7 +111,8 @@ export default class DocumentClientCore {
         }
 
         if (format === 'MOBI') {
-          return book.getCover()
+          const cover = await book.getCover()
+          return cover
         }
 
         return cover?.href
