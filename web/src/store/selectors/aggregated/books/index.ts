@@ -11,6 +11,7 @@ export const booksState = createSelector([bookSelector.books], (books) =>
       percentageProgress: book.percentageProgress,
       cover: book.metadata.cover,
       title: book.metadata.title,
+      author: book.metadata.author,
       format: book.format,
       id: book.id,
     })),

@@ -1,8 +1,7 @@
 import { IBookType as IBindingsBookType } from '@bindings/book'
 import { IBindingsEpubBook } from '@bindings/epub'
 import { IBindingsMobiBook } from '@bindings/mobi'
-import { ILocalBookType } from '@interfaces/book/interfaces'
-import { ILanguageMap } from '@interfaces/book/types'
+import { ILanguageMap, ILocalBookType } from '@interfaces/book/types'
 import { getAppClient } from '@libs/appService'
 import { convertFileSrc } from '@tauri-apps/api/core'
 

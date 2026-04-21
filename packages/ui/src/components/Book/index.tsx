@@ -1,7 +1,9 @@
 import DefaultButton from '@components/Buttons/DefaultButton'
+import ImgCover from '@components/ImgCover'
+import Show from '@components/Show'
 import { Typography } from '@components/Typography'
 import { Progress } from 'antd'
-import { FC, memo } from 'react'
+import { FC, memo, useState } from 'react'
 import { TfiMenuAlt } from 'react-icons/tfi'
 
 export interface IProps {
@@ -10,9 +12,12 @@ export interface IProps {
   img?: string
   title: string
   progress: string
+  author: string
 }
 
-const Book: FC<IProps> = ({ img, progress, title, onClick, onClickDetails }) => {
+const Book: FC<IProps> = ({ img, progress, title, author, onClick, onClickDetails }) => {
+  const [hasLoadError, setHasLoadError] = useState(false)
+
   return (
     <div
       className="group flex flex-col p-12 w-full gap-12 rounded-6 cursor-pointer transition-colors duration-300 hover:bg-button-primary-hover/40"
@@ -21,7 +26,16 @@ const Book: FC<IProps> = ({ img, progress, title, onClick, onClickDetails }) => 
         e.stopPropagation()
         onClick()
       }}>
-      <img className="rounded-6 h-full object-cover" src={img} />
+      <Show when={!hasLoadError} fallback={<ImgCover name={title} author={author} />}>
+        <img
+          className="rounded-6 h-full object-cover"
+          src={img}
+          onError={(e) => {
+            e.stopPropagation()
+            setHasLoadError(true)
+          }}
+        />
+      </Show>
       <div className="flex flex-col gap-12">
         <Typography text="small" ellipsis left>
           {title}

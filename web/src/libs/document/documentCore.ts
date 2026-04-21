@@ -1,5 +1,5 @@
 import { FormatType } from '@bindings/format'
-import { ILocalBookType } from '@interfaces/book/interfaces'
+import { ILocalBookType } from '@interfaces/book/types'
 import { rstr2hex } from '@utils/index'
 
 export default class DocumentClientCore {

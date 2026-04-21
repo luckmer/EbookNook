@@ -1,10 +1,16 @@
 import DefaultButton from '@components/Buttons/DefaultButton'
 import Show from '@components/Show'
 import { Typography } from '@components/Typography'
-import { ITocItem } from '@interfaces/book/interfaces'
 import clsx from 'clsx'
 import { FC, memo, useMemo, useState } from 'react'
 import { IoIosArrowUp } from 'react-icons/io'
+
+export interface ITocItem {
+  label: string
+  href?: string
+  id?: string
+  subitems?: ITocItem[]
+}
 
 export interface IProps {
   onClick: (href: string) => void
@@ -21,16 +27,24 @@ const Toc: FC<IProps> = ({ item, level, activeToc, onClick }) => {
     [item.subitems],
   )
 
+  const isActive = useMemo(() => {
+    if (activeToc?.id === '-1' || !activeToc) {
+      return false
+    }
+
+    return activeToc?.href === item?.href || item?.id === activeToc?.id
+  }, [activeToc, item])
+
   return (
     <div className={clsx('flex flex-col', hasSubitems && 'my-4')}>
       <DefaultButton
         className={clsx(
           'pl-6 group h-[35px] w-full flex items-center ',
-          // activeToc.href === item.href && 'bg-button-primary-hover',
+          isActive && 'bg-button-primary-hover',
           'hover:bg-hover-greyBlue-200 transition-colors duration-300 opacity-80 hover:bg-button-primary-hover rounded-6',
         )}
         onClick={() => {
-          onClick(item.href)
+          onClick(item?.href ?? item?.id ?? '')
           if (open && hasSubitems) return
           setOpen(true)
         }}>
@@ -38,7 +52,9 @@ const Toc: FC<IProps> = ({ item, level, activeToc, onClick }) => {
           <Show when={hasSubitems}>
             <div
               onClick={(e) => {
-                // if (activeToc.href === item.href) return
+                if (isActive) {
+                  return
+                }
                 e.preventDefault()
                 e.stopPropagation()
                 setOpen((prev) => !prev)

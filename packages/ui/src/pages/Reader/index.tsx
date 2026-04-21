@@ -42,7 +42,7 @@ const Reader: FC<IProps> = ({
         hideContent={hideContent}>
         <div className="absolute bottom-[20px] left-[20px]">
           <Typography text="small" color="muted">
-            Page {sectionInfo.current} of {sectionInfo.total} Pages
+            {Math.max(0, sectionInfo.total - sectionInfo.current)} pages left
           </Typography>
         </div>
         <div className="h-full relative">

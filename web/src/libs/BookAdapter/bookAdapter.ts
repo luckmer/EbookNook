@@ -1,5 +1,5 @@
 import { IBookType as IBindingsBookType } from '@bindings/book'
-import { ILocalBookType } from '@interfaces/book/interfaces'
+import { ILocalBookType } from '@interfaces/book/types'
 import { BookAdapterCore } from './bookAdapterCore'
 
 export class BookAdapter extends BookAdapterCore {

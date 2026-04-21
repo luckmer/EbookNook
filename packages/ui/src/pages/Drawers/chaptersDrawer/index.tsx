@@ -4,10 +4,17 @@ import Show from '@components/Show'
 import Toc from '@components/Toc'
 import { Typography } from '@components/Typography'
 import { useWindowSize } from '@hooks/useWindowSize'
-import { ITocItem } from '@interfaces/book/interfaces'
 import { Skeleton } from 'antd'
-import { FC, useMemo } from 'react'
+import { FC, useMemo, useState } from 'react'
 import { IoLibraryOutline } from 'react-icons/io5'
+
+export interface ITocItem {
+  label: string
+  href?: string
+  id?: string
+  subitems?: ITocItem[]
+}
+
 export interface IProps {
   onClick: (href: string) => void
   onClickClose: () => void
@@ -33,6 +40,7 @@ const ChaptersDrawer: FC<IProps> = ({
   isLoader,
   activeToc,
 }) => {
+  const [hasLoadError, setHasLoadError] = useState(false)
   const { width } = useWindowSize()
 
   const isMobile = useMemo(() => width <= 700, [width])
@@ -53,10 +61,16 @@ const ChaptersDrawer: FC<IProps> = ({
         </div>
         <Show when={!isLoader} fallback={<Skeleton active />}>
           <div className="flex flex-row gap-12">
-            <img
-              src={icon}
-              className="w-48 h-[64px] object-cover rounded-4 pointer-events-none select-none"
-            />
+            <Show when={!hasLoadError}>
+              <img
+                className="w-48 h-[64px] object-cover rounded-4 pointer-events-none select-none"
+                src={icon}
+                onError={(e) => {
+                  e.stopPropagation()
+                  setHasLoadError(true)
+                }}
+              />
+            </Show>
             <div className="flex flex-col gap-6">
               <Typography>{title}</Typography>
               <Typography text="small" color="secondary">

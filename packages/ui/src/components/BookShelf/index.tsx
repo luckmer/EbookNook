@@ -30,6 +30,7 @@ const BookShelf: FC<IProps> = ({
           progress={book.percentageProgress}
           img={book.cover}
           title={book.title}
+          author={book.author}
           onClickDetails={() => {
             onClickDetails(book.id, book.format)
           }}

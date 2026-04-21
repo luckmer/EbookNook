@@ -1,7 +1,7 @@
 import { IBookStructure, IBookType } from '@bindings/book'
-import { IBindingsEpubToc } from '@bindings/epub'
 import { FormatType } from '@bindings/format'
 import { BOOK_STATUS } from '@interfaces/book/enums'
+import { ILocalBookToc } from '@interfaces/book/types'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { PayloadType } from '@store/helper'
 
@@ -11,15 +11,15 @@ export interface IBookState {
   selectedChapter: string
   statuses: Record<string, BOOK_STATUS>
   books: Partial<Record<FormatType, Partial<Record<string, IBookType>>>>
-  activeToc: IBindingsEpubToc
+  activeToc: ILocalBookToc
   files: Record<string, File | null>
 }
 
 export const defaultActiveToc = {
-  id: 0,
+  id: -1,
   label: '',
   href: '',
-  index: 0,
+  index: -1,
 }
 
 const defaultState: IBookState = {
@@ -74,7 +74,7 @@ export const store = createSlice({
     importBook(state, _: PayloadAction<File>) {
       return state
     },
-    setActiveToc(state, action: PayloadAction<IBindingsEpubToc>) {
+    setActiveToc(state, action: PayloadAction<ILocalBookToc>) {
       state.activeToc = action.payload
       return state
     },
