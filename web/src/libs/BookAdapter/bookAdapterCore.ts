@@ -97,10 +97,9 @@ export class BookAdapterCore {
 
   async _getBookImg(content: IBindingsBookType): Promise<IBindingsBookType> {
     const appService = getAppClient()
-    const appDir = await appService.getAppDataDir()
 
-    content.metadata.cover = convertFileSrc(`${appDir}/eBookNook/covers/${content.id}.png`)
-
+    const cover = await appService.getCover(content.id)
+    content.metadata.cover = convertFileSrc(cover)
     return content
   }
 }

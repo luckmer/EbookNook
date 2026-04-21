@@ -58,6 +58,7 @@ const ChaptersDrawerRoot = () => {
         navigate('/')
       }}
       onClickClose={() => {
+        dispatch(uiActions.setHideHeader(true))
         dispatch(uiActions.setOpenChaptersDrawer(false))
       }}
       onClick={(href) => {

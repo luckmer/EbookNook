@@ -3,6 +3,7 @@ import { appDataDir, join } from '@tauri-apps/api/path'
 import { exists, mkdir, readDir, readFile, writeFile } from '@tauri-apps/plugin-fs'
 
 export class AppServiceCore {
+  appName: string = 'eBookNook'
   appDataDir: string | null = null
   private readonly MIME_MAP: Record<FormatType, string> = {
     EPUB: 'application/epub+zip',
@@ -23,9 +24,9 @@ export class AppServiceCore {
     return this.appDataDir
   }
 
-  async getBooksDir(): Promise<string> {
+  async getLibraryDir(bookId: string): Promise<string> {
     const dataDir = await this.getAppDataDir()
-    const booksDir = await join(dataDir, 'eBookNook', 'books')
+    const booksDir = await join(dataDir, this.appName, bookId)
 
     if (!(await exists(booksDir))) {
       await mkdir(booksDir, { recursive: true })
@@ -33,18 +34,8 @@ export class AppServiceCore {
     return booksDir
   }
 
-  async getCoversDir(): Promise<string> {
-    const dataDir = await this.getAppDataDir()
-    const coversDir = await join(dataDir, 'eBookNook', 'covers')
-
-    if (!(await exists(coversDir))) {
-      await mkdir(coversDir, { recursive: true })
-    }
-    return coversDir
-  }
-
   async _saveBookToStorage(file: File, bookId: string): Promise<string> {
-    const booksDir = await this.getBooksDir()
+    const booksDir = await this.getLibraryDir(bookId)
 
     const originalExt = file.name.split('.').pop()?.toLowerCase()
     const extension = originalExt && originalExt.length < 5 ? originalExt : 'epub'
@@ -57,7 +48,7 @@ export class AppServiceCore {
   }
 
   async _loadBookFromStorage(bookId: string): Promise<File> {
-    const booksDir = await this.getBooksDir()
+    const booksDir = await this.getLibraryDir(bookId)
     const entries = await readDir(booksDir)
 
     const bookEntry = entries.find((e) => e.name.startsWith(bookId))
@@ -77,13 +68,23 @@ export class AppServiceCore {
 
   async saveCover(bookId: string, coverBlob: Blob | null) {
     if (!coverBlob) return
-
-    const coversDir = await this.getCoversDir()
+    const coversDir = await this.getLibraryDir(bookId)
 
     const fileName = `${bookId}.png`
     const destPath = await join(coversDir, fileName)
 
     const buffer = await coverBlob.arrayBuffer()
     await writeFile(destPath, new Uint8Array(buffer))
+  }
+
+  async _loadCoverDir(bookId: string) {
+    const coversDir = await this.getLibraryDir(bookId)
+
+    return coversDir
+  }
+
+  async _getCover(bookId: string) {
+    const coversDir = await this.getLibraryDir(bookId)
+    return `${coversDir}/${bookId}.png`
   }
 }

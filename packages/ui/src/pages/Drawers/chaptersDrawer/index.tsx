@@ -5,7 +5,7 @@ import Toc from '@components/Toc'
 import { Typography } from '@components/Typography'
 import { useWindowSize } from '@hooks/useWindowSize'
 import { Skeleton } from 'antd'
-import { FC, useMemo, useState } from 'react'
+import { FC, useEffect, useMemo, useState } from 'react'
 import { IoLibraryOutline } from 'react-icons/io5'
 
 export interface ITocItem {
@@ -41,9 +41,16 @@ const ChaptersDrawer: FC<IProps> = ({
   activeToc,
 }) => {
   const [hasLoadError, setHasLoadError] = useState(false)
+  const [cache, setCache] = useState<string | undefined>(undefined)
   const { width } = useWindowSize()
 
   const isMobile = useMemo(() => width <= 700, [width])
+
+  useEffect(() => {
+    if (icon === cache) return
+    setHasLoadError(false)
+    setCache(icon)
+  }, [icon])
 
   return (
     <Drawer
