@@ -42,3 +42,7 @@ SELECT sections FROM mobi_book_sections_table WHERE id = ?;
 pub const SELECT_MOBI_BOOK_TOC_BY_ID: &str = r#"
 SELECT toc FROM mobi_book_toc_table WHERE id = ?;
 "#;
+
+pub const DELETE_MOBI_TABLE: &str = r#"
+DELETE FROM mobi_books_table WHERE id = ?;
+"#;

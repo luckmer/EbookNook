@@ -31,7 +31,7 @@ export interface IMobiBookFile {
   dir?: string
   metadata: IMobiMetadata
   percentageProgress: string
-  progress: Array<string>
+  progress: Record<string, string>
   format: FormatType
   toc: Array<IBindingsMobiToc>
   sections: Array<IBindingsMobiSection>

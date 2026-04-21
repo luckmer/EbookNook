@@ -1,5 +1,6 @@
 import { Books, IBookStructure, IBookType } from '@bindings/book'
 import { FormatType } from '@bindings/format'
+import { BOOK_STATUS } from '@interfaces/book/enums'
 import { getAppClient } from '@libs/appService'
 import { getBookAdapterClient } from '@libs/BookAdapter'
 import { PayloadAction } from '@reduxjs/toolkit'
@@ -17,16 +18,16 @@ export function* loadState() {
     const booksResponse = yield* call(invoke<Books>, 'get_books')
     const adapterClient = yield* call(getBookAdapterClient)
 
-    const updatedEpubBooks: Partial<Record<FormatType, Partial<Record<string, IBookType>>>> = {}
+    const updateBooks: Partial<Record<FormatType, Partial<Record<string, IBookType>>>> = {}
 
     for (const books of Object.values(booksResponse)) {
       for (const book of books) {
         const bookContent: IBookType = yield* call([adapterClient, adapterClient.getBookImg], book)
-        updatedEpubBooks[book.format] = { ...updatedEpubBooks[book.format], [book.id]: bookContent }
+        updateBooks[book.format] = { ...updateBooks[book.format], [book.id]: bookContent }
       }
     }
 
-    yield* put(actions.setBooks(updatedEpubBooks))
+    yield* put(actions.setBooks(updateBooks))
   } catch (err) {
     console.log('failed to get state')
     notify('Failed to open document', 'error')
@@ -100,8 +101,29 @@ export function* getBookStructure(action: PayloadAction<PayloadTypes['getBookStr
   }
 }
 
+export function* deleteBook(action: PayloadAction<PayloadTypes['deleteBook']>) {
+  try {
+    yield* put(actions.setStatus({ id: action.payload.id, status: BOOK_STATUS.DELETING }))
+    yield* call(invoke, 'delete_book', { id: action.payload.id, format: action.payload.format })
+
+    yield* all([
+      put(actions.setStatus({ id: action.payload.id, status: BOOK_STATUS.SUCCESS })),
+      put(actions.deleteBook(action.payload)),
+    ])
+  } catch (err) {
+    console.log(err)
+    console.log(`failed to remove ${action.payload.format}`)
+    yield* put(actions.setStatus({ id: action.payload.id, status: BOOK_STATUS.ERROR }))
+    notify(`Failed to remove ${action.payload.format}`, 'error')
+  }
+}
+
 export function* ImportBookSaga() {
   yield* takeEvery(actions.importBook, ImportBook)
+}
+
+export function* deleteBookSagas() {
+  yield* takeEvery(actions.setDeleteBook, deleteBook)
 }
 
 export function* getBookStructureSaga() {
@@ -117,5 +139,11 @@ export function* setOpenBookSaga() {
 }
 
 export default function* RootSaga() {
-  yield all([ImportBookSaga(), loadStateSaga(), setOpenBookSaga(), getBookStructureSaga()])
+  yield all([
+    ImportBookSaga(),
+    loadStateSaga(),
+    setOpenBookSaga(),
+    getBookStructureSaga(),
+    deleteBookSagas(),
+  ])
 }

@@ -38,9 +38,10 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             api::books::get_book_structure_by_id,
             api::books::get_books,
-            api::epub::add_book,
-            api::epub::set_book_progress,
-            api::epub::set_book_percentage_progress,
+            api::books::add_book,
+            api::books::set_book_progress,
+            api::books::delete_book,
+            api::books::set_book_percentage_progress,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

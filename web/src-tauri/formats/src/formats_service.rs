@@ -1,5 +1,5 @@
 use database::DatabaseManager;
-use types::{Books, FormatType, IBindingsEpubBook, IBindingsMobiBook, IBookStructure, IBookType};
+use types::{Books, FormatType, IBookStructure, IBookType};
 
 use crate::{init_epub_service, init_mobi_service};
 
@@ -24,31 +24,38 @@ impl FormatsService {
         book: IBookType,
     ) -> Result<(), Box<dyn std::error::Error>> {
         match book {
-            IBookType::Epub(epub) => self.add_epub(db, epub).await?,
-            IBookType::Mobi(mobi) => self.add_mobi(db, mobi).await?,
+            IBookType::Epub(epub) => {
+                let epub_service = init_epub_service();
+                epub_service.add_book(db, epub).await?;
+            }
+            IBookType::Mobi(mobi) => {
+                let mobi_service = init_mobi_service();
+                mobi_service.add_book(db, mobi).await?;
+            }
+            _ => return Err(format!("unsupported book").into()),
         }
 
         Ok(())
     }
 
-    pub async fn add_epub(
+    pub async fn delete_book(
         &self,
         db: &DatabaseManager,
-        book: IBindingsEpubBook,
+        id: String,
+        format: FormatType,
     ) -> Result<(), Box<dyn std::error::Error>> {
-        let epub_service = init_epub_service();
-        epub_service.add_book(db, book).await?;
+        match format {
+            FormatType::Epub => {
+                let books_service = init_epub_service();
+                books_service.delete_book(db, id).await?;
+            }
+            FormatType::Mobi => {
+                let books_service = init_mobi_service();
+                books_service.delete_book(db, id).await?;
+            }
 
-        Ok(())
-    }
-
-    pub async fn add_mobi(
-        &self,
-        db: &DatabaseManager,
-        book: IBindingsMobiBook,
-    ) -> Result<(), Box<dyn std::error::Error>> {
-        let mobi_service = init_mobi_service();
-        mobi_service.add_book(db, book).await?;
+            _ => return Err(format!("unsupported format: {:?}", format).into()),
+        }
 
         Ok(())
     }

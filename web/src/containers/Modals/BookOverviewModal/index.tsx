@@ -1,9 +1,10 @@
 import { BOOK_STATUS } from '@interfaces/book/enums'
 import BookOverviewModal from '@pages/Modals/BookOverviewModal'
+import { actions as bookActions } from '@store/reducers/books'
 import { actions } from '@store/reducers/ui'
 import { bookSelector } from '@store/selectors/books'
 import { uiSelector } from '@store/selectors/ui'
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 const BookOverviewModalRoot = () => {
@@ -20,6 +21,14 @@ const BookOverviewModalRoot = () => {
     return bookShelf[openSettingsModal.bookId]
   }, [openSettingsModal.bookId, booksMap])
 
+  const [cachedBook, setCachedBook] = useState(book)
+
+  useEffect(() => {
+    if (openSettingsModal.status && book) {
+      setCachedBook(book)
+    }
+  }, [openSettingsModal.status, book])
+
   useEffect(() => {
     if (!book) {
       dispatch(actions.setOpenBookOverviewModal({ status: false, bookId: '', format: 'EPUB' }))
@@ -29,21 +38,20 @@ const BookOverviewModalRoot = () => {
   return (
     <BookOverviewModal
       book={{
-        bookDescription: book?.metadata?.description,
-        cover: book?.metadata?.cover,
-        author: book?.metadata.author,
-        title: book?.metadata.title,
-        published: book?.metadata?.published,
-        publisher: book?.metadata?.publisher,
+        bookDescription: cachedBook?.metadata?.description,
+        cover: cachedBook?.metadata?.cover,
+        author: cachedBook?.metadata.author,
+        title: cachedBook?.metadata.title,
+        published: cachedBook?.metadata?.published,
+        publisher: cachedBook?.metadata?.publisher,
         status: status[openSettingsModal.bookId] ?? BOOK_STATUS.IDLE,
       }}
       onClickClose={() => {
         dispatch(actions.setOpenBookOverviewModal({ status: false, bookId: '', format: 'EPUB' }))
       }}
       onClickDelete={() => {
-        // const id = book?.book.id
-        // if (!id) return
-        // dispatch(bookActions.setDeleteEpub(id))
+        if (!book) return
+        dispatch(bookActions.setDeleteBook({ id: book.id, format: book.format }))
       }}
       onClickEdit={() => {
         // const id = book?.book.id

@@ -51,3 +51,7 @@ UPDATE epub_books_table SET progress = ?, updated_at = ? WHERE id = ?;
 pub const UPDATE_EPUB_BOOK_PERCENTAGE_PROGRESS: &str = r#"
 UPDATE epub_books_table SET percentage_progress = ?, updated_at = ? WHERE id = ?;
 "#;
+
+pub const DELETE_EPUB_TABLE: &str = r#"
+DELETE FROM epub_books_table WHERE id = ?;
+"#;

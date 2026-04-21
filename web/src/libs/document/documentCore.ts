@@ -121,7 +121,7 @@ export default class DocumentClientCore {
       },
       id: rstr2hex(Date.now().toString()),
       percentageProgress: '',
-      progress: [],
+      progress: {},
       format,
     }
   }

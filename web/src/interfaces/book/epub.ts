@@ -28,7 +28,7 @@ export interface IEpubBookFile {
   metadata: IEpubMetadata
   rendition: IBindingsEpubRendition
   percentageProgress: string
-  progress: Array<string>
+  progress: Record<string, string>
   format: FormatType
   toc: Array<IBindingsEpubToc>
   sections: Array<IBindingsEpubSection>

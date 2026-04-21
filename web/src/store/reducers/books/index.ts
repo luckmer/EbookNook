@@ -44,15 +44,14 @@ export const store = createSlice({
     },
 
     setBook(state, action: PayloadAction<{ id: string; book: IBookType }>) {
-      let bookShelf = state.books[action.payload.book.format]
+      const { id, book } = action.payload
+      const format = book.format
 
-      if (!bookShelf) {
-        bookShelf = {}
+      if (!state.books[format]) {
+        state.books[format] = {}
       }
 
-      bookShelf[action.payload.id] = action.payload.book
-
-      return state
+      state.books[format][id] = book
     },
 
     setActiveBook(state, action: PayloadAction<{ id: string; book: File }>) {
@@ -98,6 +97,17 @@ export const store = createSlice({
       return state
     },
 
+    deleteBook(state, action: PayloadAction<{ id: string; format: FormatType }>) {
+      let bookShelf = state.books[action.payload.format]
+      if (!bookShelf) {
+        return state
+      }
+
+      delete bookShelf[action.payload.id]
+
+      return state
+    },
+
     setFile(state, action: PayloadAction<{ id: string; file: File }>) {
       state.files[action.payload.id] = action.payload.file
       return state
@@ -107,6 +117,9 @@ export const store = createSlice({
       action: PayloadAction<Partial<Record<FormatType, Partial<Record<string, IBookType>>>>>,
     ) {
       state.books = action.payload
+      return state
+    },
+    setDeleteBook(state, _: PayloadAction<{ id: string; format: FormatType }>) {
       return state
     },
   },

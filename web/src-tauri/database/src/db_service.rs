@@ -14,35 +14,39 @@ pub struct DatabaseManager {
 }
 
 impl DatabaseManager {
-    pub async fn new(app_handle: &AppHandle) -> Result<Self, Box<dyn std::error::Error>> {
-        let app_dir = app_handle.path().app_data_dir()?;
+pub async fn new(app_handle: &AppHandle) -> Result<Self, Box<dyn std::error::Error>> {
+    let base_dir = app_handle.path().app_data_dir()?;
+    
+    let db_dir = base_dir.join("eBookNook").join("database");
 
-        if !app_dir.exists() {
-            fs::create_dir_all(&app_dir)?;
-        }
-
-        let db_path = app_dir.join("database.sqlite");
-        let db_url = format!(
-            "sqlite:{}",
-            db_path.to_str().ok_or("Invalid path encoding")?
-        );
-
-        let options = SqliteConnectOptions::from_str(&db_url)?
-            .create_if_missing(true)
-            .foreign_keys(true)
-            .journal_mode(SqliteJournalMode::Wal)
-            .synchronous(SqliteSynchronous::Normal)
-            .busy_timeout(std::time::Duration::from_secs(5));
-
-        let pool = SqlitePoolOptions::new()
-            .max_connections(5)
-            .connect_with(options)
-            .await?;
-
-        let database = DatabaseManager { pool };
-        database.run_migrations().await?;
-        Ok(database)
+    if !db_dir.exists() {
+        fs::create_dir_all(&db_dir)?;
     }
+
+    let db_path = db_dir.join("database.sqlite");
+    
+    let db_url = format!(
+        "sqlite:{}",
+        db_path.to_str().ok_or("Invalid path encoding")?
+    );
+
+    let options = SqliteConnectOptions::from_str(&db_url)?
+        .create_if_missing(true)
+        .foreign_keys(true)
+        .journal_mode(SqliteJournalMode::Wal)
+        .synchronous(SqliteSynchronous::Normal)
+        .busy_timeout(std::time::Duration::from_secs(5));
+
+    let pool = SqlitePoolOptions::new()
+        .max_connections(5)
+        .connect_with(options)
+        .await?;
+
+    let database = DatabaseManager { pool };
+    database.run_migrations().await?;
+    
+    Ok(database)
+}
 
     async fn run_migrations(&self) -> Result<(), Box<dyn std::error::Error>> {
         sqlx::query("PRAGMA foreign_keys = ON;")

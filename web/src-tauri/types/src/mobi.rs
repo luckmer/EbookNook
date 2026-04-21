@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
@@ -70,7 +72,7 @@ pub struct IBindingsMobiBook {
     #[serde(rename = "percentageProgress")]
     #[ts(rename = "percentageProgress")]
     pub percentage_progress: String,
-    pub progress: Vec<String>,
+    pub progress: HashMap<String, String>,
     pub format: FormatType,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[ts(optional)]

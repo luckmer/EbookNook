@@ -1,6 +1,8 @@
+use std::collections::HashMap;
+
 use database::{
-    DatabaseManager, INSERT_EPUB_BOOK, INSERT_EPUB_BOOK_SECTIONS, INSERT_EPUB_BOOK_TOC,
-    SELECT_EPUB_BOOK_SECTION_BY_ID, SELECT_EPUB_BOOK_TOC_BY_ID,
+    DELETE_EPUB_TABLE, DatabaseManager, INSERT_EPUB_BOOK, INSERT_EPUB_BOOK_SECTIONS,
+    INSERT_EPUB_BOOK_TOC, SELECT_EPUB_BOOK_SECTION_BY_ID, SELECT_EPUB_BOOK_TOC_BY_ID,
     UPDATE_EPUB_BOOK_PERCENTAGE_PROGRESS, UPDATE_EPUB_BOOK_PROGRESS,
 };
 use sqlx::types::chrono;
@@ -42,7 +44,7 @@ impl EpubService {
 
         let metadata: IBindingsEpubMetadata = serde_json::from_str(row.try_get("metadata")?)?;
         let rendition: IBindingsEpubRendition = serde_json::from_str(row.try_get("rendition")?)?;
-        let progress: Vec<String> = serde_json::from_str(row.try_get("progress")?)?;
+        let progress: HashMap<String, String> = serde_json::from_str(row.try_get("progress")?)?;
         let format: FormatType = serde_json::from_str(row.try_get("format")?)?;
 
         Ok(IBindingsEpubBook {
@@ -163,5 +165,18 @@ impl EpubService {
             sections,
             format: FormatType::Epub,
         })
+    }
+    pub async fn delete_book(
+        &self,
+        db: &DatabaseManager,
+        id: String,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        let conn = db.get_pool();
+        sqlx::query(DELETE_EPUB_TABLE)
+            .bind(id)
+            .execute(conn)
+            .await?;
+
+        Ok(())
     }
 }
