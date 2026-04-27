@@ -53,10 +53,12 @@ const BookOverviewModalRoot = () => {
         if (!book) return
         dispatch(bookActions.setDeleteBook({ id: book.id, format: book.format }))
       }}
-      onClickEdit={() => {
-        // const id = book?.book.id
-        // if (!id) return
-        // dispatch(bookActions.setEditEpub({ id, content }))
+      onClickEdit={(metadata) => {
+        const id = book?.id
+
+        if (!id) return
+
+        dispatch(bookActions.updateBookMetadata({ id, metadata, format: book.format }))
       }}
       isOpen={openSettingsModal.status}
     />

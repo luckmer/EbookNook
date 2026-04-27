@@ -1,27 +1,33 @@
 import { IBookType as IBindingsBookType } from '@bindings/book'
 import { IBindingsEpubBook } from '@bindings/epub'
 import { IBindingsMobiBook } from '@bindings/mobi'
-import { ILanguageMap, ILocalBookType } from '@interfaces/book/types'
+import { ILanguageMap, ILocalBookType, ITocItem } from '@interfaces/book/types'
 import { getAppClient } from '@libs/appService'
 import { convertFileSrc } from '@tauri-apps/api/core'
 
 export class BookAdapterCore {
   _getContent(content: string | string[] | ILanguageMap): string {
-    if (!content) {
-      return '--'
-    }
+    if (!content) return '--'
 
-    if (typeof content === 'string') {
-      return content
-    }
+    if (typeof content === 'string') return content
 
     if (Array.isArray(content)) {
-      return content[0]
+      const first = content[0]
+      if (!first) return '--'
+      return (typeof first === 'object' ? first['name'] : first) ?? '--'
     }
 
     return content['name'] ?? '--'
   }
 
+  _formatToc(toc: ITocItem[]): ITocItem[] {
+    if (!toc) return []
+    return toc.map((item) => ({
+      label: item.label ?? '',
+      href: item.href ?? '',
+      subitems: this._formatToc(item.subitems ?? []),
+    }))
+  }
   async _invokeBookFormat(content: ILocalBookType): Promise<IBindingsBookType> {
     switch (content.format) {
       case 'EPUB': {
@@ -55,7 +61,7 @@ export class BookAdapterCore {
           progress: content.progress,
           sections: content.sections,
           format: content.format,
-          toc: content.toc,
+          toc: this._formatToc(content.toc),
           id: content.id,
         }
         return epubFormat
@@ -85,7 +91,7 @@ export class BookAdapterCore {
               : undefined,
           },
           sections: content.sections,
-          toc: content.toc,
+          toc: this._formatToc(content.toc),
         }
         return mobiFormat
       }

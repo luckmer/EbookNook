@@ -1,4 +1,4 @@
-import { Books, IBookStructure, IBookType } from '@bindings/book'
+import { Books, IBookMetadata, IBookStructure, IBookType } from '@bindings/book'
 import { FormatType } from '@bindings/format'
 import { BOOK_STATUS } from '@interfaces/book/enums'
 import { getAppClient } from '@libs/appService'
@@ -118,12 +118,42 @@ export function* deleteBook(action: PayloadAction<PayloadTypes['deleteBook']>) {
   }
 }
 
+export function* updateBookMetadata(action: PayloadAction<PayloadTypes['updateBookMetadata']>) {
+  try {
+    yield* put(actions.setStatus({ id: action.payload.id, status: BOOK_STATUS.UPDATING }))
+    const result = yield* call(invoke<IBookMetadata>, 'update_book_metadata', {
+      id: action.payload.id,
+      metadata: { format: action.payload.format, metadata: action.payload.metadata },
+    })
+
+    yield* all([
+      put(actions.setStatus({ id: action.payload.id, status: BOOK_STATUS.SUCCESS })),
+      put(
+        actions.setUpdateBookMetadata({
+          id: action.payload.id,
+          format: action.payload.format,
+          metadata: result,
+        }),
+      ),
+    ])
+  } catch (err) {
+    console.log(err)
+    console.log(`failed to update book ${action.payload.format}`)
+    yield* put(actions.setStatus({ id: action.payload.id, status: BOOK_STATUS.ERROR }))
+    notify(`Failed to update ${action.payload.format}`, 'error')
+  }
+}
+
 export function* ImportBookSaga() {
   yield* takeEvery(actions.importBook, ImportBook)
 }
 
 export function* deleteBookSagas() {
   yield* takeEvery(actions.setDeleteBook, deleteBook)
+}
+
+export function* updateBookMetadataSaga() {
+  yield* takeLatest(actions.updateBookMetadata, updateBookMetadata)
 }
 
 export function* getBookStructureSaga() {
@@ -144,6 +174,7 @@ export default function* RootSaga() {
     loadStateSaga(),
     setOpenBookSaga(),
     getBookStructureSaga(),
+    updateBookMetadataSaga(),
     deleteBookSagas(),
   ])
 }

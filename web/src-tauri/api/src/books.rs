@@ -1,6 +1,6 @@
 use state::AppState;
 use tauri::State;
-use types::{Books, FormatType, IBookStructure, IBookType};
+use types::{Books, FormatType, IBookMetadata, IBookStructure, IBookType};
 
 #[tauri::command]
 pub async fn get_books(state: State<'_, AppState>) -> Result<Books, String> {
@@ -70,6 +70,19 @@ pub async fn delete_book(
     state
         .format_service
         .delete_book(&state.db, id, format)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub async fn update_book_metadata(
+    state: State<'_, AppState>,
+    id: String,
+    metadata: IBookMetadata,
+) -> Result<IBookType, String> {
+    state
+        .format_service
+        .update_book_metadata(&state.db, id, metadata)
         .await
         .map_err(|e| e.to_string())
 }

@@ -1,4 +1,4 @@
-import { IBookStructure, IBookType } from '@bindings/book'
+import { IBookMetadata, IBookStructure, IBookType } from '@bindings/book'
 import { FormatType } from '@bindings/format'
 import { BOOK_STATUS } from '@interfaces/book/enums'
 import { ILocalBookToc } from '@interfaces/book/types'
@@ -97,6 +97,34 @@ export const store = createSlice({
       return state
     },
 
+    setUpdateBookMetadata(
+      state,
+      action: PayloadAction<{ id: string; format: FormatType; metadata: IBookMetadata }>,
+    ) {
+      const bookShelf = state.books[action.payload.format]
+
+      if (!bookShelf) {
+        return state
+      }
+
+      const book = bookShelf[action.payload.id]
+
+      if (!book) {
+        return state
+      }
+
+      book.metadata.author = action.payload.metadata.metadata.author ?? book.metadata.author
+      book.metadata.description =
+        action.payload.metadata.metadata.description ?? book.metadata.description
+      book.metadata.published =
+        action.payload.metadata.metadata.published ?? book.metadata.published
+      book.metadata.publisher =
+        action.payload.metadata.metadata.publisher ?? book.metadata.publisher
+      book.metadata.title = action.payload.metadata.metadata.title ?? book.metadata.title
+
+      return state
+    },
+
     deleteBook(state, action: PayloadAction<{ id: string; format: FormatType }>) {
       let bookShelf = state.books[action.payload.format]
       if (!bookShelf) {
@@ -120,6 +148,12 @@ export const store = createSlice({
       return state
     },
     setDeleteBook(state, _: PayloadAction<{ id: string; format: FormatType }>) {
+      return state
+    },
+    updateBookMetadata(
+      state,
+      _: PayloadAction<{ id: string; format: FormatType; metadata: IBookMetadata }>,
+    ) {
       return state
     },
   },

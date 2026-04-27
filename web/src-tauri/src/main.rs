@@ -41,6 +41,7 @@ fn main() {
             api::books::add_book,
             api::books::set_book_progress,
             api::books::delete_book,
+            api::books::update_book_metadata,
             api::books::set_book_percentage_progress,
         ])
         .run(tauri::generate_context!())

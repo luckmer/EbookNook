@@ -7,8 +7,9 @@ use database::{
 };
 use sqlx::types::chrono;
 use types::{
-    FormatType, IBindingsEpubBook, IBindingsEpubBookStructure, IBindingsEpubMetadata,
-    IBindingsEpubRendition, IBindingsEpubSection, IBindingsEpubToc,
+    FormatType, IBindingsBookContent, IBindingsEpubBook, IBindingsEpubBookStructure,
+    IBindingsEpubMetadata, IBindingsEpubRendition, IBindingsEpubSection, IBindingsEpubToc,
+    IBookMetadata,
 };
 
 pub struct EpubService {}
@@ -178,5 +179,61 @@ impl EpubService {
             .await?;
 
         Ok(())
+    }
+
+    pub async fn update_book_metadata(
+        &self,
+        db: &DatabaseManager,
+        id: String,
+        content: HashMap<IBindingsBookContent, String>,
+    ) -> Result<IBindingsEpubBook, Box<dyn std::error::Error>> {
+        let conn = db.get_pool();
+        if content.is_empty() {
+            let row = sqlx::query("SELECT * FROM epub_books_table WHERE id = ?")
+                .bind(id)
+                .fetch_one(conn)
+                .await?;
+            return Ok(self.parse_book(row)?);
+        }
+        let current_metadata_json: String =
+            sqlx::query_scalar("SELECT metadata FROM epub_books_table WHERE id = ?")
+                .bind(&id)
+                .fetch_one(conn)
+                .await?;
+        let mut metadata: serde_json::Value = serde_json::from_str(&current_metadata_json)?;
+        let metadata_obj = metadata.as_object_mut().ok_or("Invalid metadata format")?;
+
+        for (key, value) in content {
+            match key {
+                IBindingsBookContent::Title => {
+                    metadata_obj.insert("title".to_string(), serde_json::Value::String(value));
+                }
+                IBindingsBookContent::Author => {
+                    metadata_obj.insert("author".to_string(), serde_json::Value::String(value));
+                }
+                IBindingsBookContent::Description => {
+                    metadata_obj
+                        .insert("description".to_string(), serde_json::Value::String(value));
+                }
+                IBindingsBookContent::Published => {
+                    metadata_obj.insert("published".to_string(), serde_json::Value::String(value));
+                }
+                IBindingsBookContent::Publisher => {
+                    metadata_obj.insert("publisher".to_string(), serde_json::Value::String(value));
+                }
+            }
+        }
+
+        sqlx::query("UPDATE epub_books_table SET metadata = ? WHERE id = ?")
+            .bind(serde_json::to_string(&metadata)?)
+            .bind(&id)
+            .execute(conn)
+            .await?;
+
+        let row = sqlx::query("SELECT * FROM epub_books_table WHERE id = ?")
+            .bind(id)
+            .fetch_one(conn)
+            .await?;
+        Ok(self.parse_book(row)?)
     }
 }

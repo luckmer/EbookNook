@@ -1,5 +1,7 @@
+use std::error::Error;
+
 use database::DatabaseManager;
-use types::{Books, FormatType, IBookStructure, IBookType};
+use types::{Books, FormatType, IBookMetadata, IBookStructure, IBookType};
 
 use crate::{init_epub_service, init_mobi_service};
 
@@ -9,10 +11,7 @@ impl FormatsService {
     pub fn new() -> FormatsService {
         FormatsService {}
     }
-    pub async fn get_books(
-        &self,
-        db: &DatabaseManager,
-    ) -> Result<Books, Box<dyn std::error::Error>> {
+    pub async fn get_books(&self, db: &DatabaseManager) -> Result<Books, Box<dyn Error>> {
         let mobi = init_mobi_service().get_books(db).await?;
         let epub = init_epub_service().get_books(db).await?;
         Ok(Books { epub, mobi })
@@ -22,7 +21,7 @@ impl FormatsService {
         &self,
         db: &DatabaseManager,
         book: IBookType,
-    ) -> Result<(), Box<dyn std::error::Error>> {
+    ) -> Result<(), Box<dyn Error>> {
         match book {
             IBookType::Epub(epub) => {
                 let epub_service = init_epub_service();
@@ -43,7 +42,7 @@ impl FormatsService {
         db: &DatabaseManager,
         id: String,
         format: FormatType,
-    ) -> Result<(), Box<dyn std::error::Error>> {
+    ) -> Result<(), Box<dyn Error>> {
         match format {
             FormatType::Epub => {
                 let books_service = init_epub_service();
@@ -53,20 +52,40 @@ impl FormatsService {
                 let books_service = init_mobi_service();
                 books_service.delete_book(db, id).await?;
             }
-
             _ => return Err(format!("unsupported format: {:?}", format).into()),
         }
 
         Ok(())
     }
 
+    pub async fn update_book_metadata(
+        &self,
+        db: &DatabaseManager,
+        id: String,
+        request: IBookMetadata,
+    ) -> Result<IBookType, Box<dyn Error>> {
+        match request {
+            IBookMetadata::Epub(data) => {
+                let book = init_epub_service()
+                    .update_book_metadata(db, id, data)
+                    .await?;
+                Ok(IBookType::Epub(book))
+            }
+            IBookMetadata::Mobi(data) => {
+                let book = init_mobi_service()
+                    .update_book_metadata(db, id, data)
+                    .await?;
+                Ok(IBookType::Mobi(book))
+            }
+        }
+    }
     pub async fn set_book_percentage_progress(
         &self,
         db: &DatabaseManager,
         id: String,
         percentage_progress: String,
         format: FormatType,
-    ) -> Result<(), Box<dyn std::error::Error>> {
+    ) -> Result<(), Box<dyn Error>> {
         match format {
             FormatType::Epub => {
                 let books_service = init_epub_service();
@@ -86,7 +105,7 @@ impl FormatsService {
         id: String,
         progress: Vec<String>,
         format: FormatType,
-    ) -> Result<(), Box<dyn std::error::Error>> {
+    ) -> Result<(), Box<dyn Error>> {
         match format {
             FormatType::Epub => {
                 let books_service = init_epub_service();
@@ -103,7 +122,7 @@ impl FormatsService {
         db: &DatabaseManager,
         id: String,
         format: FormatType,
-    ) -> Result<IBookStructure, Box<dyn std::error::Error>> {
+    ) -> Result<IBookStructure, Box<dyn Error>> {
         match format {
             FormatType::Epub => {
                 let books_service = init_epub_service();
