@@ -1,36 +1,36 @@
 use std::collections::HashMap;
 
 use database::{
-    DELETE_EPUB_TABLE, DatabaseManager, INSERT_EPUB_BOOK, INSERT_EPUB_BOOK_SECTIONS,
-    INSERT_EPUB_BOOK_TOC, SELECT_EPUB_BOOK_SECTION_BY_ID, SELECT_EPUB_BOOK_TOC_BY_ID,
-    UPDATE_EPUB_BOOK_PERCENTAGE_PROGRESS, UPDATE_EPUB_BOOK_PROGRESS,
+    DELETE_PDF_TABLE, DatabaseManager, INSERT_PDF_BOOK, INSERT_PDF_BOOK_SECTIONS,
+    INSERT_PDF_BOOK_TOC, SELECT_PDF_BOOK_SECTION_BY_ID, SELECT_PDF_BOOK_TOC_BY_ID,
+    UPDATE_PDF_BOOK_PERCENTAGE_PROGRESS, UPDATE_PDF_BOOK_PROGRESS,
 };
 use sqlx::types::chrono;
 use types::{
-    FormatType, IBindingsBookContent, IBindingsEpubBook, IBindingsEpubBookStructure,
-    IBindingsEpubMetadata, IBindingsEpubRendition, IBindingsEpubSection, IBindingsEpubToc,
+    FormatType, IBindingsBookContent, IBindingsPDFBook, IBindingsPDFBookStructure,
+    IBindingsPDFMetadata, IBindingsPDFSection, IBindingsPDFToc,
 };
 
-pub struct EpubService {}
+pub struct PDFService {}
 
-impl EpubService {
+impl PDFService {
     pub fn new() -> Self {
-        EpubService {}
+        PDFService {}
     }
 
     pub async fn get_books(
         &self,
         db: &DatabaseManager,
-    ) -> Result<Vec<IBindingsEpubBook>, Box<dyn std::error::Error>> {
+    ) -> Result<Vec<IBindingsPDFBook>, Box<dyn std::error::Error>> {
         let conn = db.get_pool();
-        let rows = sqlx::query("SELECT * FROM epub_books_table")
+        let rows = sqlx::query("SELECT * FROM pdf_books_table")
             .fetch_all(conn)
             .await?;
 
         let mut books = Vec::new();
         for row in rows {
-            let epub = self.parse_book(row)?;
-            books.push(epub);
+            let pdf = self.parse_book(row)?;
+            books.push(pdf);
         }
 
         Ok(books)
@@ -39,57 +39,54 @@ impl EpubService {
     fn parse_book(
         &self,
         row: sqlx::sqlite::SqliteRow,
-    ) -> Result<IBindingsEpubBook, Box<dyn std::error::Error>> {
+    ) -> Result<IBindingsPDFBook, Box<dyn std::error::Error>> {
         use sqlx::Row;
 
-        let metadata: IBindingsEpubMetadata = serde_json::from_str(row.try_get("metadata")?)?;
-        let rendition: IBindingsEpubRendition = serde_json::from_str(row.try_get("rendition")?)?;
+        let metadata: IBindingsPDFMetadata = serde_json::from_str(row.try_get("metadata")?)?;
         let progress: HashMap<String, String> = serde_json::from_str(row.try_get("progress")?)?;
         let format: FormatType = serde_json::from_str(row.try_get("format")?)?;
 
-        Ok(IBindingsEpubBook {
+        Ok(IBindingsPDFBook {
             metadata,
-            rendition,
             percentage_progress: row.try_get("percentage_progress")?,
             progress,
             format,
-            toc: None,
             sections: vec![],
+            toc: None,
             id: row.try_get("id")?,
         })
     }
+
     pub async fn add_book(
         &self,
         db: &DatabaseManager,
-        book: IBindingsEpubBook,
+        book: IBindingsPDFBook,
     ) -> Result<(), Box<dyn std::error::Error>> {
         let conn = db.get_pool();
 
         let metadata = serde_json::to_string(&book.metadata)?;
-
-        let toc = serde_json::to_string(&book.toc)?;
         let sections = serde_json::to_string(&book.sections)?;
         let progress = serde_json::to_string(&book.progress)?;
-        let rendition = serde_json::to_string(&book.rendition)?;
         let format = serde_json::to_string(&book.format)?;
+        let toc = serde_json::to_string(&book.toc)?;
 
-        sqlx::query(INSERT_EPUB_BOOK)
+
+        sqlx::query(INSERT_PDF_BOOK)
             .bind(&book.id)
             .bind(metadata)
-            .bind(rendition)
             .bind(&book.percentage_progress)
             .bind(progress)
             .bind(format)
             .execute(conn)
             .await?;
 
-        sqlx::query(INSERT_EPUB_BOOK_TOC)
+        sqlx::query(INSERT_PDF_BOOK_TOC)
             .bind(&book.id)
             .bind(toc)
             .execute(conn)
             .await?;
 
-        sqlx::query(INSERT_EPUB_BOOK_SECTIONS)
+        sqlx::query(INSERT_PDF_BOOK_SECTIONS)
             .bind(&book.id)
             .bind(sections)
             .execute(conn)
@@ -110,7 +107,7 @@ impl EpubService {
 
         let now = chrono::Utc::now().timestamp();
 
-        sqlx::query(UPDATE_EPUB_BOOK_PROGRESS)
+        sqlx::query(UPDATE_PDF_BOOK_PROGRESS)
             .bind(new_progress)
             .bind(now)
             .bind(id)
@@ -130,7 +127,7 @@ impl EpubService {
 
         let now = chrono::Utc::now().timestamp();
 
-        sqlx::query(UPDATE_EPUB_BOOK_PERCENTAGE_PROGRESS)
+        sqlx::query(UPDATE_PDF_BOOK_PERCENTAGE_PROGRESS)
             .bind(percentage_progress)
             .bind(now)
             .bind(id)
@@ -144,26 +141,28 @@ impl EpubService {
         &self,
         db: &DatabaseManager,
         id: &str,
-    ) -> Result<IBindingsEpubBookStructure, Box<dyn std::error::Error>> {
+    ) -> Result<IBindingsPDFBookStructure, Box<dyn std::error::Error>> {
         let conn = db.get_pool();
 
-        let toc_json: String = sqlx::query_scalar(SELECT_EPUB_BOOK_TOC_BY_ID)
+        let chapters_json: String = sqlx::query_scalar(SELECT_PDF_BOOK_SECTION_BY_ID)
             .bind(id)
-            .fetch_one(conn)
-            .await?;
+            .fetch_optional(conn)
+            .await?
+            .ok_or_else(|| format!("No PDF book sections found for id: '{}'", id))?;
 
-        let chapters_json: String = sqlx::query_scalar(SELECT_EPUB_BOOK_SECTION_BY_ID)
+        let toc_json: String = sqlx::query_scalar(SELECT_PDF_BOOK_TOC_BY_ID)
             .bind(id)
-            .fetch_one(conn)
-            .await?;
+            .fetch_optional(conn)
+            .await?
+            .ok_or_else(|| format!("No PDF book toc found for id: '{}'", id))?;
 
-        let toc: Option<Vec<IBindingsEpubToc>> = serde_json::from_str(&toc_json)?;
-        let sections: Vec<IBindingsEpubSection> = serde_json::from_str(&chapters_json)?;
+        let sections: Vec<IBindingsPDFSection> = serde_json::from_str(&chapters_json)?;
+        let toc: Option<Vec<IBindingsPDFToc>> = serde_json::from_str(&toc_json)?;
 
-        Ok(IBindingsEpubBookStructure {
-            toc,
+        Ok(IBindingsPDFBookStructure {
             sections,
-            format: FormatType::Epub,
+            toc,
+            format: FormatType::Pdf,
         })
     }
     pub async fn delete_book(
@@ -172,10 +171,7 @@ impl EpubService {
         id: String,
     ) -> Result<(), Box<dyn std::error::Error>> {
         let conn = db.get_pool();
-        sqlx::query(DELETE_EPUB_TABLE)
-            .bind(id)
-            .execute(conn)
-            .await?;
+        sqlx::query(DELETE_PDF_TABLE).bind(id).execute(conn).await?;
 
         Ok(())
     }
@@ -185,17 +181,17 @@ impl EpubService {
         db: &DatabaseManager,
         id: String,
         content: HashMap<IBindingsBookContent, String>,
-    ) -> Result<IBindingsEpubBook, Box<dyn std::error::Error>> {
+    ) -> Result<IBindingsPDFBook, Box<dyn std::error::Error>> {
         let conn = db.get_pool();
         if content.is_empty() {
-            let row = sqlx::query("SELECT * FROM epub_books_table WHERE id = ?")
+            let row = sqlx::query("SELECT * FROM pdf_books_table WHERE id = ?")
                 .bind(id)
                 .fetch_one(conn)
                 .await?;
             return Ok(self.parse_book(row)?);
         }
         let current_metadata_json: String =
-            sqlx::query_scalar("SELECT metadata FROM epub_books_table WHERE id = ?")
+            sqlx::query_scalar("SELECT metadata FROM pdf_books_table WHERE id = ?")
                 .bind(&id)
                 .fetch_one(conn)
                 .await?;
@@ -223,13 +219,13 @@ impl EpubService {
             }
         }
 
-        sqlx::query("UPDATE epub_books_table SET metadata = ? WHERE id = ?")
+        sqlx::query("UPDATE pdf_books_table SET metadata = ? WHERE id = ?")
             .bind(serde_json::to_string(&metadata)?)
             .bind(&id)
             .execute(conn)
             .await?;
 
-        let row = sqlx::query("SELECT * FROM epub_books_table WHERE id = ?")
+        let row = sqlx::query("SELECT * FROM pdf_books_table WHERE id = ?")
             .bind(id)
             .fetch_one(conn)
             .await?;

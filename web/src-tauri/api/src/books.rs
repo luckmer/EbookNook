@@ -1,6 +1,6 @@
 use state::AppState;
 use tauri::State;
-use types::{Books, FormatType, IBookMetadata, IBookStructure, IBookType};
+use types::{Books, FormatType, IAddBookType, IBookMetadata, IBookStructure, IBookType};
 
 #[tauri::command]
 pub async fn get_books(state: State<'_, AppState>) -> Result<Books, String> {
@@ -25,7 +25,7 @@ pub async fn get_book_structure_by_id(
 }
 
 #[tauri::command]
-pub async fn add_book(state: State<'_, AppState>, book: IBookType) -> Result<(), String> {
+pub async fn add_book(state: State<'_, AppState>, book: IAddBookType) -> Result<(), String> {
     state
         .format_service
         .add_book(&state.db, book)

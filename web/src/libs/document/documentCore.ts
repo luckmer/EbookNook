@@ -1,8 +1,11 @@
 import { FormatType } from '@bindings/format'
 import { ILocalBookType } from '@interfaces/book/types'
+import { getPDFClient } from '@libs/pdf'
 import { rstr2hex } from '@utils/index'
 
 export default class DocumentClientCore {
+  PDFClient = getPDFClient()
+
   fetchFile = async (url: string) => {
     const res = await fetch(url)
     if (!res.ok) throw new Error(`${res.status} ${res.statusText}`, { cause: res })
@@ -99,7 +102,13 @@ export default class DocumentClientCore {
       throw new Error('File type not supported')
     }
 
-    const book = await this._makeBook(file)
+    let book
+
+    if (format === 'PDF') {
+      book = await this.PDFClient.init(file)
+    } else {
+      book = await this._makeBook(file)
+    }
 
     return {
       ...book,
@@ -108,6 +117,11 @@ export default class DocumentClientCore {
 
         if (format === 'EPUB') {
           cover = book.resources?.cover
+        }
+
+        if (format === 'PDF') {
+          cover = await book.getCover()
+          return cover
         }
 
         if (format === 'MOBI') {

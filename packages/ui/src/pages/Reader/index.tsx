@@ -3,10 +3,11 @@ import Show from '@components/Show'
 import Spin from '@components/Spin'
 import { Typography } from '@components/Typography'
 import clsx from 'clsx'
-import { FC, memo, useRef } from 'react'
+import { FC, memo, RefObject } from 'react'
 
 export interface IProps {
   pageInfo: { current: number; total: number; percentage: number }
+  containerRef: RefObject<HTMLDivElement | null>
   sectionInfo: { current: number; total: number }
   loading: boolean
   onHideHeader: () => void
@@ -22,6 +23,7 @@ const Reader: FC<IProps> = ({
   hideContent,
   pageInfo,
   sectionInfo,
+  containerRef,
   loading,
   onHideHeader,
   onShowHeader,
@@ -30,8 +32,6 @@ const Reader: FC<IProps> = ({
   onClickNextPage,
   onClickPrevPage,
 }) => {
-  const containerRef = useRef<HTMLDivElement | null>(null)
-
   return (
     <main className="w-full h-full flex flex-col relative">
       <EpubNavigation

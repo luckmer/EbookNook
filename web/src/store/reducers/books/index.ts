@@ -1,7 +1,7 @@
-import { IBookMetadata, IBookStructure, IBookType } from '@bindings/book'
+import { IBindingsBookContent, IBookMetadata } from '@bindings/book'
 import { FormatType } from '@bindings/format'
 import { BOOK_STATUS } from '@interfaces/book/enums'
-import { ILocalBookToc } from '@interfaces/book/types'
+import { IBookStructure, IBookType, ILocalBookToc } from '@interfaces/book/types'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { PayloadType } from '@store/helper'
 
@@ -79,20 +79,31 @@ export const store = createSlice({
     },
 
     setBookStructure(state, action: PayloadAction<{ id: string; structure: IBookStructure }>) {
-      let bookShelf = state.books[action.payload.structure.format]
+      const { id } = action.payload
 
-      if (!bookShelf) {
-        bookShelf = {}
+      switch (action.payload.structure.format) {
+        case 'EPUB': {
+          const book = state.books.EPUB?.[id]
+          if (!book || book.format !== 'EPUB') return state
+          book.sections = action.payload.structure.sections
+          book.toc = action.payload.structure.toc
+          break
+        }
+        case 'MOBI': {
+          const book = state.books.MOBI?.[id]
+          if (!book || book.format !== 'MOBI') return state
+          book.sections = action.payload.structure.sections
+          book.toc = action.payload.structure.toc
+          break
+        }
+        case 'PDF': {
+          const book = state.books.PDF?.[id]
+          if (!book || book.format !== 'PDF') return state
+          book.sections = action.payload.structure.sections
+          book.toc = action.payload.structure.toc
+          break
+        }
       }
-
-      let book = bookShelf[action.payload.id]
-
-      if (!book) {
-        return state
-      }
-
-      book.sections = action.payload.structure.sections
-      book.toc = action.payload.structure.toc
 
       return state
     },
@@ -126,12 +137,15 @@ export const store = createSlice({
     },
 
     deleteBook(state, action: PayloadAction<{ id: string; format: FormatType }>) {
-      let bookShelf = state.books[action.payload.format]
-      if (!bookShelf) {
-        return state
-      }
+      const bookShelf = state.books[action.payload.format]
 
-      delete bookShelf[action.payload.id]
+      if (!bookShelf?.[action.payload.id]) return state
+
+      if (Object.keys(bookShelf).length === 1) {
+        delete state.books[action.payload.format]
+      } else {
+        delete bookShelf[action.payload.id]
+      }
 
       return state
     },
@@ -152,7 +166,11 @@ export const store = createSlice({
     },
     updateBookMetadata(
       state,
-      _: PayloadAction<{ id: string; format: FormatType; metadata: IBookMetadata }>,
+      _: PayloadAction<{
+        id: string
+        format: FormatType
+        metadata: Partial<Record<IBindingsBookContent, string>>
+      }>,
     ) {
       return state
     },

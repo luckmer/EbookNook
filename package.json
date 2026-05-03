@@ -11,6 +11,9 @@
     "storybook": "cd packages/ui && pnpm storybook",
     "build-storybook": "cd packages/ui && storybook build",
     "typecheck": "cd web && pnpm typecheck --noEmit && cd packages/ui && pnpm typecheck --noEmit",
+    "copy-cmaps": "npx cpx \"./web/src/foliate/vendor/pdfjs/cmaps/**/*\" ./web/src/libs/pdf/cmaps",
+    "copy-standard-fonts": "npx cpx \"./web/src/foliate/vendor/pdfjs/standard_fonts/**/*\" ./web/src/libs/pdf/standard_fonts",
+    "copy-pdf-content": "pnpm run copy-cmaps && pnpm run copy-standard-fonts",
     "build": "cd web && pnpm tauri:build"
   },
   "dependencies": {
@@ -31,6 +34,7 @@
   "devDependencies": {
     "@types/react": "19.1.8",
     "@vitejs/plugin-react": "5.1.0",
+    "cpx": "^1.5.0",
     "vite": "7.0.4"
   },
   "engines": {

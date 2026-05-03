@@ -1,6 +1,7 @@
-import { Books, IBookMetadata, IBookStructure, IBookType } from '@bindings/book'
+import { IBookMetadata } from '@bindings/book'
 import { FormatType } from '@bindings/format'
 import { BOOK_STATUS } from '@interfaces/book/enums'
+import { Books, IBookStructure, IBookType } from '@interfaces/book/types'
 import { getAppClient } from '@libs/appService'
 import { getBookAdapterClient } from '@libs/BookAdapter'
 import { PayloadAction } from '@reduxjs/toolkit'
@@ -22,14 +23,16 @@ export function* loadState() {
 
     for (const books of Object.values(booksResponse)) {
       for (const book of books) {
-        const bookContent: IBookType = yield* call([adapterClient, adapterClient.getBookImg], book)
-        updateBooks[book.format] = { ...updateBooks[book.format], [book.id]: bookContent }
+        const cover = yield* call([adapterClient, adapterClient.getBookImg], book.id)
+        book.metadata.cover = cover
+
+        updateBooks[book.format] = { ...updateBooks[book.format], [book.id]: book }
       }
     }
 
     yield* put(actions.setBooks(updateBooks))
   } catch (err) {
-    console.log('failed to get state')
+    console.log('failed to get state', err)
     notify('Failed to open document', 'error')
   }
 
@@ -44,18 +47,21 @@ export function* ImportBook(action: PayloadAction<PayloadTypes['importBook']>) {
 
     const response = yield* call([core, core.init], action.payload)
     const adapterClient = yield* call(getBookAdapterClient)
-
     const bookFormat = yield* call([adapterClient, adapterClient.invokeBookFormat], response)
-    const bookImg = yield* call([response, response.getCover])
 
+    yield* call(invoke<IBookType>, 'add_book', { book: bookFormat })
+
+    const bookImg = yield* call([response, response.getCover])
     yield* all([
       call([appService, appService.saveCover], response.id, bookImg),
       call([appService, appService.saveBookToStorage], action.payload, response.id),
     ])
 
-    yield* call(invoke<IBookType>, 'add_book', { book: bookFormat })
+    const cover = yield* call([adapterClient, adapterClient.getBookImg], bookFormat.book.id)
 
-    const bookContent = yield* call([adapterClient, adapterClient.getBookImg], bookFormat)
+    const bookContent = bookFormat.book
+    bookContent.metadata.cover = cover
+
     yield* put(actions.setBook({ id: response.id, book: bookContent }))
   } catch (err) {
     console.log(err)
@@ -88,16 +94,16 @@ export function* setOpenBook(action: PayloadAction<PayloadTypes['setOpenBook']>)
 
 export function* getBookStructure(action: PayloadAction<PayloadTypes['getBookStructure']>) {
   try {
-    const booksResponse = yield* call(invoke<IBookStructure>, 'get_book_structure_by_id', {
+    const structure = yield* call(invoke<IBookStructure>, 'get_book_structure_by_id', {
       id: action.payload.id,
       format: action.payload.format,
     })
 
-    yield* put(actions.setBookStructure({ id: action.payload.id, structure: booksResponse }))
+    yield* put(actions.setBookStructure({ id: action.payload.id, structure }))
   } catch (err) {
     console.log(err)
-    console.log('failed to open document')
-    notify('Failed to open document', 'error')
+    console.log('Failed to get book structure')
+    notify('Failed to get book structure', 'error')
   }
 }
 
@@ -106,7 +112,10 @@ export function* deleteBook(action: PayloadAction<PayloadTypes['deleteBook']>) {
     yield* put(actions.setStatus({ id: action.payload.id, status: BOOK_STATUS.DELETING }))
     yield* call(invoke, 'delete_book', { id: action.payload.id, format: action.payload.format })
 
+    const appService = yield* call(getAppClient)
+
     yield* all([
+      call([appService, appService.deleteBookFromStorage], action.payload.id),
       put(actions.setStatus({ id: action.payload.id, status: BOOK_STATUS.SUCCESS })),
       put(actions.deleteBook(action.payload)),
     ])

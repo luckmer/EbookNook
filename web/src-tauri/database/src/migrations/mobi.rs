@@ -46,3 +46,11 @@ SELECT toc FROM mobi_book_toc_table WHERE id = ?;
 pub const DELETE_MOBI_TABLE: &str = r#"
 DELETE FROM mobi_books_table WHERE id = ?;
 "#;
+
+pub const UPDATE_MOBI_BOOK_PERCENTAGE_PROGRESS: &str = r#"
+UPDATE mobi_books_table SET percentage_progress = ?, updated_at = ? WHERE id = ?;
+"#;
+
+pub const UPDATE_MOBI_BOOK_PROGRESS: &str = r#"
+UPDATE mobi_books_table SET progress = ?, updated_at = ? WHERE id = ?;
+"#;

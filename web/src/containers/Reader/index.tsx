@@ -1,3 +1,5 @@
+import { getDocumentClient } from '@libs/document'
+import { getPDFClient } from '@libs/pdf'
 import Reader from '@pages/Reader'
 import { actions as bookActions } from '@store/reducers/books'
 import { actions } from '@store/reducers/ui'
@@ -23,6 +25,7 @@ const ReaderRoot = () => {
   const file = useMemo(() => files[bookId], [bookId, files])
 
   const dispatch = useDispatch()
+  const containerRef = useRef<HTMLDivElement | null>(null)
   const viewRef = useRef<any | null>(null)
   const isViewCreated = useRef(false)
 
@@ -50,7 +53,8 @@ const ReaderRoot = () => {
 
     const openBook = async () => {
       await import('@foliate/view.js')
-      const container = document.querySelector('.book-content')
+
+      const container = containerRef.current
       if (!container) return
 
       const view = document.createElement('foliate-view') as any
@@ -59,7 +63,17 @@ const ReaderRoot = () => {
       view.style.height = '100vh'
       container.appendChild(view)
 
-      await view.open(file)
+      const client = getDocumentClient()
+      const isPDF = await client.isPDF(file)
+
+      if (isPDF) {
+        const pdfClient = getPDFClient()
+        const content = await pdfClient.init(file)
+        await view.open(content)
+      } else {
+        await view.open(file)
+      }
+
       viewRef.current = view
 
       view.renderer.setStyles?.(`
@@ -94,6 +108,7 @@ const ReaderRoot = () => {
 
   return (
     <Reader
+      containerRef={containerRef}
       sectionInfo={{
         current: Math.max(1, sectionProgress.current),
         total: sectionProgress.total,

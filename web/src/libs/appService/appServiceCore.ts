@@ -1,6 +1,6 @@
 import { FormatType } from '@bindings/format'
 import { appDataDir, join } from '@tauri-apps/api/path'
-import { exists, mkdir, readDir, readFile, writeFile } from '@tauri-apps/plugin-fs'
+import { exists, mkdir, readDir, readFile, remove, writeFile } from '@tauri-apps/plugin-fs'
 
 export class AppServiceCore {
   appName: string = 'eBookNook'
@@ -86,5 +86,15 @@ export class AppServiceCore {
   async _getCover(bookId: string) {
     const coversDir = await this.getLibraryDir(bookId)
     return `${coversDir}/${bookId}.png`
+  }
+
+  async _deleteBookFromStorage(bookId: string) {
+    const dataDir = await this.getAppDataDir()
+    const booksDir = await join(dataDir, this.appName, bookId)
+
+    const exist = await exists(booksDir)
+    if (!exist) return
+
+    await remove(booksDir, { recursive: true })
   }
 }

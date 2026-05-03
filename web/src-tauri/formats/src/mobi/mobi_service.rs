@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use database::{
     DELETE_MOBI_TABLE, DatabaseManager, INSERT_MOBI_BOOK, INSERT_MOBI_BOOK_SECTIONS,
     INSERT_MOBI_BOOK_TOC, SELECT_MOBI_BOOK_SECTION_BY_ID, SELECT_MOBI_BOOK_TOC_BY_ID,
+    UPDATE_MOBI_BOOK_PERCENTAGE_PROGRESS, UPDATE_MOBI_BOOK_PROGRESS,
 };
 use sqlx::types::chrono;
 use types::{
@@ -94,6 +95,28 @@ impl MobiService {
         Ok(())
     }
 
+    pub async fn set_book_progress(
+        &self,
+        db: &DatabaseManager,
+        id: String,
+        progress: Vec<String>,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        let conn = db.get_pool();
+
+        let new_progress = serde_json::to_string(&progress)?;
+
+        let now = chrono::Utc::now().timestamp();
+
+        sqlx::query(UPDATE_MOBI_BOOK_PROGRESS)
+            .bind(new_progress)
+            .bind(now)
+            .bind(id)
+            .execute(conn)
+            .await?;
+
+        Ok(())
+    }
+
     pub async fn get_book_structure_by_id(
         &self,
         db: &DatabaseManager,
@@ -134,6 +157,26 @@ impl MobiService {
         Ok(())
     }
 
+    pub async fn set_book_percentage_progress(
+        &self,
+        db: &DatabaseManager,
+        id: String,
+        percentage_progress: String,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        let conn = db.get_pool();
+
+        let now = chrono::Utc::now().timestamp();
+
+        sqlx::query(UPDATE_MOBI_BOOK_PERCENTAGE_PROGRESS)
+            .bind(percentage_progress)
+            .bind(now)
+            .bind(id)
+            .execute(conn)
+            .await?;
+
+        Ok(())
+    }
+
     pub async fn update_book_metadata(
         &self,
         db: &DatabaseManager,
@@ -148,7 +191,7 @@ impl MobiService {
                 .await?;
             return Ok(self.parse_book(row)?);
         }
-        
+
         let current_metadata_json: String =
             sqlx::query_scalar("SELECT metadata FROM mobi_books_table WHERE id = ?")
                 .bind(&id)

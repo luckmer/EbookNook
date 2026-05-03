@@ -26,16 +26,18 @@ const Book: FC<IProps> = ({ img, progress, title, author, onClick, onClickDetail
         e.stopPropagation()
         onClick()
       }}>
-      <Show when={!hasLoadError} fallback={<ImgCover name={title} author={author} />}>
-        <img
-          className="rounded-6 h-full object-cover"
-          src={img}
-          onError={(e) => {
-            e.stopPropagation()
-            setHasLoadError(true)
-          }}
-        />
-      </Show>
+      <div className="w-full aspect-2/3 overflow-hidden rounded-6">
+        <Show when={!hasLoadError} fallback={<ImgCover name={title} author={author} />}>
+          <img
+            className="w-full h-full object-fit transition-transform duration-300 group-hover:scale-105"
+            src={img}
+            onError={(e) => {
+              e.stopPropagation()
+              setHasLoadError(true)
+            }}
+          />
+        </Show>
+      </div>
       <div className="flex flex-col gap-12">
         <Typography text="small" ellipsis left>
           {title}

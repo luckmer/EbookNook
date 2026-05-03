@@ -5,6 +5,7 @@ use ts_rs::TS;
 
 use crate::{
     IBindingsEpubBook, IBindingsEpubBookStructure, IBindingsMobiBook, IBindingsMobiBookStructure,
+    IBindingsPDFBook, IBindingsPDFBookStructure,
 };
 
 #[derive(Serialize, Deserialize, TS)]
@@ -13,6 +14,19 @@ use crate::{
 pub enum IBookType {
     Epub(IBindingsEpubBook),
     Mobi(IBindingsMobiBook),
+    Pdf(IBindingsPDFBook),
+}
+
+#[derive(Serialize, Deserialize, TS)]
+#[serde(tag = "format", content = "book")]
+#[ts(export, export_to = "book.ts")]
+pub enum IAddBookType {
+    #[serde(rename = "EPUB")]
+    Epub(IBindingsEpubBook),
+    #[serde(rename = "MOBI")]
+    Mobi(IBindingsMobiBook),
+    #[serde(rename = "PDF")]
+    Pdf(IBindingsPDFBook),
 }
 
 #[derive(Serialize, Deserialize, TS)]
@@ -21,6 +35,7 @@ pub enum IBookType {
 pub enum IBookStructure {
     Epub(IBindingsEpubBookStructure),
     Mobi(IBindingsMobiBookStructure),
+    Pdf(IBindingsPDFBookStructure),
 }
 
 #[derive(Serialize, Deserialize, TS)]
@@ -30,6 +45,8 @@ pub struct Books {
     pub epub: Vec<IBindingsEpubBook>,
     #[serde(rename = "MOBI")]
     pub mobi: Vec<IBindingsMobiBook>,
+    #[serde(rename = "PDF")]
+    pub pdf: Vec<IBindingsPDFBook>,
 }
 
 #[derive(Serialize, Deserialize, TS, Hash, Eq, PartialEq)]
@@ -51,4 +68,6 @@ pub enum IBookMetadata {
     Epub(HashMap<IBindingsBookContent, String>),
     #[serde(rename = "MOBI")]
     Mobi(HashMap<IBindingsBookContent, String>),
+    #[serde(rename = "PDF")]
+    Pdf(HashMap<IBindingsBookContent, String>),
 }

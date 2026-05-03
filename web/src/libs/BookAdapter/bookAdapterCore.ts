@@ -1,7 +1,5 @@
-import { IBookType as IBindingsBookType } from '@bindings/book'
-import { IBindingsEpubBook } from '@bindings/epub'
-import { IBindingsMobiBook } from '@bindings/mobi'
-import { ILanguageMap, ILocalBookType, ITocItem } from '@interfaces/book/types'
+import { IEpubBookType, IMobiBookType, IPDFBookType } from '@interfaces/book/interfaces'
+import { IAddBookType, ILanguageMap, ILocalBookType, ITocItem } from '@interfaces/book/types'
 import { getAppClient } from '@libs/appService'
 import { convertFileSrc } from '@tauri-apps/api/core'
 
@@ -28,10 +26,11 @@ export class BookAdapterCore {
       subitems: this._formatToc(item.subitems ?? []),
     }))
   }
-  async _invokeBookFormat(content: ILocalBookType): Promise<IBindingsBookType> {
+
+  async _invokeBookFormat(content: ILocalBookType): Promise<IAddBookType> {
     switch (content.format) {
       case 'EPUB': {
-        const epubFormat: IBindingsEpubBook = {
+        const epubFormat: IEpubBookType = {
           percentageProgress: content.percentageProgress,
           metadata: {
             author: this._getContent(content.metadata.author),
@@ -64,10 +63,14 @@ export class BookAdapterCore {
           toc: this._formatToc(content.toc),
           id: content.id,
         }
-        return epubFormat
+
+        return {
+          book: epubFormat,
+          format: 'EPUB',
+        }
       }
       case 'MOBI': {
-        const mobiFormat: IBindingsMobiBook = {
+        const mobiFormat: IMobiBookType = {
           id: content.id,
           format: content.format,
           percentageProgress: content.percentageProgress,
@@ -93,7 +96,40 @@ export class BookAdapterCore {
           sections: content.sections,
           toc: this._formatToc(content.toc),
         }
-        return mobiFormat
+
+        return {
+          book: mobiFormat,
+          format: 'MOBI',
+        }
+      }
+      case 'PDF': {
+        const pdfFormat: IPDFBookType = {
+          id: content.id,
+          format: content.format,
+          percentageProgress: content.percentageProgress,
+          progress: content.progress,
+          sections: content.sections,
+          toc: this._formatToc(content.toc ?? []),
+          metadata: {
+            author: this._getContent(content.metadata.author ?? 'Unknown Author'),
+            title: this._getContent(content.metadata.title ?? 'Unknown Title'),
+            contributor: content.metadata.contributor,
+            description: content.metadata.description,
+            identifier: content.metadata.identifier,
+            language: content.metadata.language,
+            cover: '',
+            publisher: content.metadata.publisher,
+            rights: content.metadata.rights,
+            subject: content.metadata.subject
+              ? this._getContent(content.metadata.subject)
+              : undefined,
+          },
+        }
+
+        return {
+          book: pdfFormat,
+          format: 'PDF',
+        }
       }
       default: {
         throw new Error('format not implemented')
@@ -101,11 +137,11 @@ export class BookAdapterCore {
     }
   }
 
-  async _getBookImg(content: IBindingsBookType): Promise<IBindingsBookType> {
+  async _getBookImg(id: string): Promise<string> {
     const appService = getAppClient()
 
-    const cover = await appService.getCover(content.id)
-    content.metadata.cover = convertFileSrc(cover)
-    return content
+    const cover = await appService.getCover(id)
+
+    return convertFileSrc(cover)
   }
 }

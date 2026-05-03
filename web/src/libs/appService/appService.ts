@@ -9,6 +9,10 @@ export class AppService extends AppServiceCore {
     return this._loadBookFromStorage(bookId)
   }
 
+  async deleteBookFromStorage(id: string) {
+    return this._deleteBookFromStorage(id)
+  }
+
   async getCover(bookId: string) {
     return this._getCover(bookId)
   }

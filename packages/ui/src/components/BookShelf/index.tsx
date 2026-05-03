@@ -23,7 +23,7 @@ const BookShelf: FC<IProps> = ({
   onClickDetails,
 }) => {
   return (
-    <div className="grid flex-1 grid-cols-3 px-4 sm:px-2 sm:grid-cols-4 md:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-12 gap-12">
+    <div className="grid flex-1 max-[450px]:grid-cols-1 grid-cols-2 px-4 sm:px-2 sm:grid-cols-4 md:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-12 gap-12">
       {books.map((book, id) => (
         <Book
           key={id}
@@ -40,8 +40,14 @@ const BookShelf: FC<IProps> = ({
         />
       ))}
       <Show when={isAddingBook}>
-        <div className="bg-base hover:bg-surface-drawer w-full h-full flex items-center justify-center rounded-6">
-          <Spin />
+        <div className="flex flex-col p-12 w-full gap-12 rounded-6">
+          <div className="w-full aspect-2/3 rounded-6 bg-base hover:bg-surface-drawer flex items-center justify-center">
+            <Spin />
+          </div>
+          <div className="flex flex-col gap-12">
+            <div className="h-12 w-3/4 rounded-4 bg-base animate-pulse" />
+            <div className="h-[20px] w-1/3 rounded-4 bg-base animate-pulse" />
+          </div>
         </div>
       </Show>
       <div className="aspect-3/5 h-full w-full">
