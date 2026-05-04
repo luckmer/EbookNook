@@ -6,7 +6,7 @@ const host = process.env.TAURI_DEV_HOST
 
 const foliatePDFPlugin = () => {
   return {
-    name: 'fix-foliate-glob',
+    name: 'pdf-vendor-url',
     enforce: 'pre',
     transform(code: string, id: string) {
       if (id.includes('foliate') && id.endsWith('pdf.js')) {
