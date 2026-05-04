@@ -124,7 +124,7 @@ const FontSettings: FC<IProps> = ({
             }}
           />
         </div>
-        <div className="bg-button-secondary-background p-16 rounded-8 flex flex-col gap-8">
+        <div className="bg-button-secondary-background p-16  rounded-8 flex flex-col gap-8">
           <Typography text="small" color="secondary">
             {t('preview')} ({defaultFontSize}px, {fontWeight})
           </Typography>

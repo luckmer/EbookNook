@@ -1,6 +1,10 @@
+use std::collections::HashMap;
+
 use state::AppState;
 use tauri::State;
-use types::{Books, FormatType, IAddBookType, IBookMetadata, IBookStructure, IBookType};
+use types::{
+    Books, FormatType, IAddBookType, IBookMetadata, IBookStructure, IBookType, ProgressType,
+};
 
 #[tauri::command]
 pub async fn get_books(state: State<'_, AppState>) -> Result<Books, String> {
@@ -37,7 +41,7 @@ pub async fn add_book(state: State<'_, AppState>, book: IAddBookType) -> Result<
 pub async fn set_book_progress(
     state: State<'_, AppState>,
     id: String,
-    progress: Vec<String>,
+    progress: HashMap<ProgressType, String>,
     format: FormatType,
 ) -> Result<(), String> {
     state

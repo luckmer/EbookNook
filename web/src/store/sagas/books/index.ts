@@ -153,6 +153,41 @@ export function* updateBookMetadata(action: PayloadAction<PayloadTypes['updateBo
   }
 }
 
+export function* updateBookProgress(action: PayloadAction<PayloadTypes['updateBookProgress']>) {
+  try {
+    yield* all([
+      call(invoke<IBookStructure>, 'set_book_progress', {
+        progress: action.payload.progress,
+        format: action.payload.format,
+        id: action.payload.id,
+      }),
+
+      call(invoke<IBookStructure>, 'set_book_percentage_progress', {
+        percentageProgress: action.payload.percentageProgress,
+        format: action.payload.format,
+        id: action.payload.id,
+      }),
+    ])
+
+    yield* put(
+      actions.setUpdateBookProgress({
+        id: action.payload.id,
+        format: action.payload.format,
+        progress: action.payload.progress,
+        percentageProgress: action.payload.percentageProgress,
+      }),
+    )
+  } catch (err) {
+    console.log(err)
+    console.log('Failed to update progress')
+    notify('Failed to update progress', 'error')
+  }
+}
+
+export function* updateBookProgressSaga() {
+  yield* takeEvery(actions.updateBookProgress, updateBookProgress)
+}
+
 export function* ImportBookSaga() {
   yield* takeEvery(actions.importBook, ImportBook)
 }
@@ -184,6 +219,7 @@ export default function* RootSaga() {
     setOpenBookSaga(),
     getBookStructureSaga(),
     updateBookMetadataSaga(),
+    updateBookProgressSaga(),
     deleteBookSagas(),
   ])
 }

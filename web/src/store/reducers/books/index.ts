@@ -1,5 +1,6 @@
 import { IBindingsBookContent, IBookMetadata } from '@bindings/book'
 import { FormatType } from '@bindings/format'
+import { ProgressType } from '@bindings/progress'
 import { BOOK_STATUS } from '@interfaces/book/enums'
 import { IBookStructure, IBookType, ILocalBookToc } from '@interfaces/book/types'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
@@ -154,6 +155,30 @@ export const store = createSlice({
       state.files[action.payload.id] = action.payload.file
       return state
     },
+    setUpdateBookProgress(
+      state,
+      action: PayloadAction<{
+        id: string
+        format: FormatType
+        progress: Partial<Record<ProgressType, string>>
+        percentageProgress: string
+      }>,
+    ) {
+      const bookShelf = state.books[action.payload.format]
+      if (!bookShelf) return state
+
+      const book = bookShelf[action.payload.id]
+
+      if (!book) {
+        return state
+      }
+
+      book.progress = action.payload.progress
+      book.percentageProgress = action.payload.percentageProgress
+
+      return state
+    },
+
     setBooks(
       state,
       action: PayloadAction<Partial<Record<FormatType, Partial<Record<string, IBookType>>>>>,
@@ -170,6 +195,17 @@ export const store = createSlice({
         id: string
         format: FormatType
         metadata: Partial<Record<IBindingsBookContent, string>>
+      }>,
+    ) {
+      return state
+    },
+    updateBookProgress(
+      state,
+      _: PayloadAction<{
+        id: string
+        format: FormatType
+        percentageProgress: string
+        progress: Partial<Record<ProgressType, string>>
       }>,
     ) {
       return state

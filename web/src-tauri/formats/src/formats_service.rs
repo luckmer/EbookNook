@@ -1,7 +1,9 @@
-use std::error::Error;
+use std::{collections::HashMap, error::Error};
 
 use database::DatabaseManager;
-use types::{Books, FormatType, IAddBookType, IBookMetadata, IBookStructure, IBookType};
+use types::{
+    Books, FormatType, IAddBookType, IBookMetadata, IBookStructure, IBookType, ProgressType,
+};
 
 use crate::{
     EpubService, MobiService, PDFService, init_epub_service, init_mobi_service, init_pdf_service,
@@ -112,7 +114,7 @@ impl FormatsService {
         &self,
         db: &DatabaseManager,
         id: String,
-        progress: Vec<String>,
+        progress: HashMap<ProgressType, String>,
         format: FormatType,
     ) -> Result<(), Box<dyn Error>> {
         match format {

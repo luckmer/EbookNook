@@ -48,9 +48,13 @@ DELETE FROM mobi_books_table WHERE id = ?;
 "#;
 
 pub const UPDATE_MOBI_BOOK_PERCENTAGE_PROGRESS: &str = r#"
-UPDATE mobi_books_table SET percentage_progress = ?, updated_at = ? WHERE id = ?;
+UPDATE mobi_books_table SET percentage_progress = ? WHERE id = ?;
 "#;
 
 pub const UPDATE_MOBI_BOOK_PROGRESS: &str = r#"
-UPDATE mobi_books_table SET progress = ?, updated_at = ? WHERE id = ?;
+UPDATE mobi_books_table SET progress = ? WHERE id = ?;
+"#;
+
+pub const SELECT_PGORESS_FROM_MOBI: &str = r#"
+SELECT progress FROM mobi_books_table WHERE id = ?
 "#;

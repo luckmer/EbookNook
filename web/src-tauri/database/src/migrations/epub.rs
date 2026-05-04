@@ -45,13 +45,17 @@ VALUES (?, ?, ?, ?, ?, ?);
 "#;
 
 pub const UPDATE_EPUB_BOOK_PROGRESS: &str = r#"
-UPDATE epub_books_table SET progress = ?, updated_at = ? WHERE id = ?;
+UPDATE epub_books_table SET progress = ? WHERE id = ?;
 "#;
 
 pub const UPDATE_EPUB_BOOK_PERCENTAGE_PROGRESS: &str = r#"
-UPDATE epub_books_table SET percentage_progress = ?, updated_at = ? WHERE id = ?;
+UPDATE epub_books_table SET percentage_progress = ? WHERE id = ?;
 "#;
 
 pub const DELETE_EPUB_TABLE: &str = r#"
 DELETE FROM epub_books_table WHERE id = ?;
+"#;
+
+pub const SELECT_PGORESS_FROM_EPUB: &str = r#"
+SELECT progress FROM epub_books_table WHERE id = ?
 "#;

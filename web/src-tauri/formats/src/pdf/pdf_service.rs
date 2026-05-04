@@ -3,12 +3,12 @@ use std::collections::HashMap;
 use database::{
     DELETE_PDF_TABLE, DatabaseManager, INSERT_PDF_BOOK, INSERT_PDF_BOOK_SECTIONS,
     INSERT_PDF_BOOK_TOC, SELECT_PDF_BOOK_SECTION_BY_ID, SELECT_PDF_BOOK_TOC_BY_ID,
-    UPDATE_PDF_BOOK_PERCENTAGE_PROGRESS, UPDATE_PDF_BOOK_PROGRESS,
+    SELECT_PROGRESS_FROM_PDF, UPDATE_PDF_BOOK_PERCENTAGE_PROGRESS, UPDATE_PDF_BOOK_PROGRESS,
 };
 use sqlx::types::chrono;
 use types::{
     FormatType, IBindingsBookContent, IBindingsPDFBook, IBindingsPDFBookStructure,
-    IBindingsPDFMetadata, IBindingsPDFSection, IBindingsPDFToc,
+    IBindingsPDFMetadata, IBindingsPDFSection, IBindingsPDFToc, ProgressType,
 };
 
 pub struct PDFService {}
@@ -43,7 +43,8 @@ impl PDFService {
         use sqlx::Row;
 
         let metadata: IBindingsPDFMetadata = serde_json::from_str(row.try_get("metadata")?)?;
-        let progress: HashMap<String, String> = serde_json::from_str(row.try_get("progress")?)?;
+        let progress: HashMap<ProgressType, String> =
+            serde_json::from_str(row.try_get("progress")?)?;
         let format: FormatType = serde_json::from_str(row.try_get("format")?)?;
 
         Ok(IBindingsPDFBook {
@@ -69,7 +70,6 @@ impl PDFService {
         let progress = serde_json::to_string(&book.progress)?;
         let format = serde_json::to_string(&book.format)?;
         let toc = serde_json::to_string(&book.toc)?;
-
 
         sqlx::query(INSERT_PDF_BOOK)
             .bind(&book.id)
@@ -99,18 +99,37 @@ impl PDFService {
         &self,
         db: &DatabaseManager,
         id: String,
-        progress: Vec<String>,
+        progress: HashMap<ProgressType, String>,
     ) -> Result<(), Box<dyn std::error::Error>> {
+        if progress.is_empty() {
+            return Ok(());
+        }
+
         let conn = db.get_pool();
 
-        let new_progress = serde_json::to_string(&progress)?;
+        let raw: String = sqlx::query_scalar(SELECT_PROGRESS_FROM_PDF)
+            .bind(&id)
+            .fetch_one(conn)
+            .await?;
+
+        let mut existing: serde_json::Value = serde_json::from_str(&raw)?;
+        let existing_map = existing
+            .as_object_mut()
+            .ok_or("Progress is not a JSON object")?;
+
+        for (key, value) in progress {
+            let key_str = serde_json::to_value(&key)?
+                .as_str()
+                .ok_or("Failed to serialize ProgressType key")?
+                .to_string();
+
+            existing_map.insert(key_str, serde_json::Value::String(value));
+        }
 
         let now = chrono::Utc::now().timestamp();
-
         sqlx::query(UPDATE_PDF_BOOK_PROGRESS)
-            .bind(new_progress)
-            .bind(now)
-            .bind(id)
+            .bind(serde_json::to_string(&existing)?)
+            .bind(&id)
             .execute(conn)
             .await?;
 
@@ -129,7 +148,6 @@ impl PDFService {
 
         sqlx::query(UPDATE_PDF_BOOK_PERCENTAGE_PROGRESS)
             .bind(percentage_progress)
-            .bind(now)
             .bind(id)
             .execute(conn)
             .await?;

@@ -2,8 +2,22 @@ import DefaultButton from '@components/Buttons/DefaultButton'
 import Show from '@components/Show'
 import { Typography } from '@components/Typography'
 import clsx from 'clsx'
-import { FC, memo, useMemo, useState } from 'react'
+import { FC, memo, useEffect, useMemo, useState } from 'react'
 import { IoIosArrowUp } from 'react-icons/io'
+
+export interface ITocItem {
+  label: string
+  href?: string
+  id?: string
+  subitems?: ITocItem[]
+}
+
+export interface IProps {
+  onClick: (href: string) => void
+  activeToc: ITocItem
+  item: ITocItem
+  level: number
+}
 
 export interface ITocItem {
   label: string
@@ -27,12 +41,33 @@ const Toc: FC<IProps> = ({ item, level, activeToc, onClick }) => {
     [item.subitems],
   )
 
+  const containsActiveItem = (currentItem: ITocItem, target: ITocItem): boolean => {
+    if (!currentItem.subitems) return false
+
+    return currentItem.subitems.some((sub) => {
+      const isMatch = (sub.id && sub.id === target?.id) || (sub.href && sub.href === target?.href)
+      if (isMatch) return true
+
+      return containsActiveItem(sub, target)
+    })
+  }
+
+  useEffect(() => {
+    if (!activeToc) return
+
+    const shouldBeOpen = containsActiveItem(item, activeToc)
+
+    if (shouldBeOpen) {
+      setOpen(true)
+    }
+  }, [activeToc, item])
+
   const isActive = useMemo(() => {
     if (activeToc?.id === '-1' || !activeToc) {
       return false
     }
 
-    return activeToc?.href === item?.href || item?.id === activeToc?.id
+    return activeToc?.href === item?.href || (item?.id && item?.id === activeToc?.id)
   }, [activeToc, item])
 
   return (
@@ -45,16 +80,12 @@ const Toc: FC<IProps> = ({ item, level, activeToc, onClick }) => {
         )}
         onClick={() => {
           onClick(item?.href ?? item?.id ?? '')
-          if (open && hasSubitems) return
-          setOpen(true)
+          if (hasSubitems) setOpen(true)
         }}>
         <div className="flex flex-row gap-12 items-center w-full">
           <Show when={hasSubitems}>
             <div
               onClick={(e) => {
-                if (isActive) {
-                  return
-                }
                 e.preventDefault()
                 e.stopPropagation()
                 setOpen((prev) => !prev)
@@ -62,7 +93,7 @@ const Toc: FC<IProps> = ({ item, level, activeToc, onClick }) => {
               <IoIosArrowUp
                 className={clsx(
                   'transition-all duration-300 ease-in-out opacity-20 group-hover:opacity-100 min-w-[14px] min-h-[14px] max-w-[14px] max-h-[14px]',
-                  open ? 'rotate-x-180 opacity-100' : '',
+                  open ? 'rotate-180 opacity-100' : 'rotate-90',
                 )}
               />
             </div>
@@ -72,15 +103,22 @@ const Toc: FC<IProps> = ({ item, level, activeToc, onClick }) => {
           </Typography>
         </div>
       </DefaultButton>
+
       <Show when={hasSubitems}>
         <div
           className={clsx(
             'overflow-hidden transition-all duration-300 ease-in-out',
-            open ? 'block' : 'hidden',
+            open ? 'max-h-fit opacity-100' : 'max-h-0 opacity-0 pointer-events-none',
           )}>
-          <div className="pl-12 transition-all duration-300 ease-in-out">
+          <div className="pl-12">
             {(item.subitems ?? []).map((sub, index) => (
-              <Toc key={index} item={sub} level={level++} onClick={onClick} activeToc={activeToc} />
+              <Toc
+                key={sub.id ?? index}
+                item={sub}
+                level={level + 1}
+                onClick={onClick}
+                activeToc={activeToc}
+              />
             ))}
           </div>
         </div>

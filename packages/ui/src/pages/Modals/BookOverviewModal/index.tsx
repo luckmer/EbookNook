@@ -1,5 +1,6 @@
 import { IBindingsBookContent } from '@bindings/book'
 import DefaultButton from '@components/Buttons/DefaultButton'
+import ImgCover from '@components/ImgCover'
 import ContentArea from '@components/Inputs/ContentArea'
 import ContentInput from '@components/Inputs/ContentInput'
 import DateContentInput from '@components/Inputs/DateContentInput'
@@ -42,6 +43,7 @@ const BookOverviewModal: FC<IProps> = ({
   isOpen,
   book,
 }) => {
+  const [hasLoadError, setHasLoadError] = useState(false)
   const [newContent, setNewContent] = useState<Partial<Record<IBindingsBookContent, string>>>({})
   const [isEditing, setIsEditing] = useState(false)
   const [isError, setIsError] = useState(false)
@@ -108,6 +110,10 @@ const BookOverviewModal: FC<IProps> = ({
     }
   }, [isOpen])
 
+  useEffect(() => {
+    setHasLoadError(false)
+  }, [book.cover])
+
   return (
     <Modal
       isFooter={false}
@@ -157,13 +163,23 @@ const BookOverviewModal: FC<IProps> = ({
           </div>
           <div className="flex flex-col gap-24 overflow-y-auto px-24">
             <div className="flex flex-row gap-24">
-              <img
-                src={book.cover}
-                alt="cover"
-                loading="lazy"
-                className="rounded-6  max-h-[200px] min-h-[200px] min-w-[130px] max-w-[130px] object-cover bg-neutral-800"
-              />
-              <div className="flex flex-col justify-between items-start py-4 w-full">
+              <Show
+                when={!hasLoadError}
+                fallback={
+                  <div className="rounded-6  max-h-[200px] min-h-[200px] min-w-[130px] max-w-[130px] object-cover bg-neutral-800">
+                    <ImgCover name={book.title ?? '--'} author={book.author ?? '--'} />
+                  </div>
+                }>
+                <img
+                  className="rounded-6  max-h-[200px] min-h-[200px] min-w-[130px] max-w-[130px] object-cover bg-neutral-800"
+                  src={book.cover}
+                  onError={(e) => {
+                    e.stopPropagation()
+                    setHasLoadError(true)
+                  }}
+                />
+              </Show>
+              <div className="flex flex-col justify-between items-start w-full">
                 <div className="flex flex-col gap-24 py-4 w-full">
                   <div className="flex flex-col gap-8 w-full">
                     <ContentInput

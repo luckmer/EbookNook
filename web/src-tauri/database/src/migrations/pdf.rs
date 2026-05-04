@@ -36,11 +36,11 @@ VALUES (?, ?, ?, ?, ?);
 "#;
 
 pub const UPDATE_PDF_BOOK_PROGRESS: &str = r#"
-UPDATE pdf_books_table SET progress = ?, updated_at = ? WHERE id = ?;
+UPDATE pdf_books_table SET progress = ? WHERE id = ?;
 "#;
 
 pub const UPDATE_PDF_BOOK_PERCENTAGE_PROGRESS: &str = r#"
-UPDATE pdf_books_table SET percentage_progress = ?, updated_at = ? WHERE id = ?;
+UPDATE pdf_books_table SET percentage_progress = ? WHERE id = ?;
 "#;
 
 pub const DELETE_PDF_TABLE: &str = r#"
@@ -53,4 +53,8 @@ INSERT OR REPLACE INTO pdf_book_toc_table (id, toc) VALUES (?, ?);
 
 pub const SELECT_PDF_BOOK_TOC_BY_ID: &str = r#"
 SELECT toc FROM pdf_book_toc_table WHERE id = ?;
+"#;
+
+pub const SELECT_PROGRESS_FROM_PDF: &str = r#"
+SELECT progress FROM pdf_books_table WHERE id = ?
 "#;

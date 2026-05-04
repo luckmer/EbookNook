@@ -3,12 +3,13 @@ use std::collections::HashMap;
 use database::{
     DELETE_EPUB_TABLE, DatabaseManager, INSERT_EPUB_BOOK, INSERT_EPUB_BOOK_SECTIONS,
     INSERT_EPUB_BOOK_TOC, SELECT_EPUB_BOOK_SECTION_BY_ID, SELECT_EPUB_BOOK_TOC_BY_ID,
-    UPDATE_EPUB_BOOK_PERCENTAGE_PROGRESS, UPDATE_EPUB_BOOK_PROGRESS,
+    SELECT_PGORESS_FROM_EPUB, UPDATE_EPUB_BOOK_PERCENTAGE_PROGRESS, UPDATE_EPUB_BOOK_PROGRESS,
 };
 use sqlx::types::chrono;
 use types::{
     FormatType, IBindingsBookContent, IBindingsEpubBook, IBindingsEpubBookStructure,
     IBindingsEpubMetadata, IBindingsEpubRendition, IBindingsEpubSection, IBindingsEpubToc,
+    ProgressType,
 };
 
 pub struct EpubService {}
@@ -44,7 +45,8 @@ impl EpubService {
 
         let metadata: IBindingsEpubMetadata = serde_json::from_str(row.try_get("metadata")?)?;
         let rendition: IBindingsEpubRendition = serde_json::from_str(row.try_get("rendition")?)?;
-        let progress: HashMap<String, String> = serde_json::from_str(row.try_get("progress")?)?;
+        let progress: HashMap<ProgressType, String> =
+            serde_json::from_str(row.try_get("progress")?)?;
         let format: FormatType = serde_json::from_str(row.try_get("format")?)?;
 
         Ok(IBindingsEpubBook {
@@ -102,18 +104,36 @@ impl EpubService {
         &self,
         db: &DatabaseManager,
         id: String,
-        progress: Vec<String>,
+        progress: HashMap<ProgressType, String>,
     ) -> Result<(), Box<dyn std::error::Error>> {
+        if progress.is_empty() {
+            return Ok(());
+        }
+
         let conn = db.get_pool();
 
-        let new_progress = serde_json::to_string(&progress)?;
+        let raw: String = sqlx::query_scalar(SELECT_PGORESS_FROM_EPUB)
+            .bind(&id)
+            .fetch_one(conn)
+            .await?;
 
-        let now = chrono::Utc::now().timestamp();
+        let mut existing: serde_json::Value = serde_json::from_str(&raw)?;
+        let existing_map = existing
+            .as_object_mut()
+            .ok_or("Progress is not a JSON object")?;
+
+        for (key, value) in progress {
+            let key_str = serde_json::to_value(&key)?
+                .as_str()
+                .ok_or("Failed to serialize ProgressType key")?
+                .to_string();
+
+            existing_map.insert(key_str, serde_json::Value::String(value));
+        }
 
         sqlx::query(UPDATE_EPUB_BOOK_PROGRESS)
-            .bind(new_progress)
-            .bind(now)
-            .bind(id)
+            .bind(serde_json::to_string(&existing)?)
+            .bind(&id)
             .execute(conn)
             .await?;
 
@@ -132,7 +152,6 @@ impl EpubService {
 
         sqlx::query(UPDATE_EPUB_BOOK_PERCENTAGE_PROGRESS)
             .bind(percentage_progress)
-            .bind(now)
             .bind(id)
             .execute(conn)
             .await?;
@@ -199,6 +218,7 @@ impl EpubService {
                 .bind(&id)
                 .fetch_one(conn)
                 .await?;
+
         let mut metadata: serde_json::Value = serde_json::from_str(&current_metadata_json)?;
         let metadata_obj = metadata.as_object_mut().ok_or("Invalid metadata format")?;
 

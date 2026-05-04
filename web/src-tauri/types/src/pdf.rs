@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
-use crate::FormatType;
+use crate::{FormatType, ProgressType};
 
 #[derive(Serialize, Deserialize, Debug, Clone, TS)]
 #[ts(export, export_to = "pdf.ts")]
@@ -65,7 +65,7 @@ pub struct IBindingsPDFBook {
     #[serde(rename = "percentageProgress")]
     #[ts(rename = "percentageProgress")]
     pub percentage_progress: String,
-    pub progress: HashMap<String, String>,
+    pub progress: HashMap<ProgressType, String>,
     pub format: FormatType,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[ts(optional)]

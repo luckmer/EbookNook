@@ -78,6 +78,7 @@ export const Header: FC<IProps> = ({
       <div className="flex flex-row gap-4 ml-auto" data-tauri-drag-region>
         <Show when={!!isReader}>
           <DefaultButton
+            disabled
             onClick={onClickOpenNotebook}
             className="transition-colors hover:bg-button-primary-hover hover:text-text-primary text-text-secondary duration-300 rounded-4 px-6 py-6">
             <LuNotebookPen className="w-18 h-18 transition-colors duration-200" />
