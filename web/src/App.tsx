@@ -1,15 +1,15 @@
+import { FormatType } from '@bindings/format'
 import Annotator from '@containers/Annotator'
 import Header from '@pages/Header'
-import { actions as annotationActions } from '@store/reducers/annotations/index'
 import { actions as bookActions } from '@store/reducers/books/index'
 import { actions } from '@store/reducers/search'
 import { actions as uiActions } from '@store/reducers/ui'
-import { selectEpubMap } from '@store/selectors/books'
+import { bookSelector } from '@store/selectors/books'
 import { searchSelector } from '@store/selectors/search'
 import { uiSelector } from '@store/selectors/ui'
 import '@styles/import.css'
 import { getCurrentWindow } from '@tauri-apps/api/window'
-import { useEffect, useLayoutEffect, useMemo } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Route, Routes, useLocation } from 'react-router-dom'
 import { routes } from './routes'
@@ -19,34 +19,50 @@ function App() {
   const isSidebarOpen = useSelector(uiSelector.openChaptersDrawer)
   const searchValue = useSelector(searchSelector.value)
   const hideHeader = useSelector(uiSelector.hideHeader)
-  const booksMap = useSelector(selectEpubMap)
+  const booksMap = useSelector(bookSelector.books)
 
   const dispatch = useDispatch()
 
   const location = useLocation()
+  const isLoaded = useRef(false)
 
   useLayoutEffect(() => {
     dispatch(bookActions.load())
   }, [])
 
   useEffect(() => {
-    if (location?.state?.id) {
-      const bookId = location.state.id
-      const book = booksMap[bookId]
-      if (book) {
-        dispatch(bookActions.getEpubStructure(book.book.id))
-        dispatch(annotationActions.getAnnotationStructure(book.book.id))
-      }
+    if (!location?.state?.id || isLoaded.current) return
+
+    const bookShelf = booksMap[bookState.format]
+    if (!bookShelf) return
+
+    const book = bookShelf[bookState.id]
+    if (book) {
+      isLoaded.current = true
+      dispatch(bookActions.setOpenBook(book.id))
+      dispatch(bookActions.getBookStructure({ id: book.id, format: book.format }))
     }
   }, [booksMap])
 
-  const bookId = useMemo(() => location?.state?.id, [location])
-  const book = useMemo(() => booksMap[bookId], [bookId, booksMap])
+  const bookState: {
+    id: string
+    format: FormatType
+  } = useMemo(() => location?.state, [location])
+
+  const book = useMemo(() => {
+    if (!bookState) return
+
+    const bookShelf = booksMap[bookState.format]
+
+    if (!bookShelf) return
+
+    return bookShelf[bookState.id]
+  }, [bookState, booksMap])
 
   return (
     <div className="w-full h-full flex flex-col gap-4">
       <Header
-        bookName={book?.book.title}
+        bookName={book?.metadata.title}
         hideHeader={hideHeader}
         onClickSettings={() => {
           dispatch(uiActions.setOpenSettingsModal(!isSettingsOpen))

@@ -1,6 +1,35 @@
 @font-face {
   font-family: 'Ubuntu';
-  src: url('../../../packages/ui/common/font/Ubuntu//Ubuntu-Regular.ttf');
+  src: url('../../../packages/ui/common/font/Ubuntu/Ubuntu-Light.ttf');
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Ubuntu';
+  src: url('../../../packages/ui/common/font/Ubuntu/Ubuntu-Regular.ttf');
   font-weight: 400;
   font-style: normal;
+}
+
+@font-face {
+  font-family: 'Ubuntu';
+  src: url('../../../packages/ui/common/font/Ubuntu/Ubuntu-Medium.ttf');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Ubuntu';
+  src: url('../../../packages/ui/common/font/Ubuntu/Ubuntu-Bold.ttf');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Raleway';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('../../../packages/ui/common/font/Raleway/Raleway-VariableFont_wght.ttf') format('woff2');
 }

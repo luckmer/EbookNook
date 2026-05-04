@@ -1,4 +1,5 @@
 import { Meta, StoryObj } from '@storybook/react-vite'
+import { useRef } from 'react'
 import Reader from './index'
 
 const meta: Meta<typeof Reader> = {
@@ -11,8 +12,14 @@ type Story = StoryObj<typeof Reader>
 
 export const BannersStory: Story = {
   render: () => {
+    const containerRef = useRef<HTMLDivElement | null>(null)
     return (
       <Reader
+        containerRef={containerRef}
+        sectionInfo={{
+          current: 1,
+          total: 20,
+        }}
         onHideHeader={() => {}}
         onShowHeader={() => {}}
         onClickNextChapter={() => {}}

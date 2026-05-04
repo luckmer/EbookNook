@@ -1,12 +1,16 @@
 use std::collections::HashMap;
 
 use database::{
-    DELETE_EPUB_TABLE, DatabaseManager, INSERT_EPUB_BOOK, INSERT_EPUB_CHAPTERS, INSERT_EPUB_TOC,
-    SELECT_EPUB_CHAPTERS_BY_ID, SELECT_EPUB_TOC_BY_ID, UPDATE_EPUB_BOOK_PROGRESS,
+    DELETE_EPUB_TABLE, DatabaseManager, INSERT_EPUB_BOOK, INSERT_EPUB_BOOK_SECTIONS,
+    INSERT_EPUB_BOOK_TOC, SELECT_EPUB_BOOK_SECTION_BY_ID, SELECT_EPUB_BOOK_TOC_BY_ID,
+    SELECT_PGORESS_FROM_EPUB, UPDATE_EPUB_BOOK_PERCENTAGE_PROGRESS, UPDATE_EPUB_BOOK_PROGRESS,
 };
-
 use sqlx::types::chrono;
-use types::{Book, Chapter, Epub, EpubStructure, Metadata, NewEpubBookContent, Progress, Toc};
+use types::{
+    FormatType, IBindingsBookContent, IBindingsEpubBook, IBindingsEpubBookStructure,
+    IBindingsEpubMetadata, IBindingsEpubRendition, IBindingsEpubSection, IBindingsEpubToc,
+    ProgressType,
+};
 
 pub struct EpubService {}
 
@@ -15,80 +19,139 @@ impl EpubService {
         EpubService {}
     }
 
+    pub async fn get_books(
+        &self,
+        db: &DatabaseManager,
+    ) -> Result<Vec<IBindingsEpubBook>, Box<dyn std::error::Error>> {
+        let conn = db.get_pool();
+        let rows = sqlx::query("SELECT * FROM epub_books_table")
+            .fetch_all(conn)
+            .await?;
+
+        let mut books = Vec::new();
+        for row in rows {
+            let epub = self.parse_book(row)?;
+            books.push(epub);
+        }
+
+        Ok(books)
+    }
+
+    fn parse_book(
+        &self,
+        row: sqlx::sqlite::SqliteRow,
+    ) -> Result<IBindingsEpubBook, Box<dyn std::error::Error>> {
+        use sqlx::Row;
+
+        let metadata: IBindingsEpubMetadata = serde_json::from_str(row.try_get("metadata")?)?;
+        let rendition: IBindingsEpubRendition = serde_json::from_str(row.try_get("rendition")?)?;
+        let progress: HashMap<ProgressType, String> =
+            serde_json::from_str(row.try_get("progress")?)?;
+        let format: FormatType = serde_json::from_str(row.try_get("format")?)?;
+
+        Ok(IBindingsEpubBook {
+            metadata,
+            rendition,
+            percentage_progress: row.try_get("percentage_progress")?,
+            progress,
+            format,
+            toc: None,
+            sections: vec![],
+            id: row.try_get("id")?,
+        })
+    }
     pub async fn add_book(
         &self,
         db: &DatabaseManager,
-        epub: Epub,
+        book: IBindingsEpubBook,
     ) -> Result<(), Box<dyn std::error::Error>> {
         let conn = db.get_pool();
-        let book = &epub.book;
 
-        let tags = book
-            .tags
-            .as_ref()
-            .map(|t| serde_json::to_string(t))
-            .transpose()?;
         let metadata = serde_json::to_string(&book.metadata)?;
 
-        let toc = serde_json::to_string(&epub.toc)?;
-        let chapters = serde_json::to_string(&epub.chapters)?;
-
+        let toc = serde_json::to_string(&book.toc)?;
+        let sections = serde_json::to_string(&book.sections)?;
         let progress = serde_json::to_string(&book.progress)?;
+        let rendition = serde_json::to_string(&book.rendition)?;
+        let format = serde_json::to_string(&book.format)?;
 
         sqlx::query(INSERT_EPUB_BOOK)
             .bind(&book.id)
-            .bind(&book.url)
-            .bind(&book.format)
-            .bind(&book.title)
-            .bind(&book.source_title)
-            .bind(&book.author)
-            .bind(&book.group_id)
-            .bind(&book.group_name)
-            .bind(tags)
-            .bind(&book.cover_image_url)
-            .bind(book.created_at)
-            .bind(book.updated_at)
-            .bind(book.deleted_at)
-            .bind(book.uploaded_at)
-            .bind(book.downloaded_at)
-            .bind(book.cover_downloaded_at)
-            .bind(book.last_updated)
-            .bind(&book.primary_language)
             .bind(metadata)
+            .bind(rendition)
+            .bind(&book.percentage_progress)
             .bind(progress)
+            .bind(format)
             .execute(conn)
             .await?;
 
-        sqlx::query(INSERT_EPUB_TOC)
+        sqlx::query(INSERT_EPUB_BOOK_TOC)
             .bind(&book.id)
             .bind(toc)
             .execute(conn)
             .await?;
 
-        sqlx::query(INSERT_EPUB_CHAPTERS)
+        sqlx::query(INSERT_EPUB_BOOK_SECTIONS)
             .bind(&book.id)
-            .bind(chapters)
+            .bind(sections)
             .execute(conn)
             .await?;
 
         Ok(())
     }
 
-    pub async fn set_epub_book_progress(
+    pub async fn set_book_progress(
         &self,
         db: &DatabaseManager,
         id: String,
-        progress: Progress,
+        progress: HashMap<ProgressType, String>,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        if progress.is_empty() {
+            return Ok(());
+        }
+
+        let conn = db.get_pool();
+
+        let raw: String = sqlx::query_scalar(SELECT_PGORESS_FROM_EPUB)
+            .bind(&id)
+            .fetch_one(conn)
+            .await?;
+
+        let mut existing: serde_json::Value = serde_json::from_str(&raw)?;
+        let existing_map = existing
+            .as_object_mut()
+            .ok_or("Progress is not a JSON object")?;
+
+        for (key, value) in progress {
+            let key_str = serde_json::to_value(&key)?
+                .as_str()
+                .ok_or("Failed to serialize ProgressType key")?
+                .to_string();
+
+            existing_map.insert(key_str, serde_json::Value::String(value));
+        }
+
+        sqlx::query(UPDATE_EPUB_BOOK_PROGRESS)
+            .bind(serde_json::to_string(&existing)?)
+            .bind(&id)
+            .execute(conn)
+            .await?;
+
+        Ok(())
+    }
+
+    pub async fn set_book_percentage_progress(
+        &self,
+        db: &DatabaseManager,
+        id: String,
+        percentage_progress: String,
     ) -> Result<(), Box<dyn std::error::Error>> {
         let conn = db.get_pool();
 
-        let new_progress = serde_json::to_string(&progress)?;
-
         let now = chrono::Utc::now().timestamp();
 
-        sqlx::query(UPDATE_EPUB_BOOK_PROGRESS)
-            .bind(new_progress)
-            .bind(now)
+        sqlx::query(UPDATE_EPUB_BOOK_PERCENTAGE_PROGRESS)
+            .bind(percentage_progress)
             .bind(id)
             .execute(conn)
             .await?;
@@ -96,7 +159,33 @@ impl EpubService {
         Ok(())
     }
 
-    pub async fn delete_epub_book(
+    pub async fn get_book_structure_by_id(
+        &self,
+        db: &DatabaseManager,
+        id: &str,
+    ) -> Result<IBindingsEpubBookStructure, Box<dyn std::error::Error>> {
+        let conn = db.get_pool();
+
+        let toc_json: String = sqlx::query_scalar(SELECT_EPUB_BOOK_TOC_BY_ID)
+            .bind(id)
+            .fetch_one(conn)
+            .await?;
+
+        let chapters_json: String = sqlx::query_scalar(SELECT_EPUB_BOOK_SECTION_BY_ID)
+            .bind(id)
+            .fetch_one(conn)
+            .await?;
+
+        let toc: Option<Vec<IBindingsEpubToc>> = serde_json::from_str(&toc_json)?;
+        let sections: Vec<IBindingsEpubSection> = serde_json::from_str(&chapters_json)?;
+
+        Ok(IBindingsEpubBookStructure {
+            toc,
+            sections,
+            format: FormatType::Epub,
+        })
+    }
+    pub async fn delete_book(
         &self,
         db: &DatabaseManager,
         id: String,
@@ -110,171 +199,60 @@ impl EpubService {
         Ok(())
     }
 
-    pub async fn edit_epub_book(
+    pub async fn update_book_metadata(
         &self,
         db: &DatabaseManager,
         id: String,
-        content: HashMap<NewEpubBookContent, String>,
-    ) -> Result<Epub, Box<dyn std::error::Error>> {
+        content: HashMap<IBindingsBookContent, String>,
+    ) -> Result<IBindingsEpubBook, Box<dyn std::error::Error>> {
         let conn = db.get_pool();
         if content.is_empty() {
-            let row = sqlx::query("SELECT * FROM epub_table WHERE id = ?")
+            let row = sqlx::query("SELECT * FROM epub_books_table WHERE id = ?")
                 .bind(id)
                 .fetch_one(conn)
                 .await?;
-
             return Ok(self.parse_book(row)?);
         }
-
-        let now = chrono::Utc::now().timestamp();
-
         let current_metadata_json: String =
-            sqlx::query_scalar("SELECT metadata FROM epub_table WHERE id = ?")
+            sqlx::query_scalar("SELECT metadata FROM epub_books_table WHERE id = ?")
                 .bind(&id)
                 .fetch_one(conn)
                 .await?;
 
         let mut metadata: serde_json::Value = serde_json::from_str(&current_metadata_json)?;
-
         let metadata_obj = metadata.as_object_mut().ok_or("Invalid metadata format")?;
-
-        let mut set_clauses = Vec::new();
-        let mut bindings: Vec<String> = Vec::new();
 
         for (key, value) in content {
             match key {
-                NewEpubBookContent::Title => {
-                    set_clauses.push("title = ?");
-                    bindings.push(value.clone());
-                    metadata_obj.insert(
-                        "title".to_string(),
-                        serde_json::Value::String(value.clone()),
-                    );
+                IBindingsBookContent::Title => {
+                    metadata_obj.insert("title".to_string(), serde_json::Value::String(value));
                 }
-                NewEpubBookContent::Author => {
-                    set_clauses.push("author = ?");
-                    bindings.push(value.clone());
-                    metadata_obj.insert(
-                        "author".to_string(),
-                        serde_json::Value::String(value.clone()),
-                    );
+                IBindingsBookContent::Author => {
+                    metadata_obj.insert("author".to_string(), serde_json::Value::String(value));
                 }
-                NewEpubBookContent::Description => {
+                IBindingsBookContent::Description => {
                     metadata_obj
                         .insert("description".to_string(), serde_json::Value::String(value));
                 }
-                NewEpubBookContent::Published => {
+                IBindingsBookContent::Published => {
                     metadata_obj.insert("published".to_string(), serde_json::Value::String(value));
                 }
-                NewEpubBookContent::Publisher => {
+                IBindingsBookContent::Publisher => {
                     metadata_obj.insert("publisher".to_string(), serde_json::Value::String(value));
                 }
             }
         }
 
-        set_clauses.push("metadata = ?");
-        bindings.push(serde_json::to_string(&metadata)?);
+        sqlx::query("UPDATE epub_books_table SET metadata = ? WHERE id = ?")
+            .bind(serde_json::to_string(&metadata)?)
+            .bind(&id)
+            .execute(conn)
+            .await?;
 
-        set_clauses.push("last_updated = ?");
-        bindings.push(now.to_string());
-
-        let query = format!(
-            "UPDATE epub_table SET {} WHERE id = ?",
-            set_clauses.join(", ")
-        );
-        let mut sql_query = sqlx::query(&query);
-
-        for binding in bindings {
-            sql_query = sql_query.bind(binding);
-        }
-
-        sql_query.bind(&id).execute(conn).await?;
-
-        let row = sqlx::query("SELECT * FROM epub_table WHERE id = ?")
+        let row = sqlx::query("SELECT * FROM epub_books_table WHERE id = ?")
             .bind(id)
             .fetch_one(conn)
             .await?;
-
         Ok(self.parse_book(row)?)
-    }
-
-    pub async fn get_books(
-        &self,
-        db: &DatabaseManager,
-    ) -> Result<Vec<Epub>, Box<dyn std::error::Error>> {
-        let conn = db.get_pool();
-        let rows = sqlx::query("SELECT * FROM epub_table")
-            .fetch_all(conn)
-            .await?;
-
-        let mut books = Vec::new();
-        for row in rows {
-            let epub = self.parse_book(row)?;
-            books.push(epub);
-        }
-
-        Ok(books)
-    }
-
-    pub async fn get_epub_structure_by_id(
-        &self,
-        db: &DatabaseManager,
-        id: String,
-    ) -> Result<EpubStructure, Box<dyn std::error::Error>> {
-        let conn = db.get_pool();
-
-        let toc_json: String = sqlx::query_scalar(SELECT_EPUB_TOC_BY_ID)
-            .bind(id.clone())
-            .fetch_one(conn)
-            .await?;
-
-        let chapters_json: String = sqlx::query_scalar(SELECT_EPUB_CHAPTERS_BY_ID)
-            .bind(id.clone())
-            .fetch_one(conn)
-            .await?;
-
-        let toc: Vec<Toc> = serde_json::from_str(&toc_json)?;
-        let chapters: Vec<Chapter> = serde_json::from_str(&chapters_json)?;
-
-        Ok(EpubStructure { toc, chapters })
-    }
-
-    fn parse_book(&self, row: sqlx::sqlite::SqliteRow) -> Result<Epub, Box<dyn std::error::Error>> {
-        use sqlx::Row;
-
-        let tags: Option<Vec<String>> = row
-            .try_get::<Option<String>, _>("tags")?
-            .map(|s| serde_json::from_str(&s))
-            .transpose()?;
-
-        let metadata: Metadata = serde_json::from_str(row.try_get("metadata")?)?;
-        let progress: Progress = serde_json::from_str(row.try_get("progress")?)?;
-
-        Ok(Epub {
-            book: Book {
-                id: row.try_get("id")?,
-                url: row.try_get("url")?,
-                format: row.try_get("format")?,
-                title: row.try_get("title")?,
-                source_title: row.try_get("source_title")?,
-                author: row.try_get("author")?,
-                group_id: row.try_get("group_id")?,
-                group_name: row.try_get("group_name")?,
-                tags,
-                cover_image_url: row.try_get("cover_image_url")?,
-                created_at: row.try_get("created_at")?,
-                updated_at: row.try_get("updated_at")?,
-                deleted_at: row.try_get("deleted_at")?,
-                uploaded_at: row.try_get("uploaded_at")?,
-                downloaded_at: row.try_get("downloaded_at")?,
-                cover_downloaded_at: row.try_get("cover_downloaded_at")?,
-                last_updated: row.try_get("last_updated")?,
-                primary_language: row.try_get("primary_language")?,
-                metadata,
-                progress,
-            },
-            toc: vec![],
-            chapters: vec![],
-        })
     }
 }

@@ -1,3 +1,4 @@
+import { FormatType } from '@bindings/format'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 export const uiStore = 'uiStore'
@@ -5,6 +6,7 @@ export const uiStore = 'uiStore'
 export interface IOpenBookOverviewModal {
   status: boolean
   bookId: string
+  format: FormatType
 }
 
 export interface IUiState {
@@ -20,7 +22,11 @@ export interface IUiState {
   hideHeader: boolean
 }
 
-const defaultOpenBookOverviewModalState = { status: false, bookId: '' }
+const defaultOpenBookOverviewModalState: IOpenBookOverviewModal = {
+  status: false,
+  format: 'EPUB',
+  bookId: '',
+}
 
 const defaultState: IUiState = {
   openBookOverviewModal: defaultOpenBookOverviewModalState,

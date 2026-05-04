@@ -1,9 +1,13 @@
 pub mod book;
 pub mod epub;
-pub mod highlights;
-pub mod notes;
+pub mod format;
+pub mod mobi;
+pub mod pdf;
+pub mod progress;
 
 pub use book::*;
 pub use epub::*;
-pub use highlights::*;
-pub use notes::*;
+pub use format::*;
+pub use mobi::*;
+pub use pdf::*;
+pub use progress::*;

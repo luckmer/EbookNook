@@ -14,6 +14,11 @@ export const Default: Story = {
     return (
       <ChaptersDrawer
         isOpen
+        activeToc={{
+          href: 'epub30-overview.xhtml#sec-intro',
+          label: '1. Introduction',
+          subitems: [],
+        }}
         isLoader={args.isLoader}
         onClickBack={() => {}}
         onClick={() => {}}
@@ -24,9 +29,7 @@ export const Default: Story = {
         toc={[
           {
             href: 'epub30-overview.xhtml#sec-intro',
-            id: 'epub30-overview.xhtml#sec-intro',
             label: '1. Introduction',
-            parent: 'ovw',
             subitems: new Array(6).fill(0).map(() => ({
               href: 'epub30-overview.xhtml#sec-intro',
               id: 'epub30-overview.xhtml#sec-intro',
@@ -37,9 +40,7 @@ export const Default: Story = {
           },
           {
             href: 'epub30-overview.xhtml#sec-intro',
-            id: 'epub30-overview.xhtml#sec-intro',
             label: '1. Introduction',
-            parent: 'ovw',
             subitems: new Array(6).fill(0).map(() => ({
               href: 'epub30-overview.xhtml#sec-intro',
               id: 'epub30-overview.xhtml#sec-intro',
@@ -50,9 +51,7 @@ export const Default: Story = {
           },
           {
             href: 'epub30-overview.xhtml#sec-intro',
-            id: 'epub30-overview.xhtml#sec-intro',
             label: '1. Introduction',
-            parent: 'ovw',
             subitems: new Array(6).fill(0).map(() => ({
               href: 'epub30-overview.xhtml#sec-intro',
               id: 'epub30-overview.xhtml#sec-intro',

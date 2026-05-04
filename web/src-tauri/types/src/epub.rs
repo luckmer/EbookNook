@@ -1,183 +1,169 @@
-use std::collections::HashMap;
-
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use ts_rs::TS;
 
+use crate::{FormatType, ProgressType};
+
 #[derive(Serialize, Deserialize, Debug, Clone, TS)]
 #[ts(export, export_to = "epub.ts")]
-pub struct Metadata {
+pub struct IBindingsEpubViewport {
+    pub width: f64,
+    pub height: f64,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, TS)]
+#[ts(export, export_to = "epub.ts")]
+pub enum IBindingsEpubSpread {
+    #[serde(rename = "left")]
+    Left,
+    #[serde(rename = "right")]
+    Right,
+    #[serde(rename = "center")]
+    Center,
+    #[serde(rename = "")]
+    Empty,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, TS)]
+#[ts(export, export_to = "epub.ts")]
+pub enum IBindingsEpubLayout {
+    #[serde(rename = "pre-paginated")]
+    PrePaginated,
+    #[serde(rename = "reflowable")]
+    Reflowable,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, TS)]
+#[serde(untagged)]
+#[ts(export, export_to = "epub.ts")]
+pub enum IEpubLanguage {
+    Single(String),
+    Multiple(Vec<String>),
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, TS)]
+#[ts(export, export_to = "epub.ts")]
+pub struct IBindingsEpubRendition {
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[ts(optional)]
-    pub identifier: Option<String>,
+    pub layout: Option<IBindingsEpubLayout>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[ts(optional)]
+    pub spread: Option<IBindingsEpubSpread>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[ts(optional)]
+    pub viewport: Option<IBindingsEpubViewport>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, TS)]
+#[ts(export, export_to = "epub.ts")]
+pub struct IBindingsEpubToc {
+    pub label: String,
+    pub href: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[ts(optional)]
+    pub subitems: Option<Vec<IBindingsEpubToc>>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, TS)]
+#[ts(export, export_to = "epub.ts")]
+pub struct IBindingsEpubLocation {
+    pub current: i32,
+    pub next: i32,
+    pub total: i32,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export, export_to = "epub.ts")]
+pub struct IBindingsEpubSection {
+    pub id: String,
+    pub cfi: String,
+    pub size: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[ts(optional)]
+    pub linear: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[ts(optional)]
+    pub page_spread: Option<IBindingsEpubSpread>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export, export_to = "epub.ts")]
+pub struct IBindingsEpubMetadata {
     pub title: String,
     pub author: String,
+    pub cover: String,
+    pub language: IEpubLanguage,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[ts(optional)]
-    pub language: Option<Vec<String>>,
-    #[ts(optional)]
-    pub description: Option<String>,
+    pub editor: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[ts(optional)]
     pub publisher: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[ts(optional)]
-    pub published: Option<String>,
+    pub contributor: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[ts(optional)]
     pub modified: Option<String>,
-    #[ts(optional)]
-    pub subject: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[ts(optional)]
     pub rights: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[ts(optional)]
-    pub cover: Option<String>,
+    pub published: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[ts(optional)]
-    #[serde(rename = "seriesName")]
-    #[ts(rename = "seriesName")]
-    pub series_name: Option<String>,
-    #[ts(optional, type = "number")]
-    #[serde(rename = "seriesPosition")]
-    #[ts(rename = "seriesPosition")]
-    pub series_positions: Option<i64>,
+    pub description: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[ts(optional)]
+    pub subject: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[ts(optional)]
+    pub identifier: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[ts(optional)]
+    pub isbn: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[ts(optional)]
+    pub subtitle: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[ts(optional)]
+    pub series: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[ts(optional)]
+    pub series_index: Option<f64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[ts(optional)]
+    pub series_total: Option<f64>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, TS)]
 #[ts(export, export_to = "epub.ts")]
-pub struct Series {
-    pub name: String,
-    #[ts(type = "string")]
-    pub position: Option<i64>,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone, TS)]
-#[ts(export, export_to = "epub.ts")]
-pub struct Chapter {
+pub struct IBindingsEpubBook {
+    pub metadata: IBindingsEpubMetadata,
+    pub rendition: IBindingsEpubRendition,
+    #[serde(rename = "percentageProgress")]
+    #[ts(rename = "percentageProgress")]
+    pub percentage_progress: String,
+    pub progress: HashMap<ProgressType, String>,
+    pub format: FormatType,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[ts(optional)]
+    pub toc: Option<Vec<IBindingsEpubToc>>,
+    pub sections: Vec<IBindingsEpubSection>,
     pub id: String,
-    pub href: String,
-    #[ts(type = "number")]
-    pub index: i64,
-    pub content: String,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, TS)]
 #[ts(export, export_to = "epub.ts")]
-pub struct Toc {
-    pub id: String,
-    pub href: String,
-    pub label: String,
+pub struct IBindingsEpubBookStructure {
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[ts(optional)]
-    pub parent: Option<String>,
-    pub subitems: Vec<Toc>,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone, TS)]
-#[ts(export, export_to = "epub.ts")]
-pub struct ChapterContentNumber(pub String);
-
-#[derive(Serialize, Deserialize, Debug, Clone, TS)]
-#[ts(export, export_to = "epub.ts")]
-pub struct BookOffset(pub String);
-
-#[derive(Serialize, Deserialize, Debug, Clone, TS)]
-#[ts(export, export_to = "epub.ts")]
-pub struct BookPercentageProgress(pub String);
-
-#[derive(Serialize, Deserialize, Debug, Clone, TS)]
-#[ts(export, export_to = "epub.ts")]
-pub struct Progress(
-    pub ChapterContentNumber,
-    pub BookOffset,
-    pub BookPercentageProgress,
-);
-
-#[derive(Serialize, Deserialize, Debug, Clone, TS)]
-#[ts(export, export_to = "epub.ts")]
-pub struct Book {
-    pub id: String,
-
-    #[ts(optional)]
-    pub url: Option<String>,
-    pub format: String,
-    pub title: String,
-
-    #[serde(rename = "sourceTitle")]
-    #[ts(rename = "sourceTitle")]
-    #[ts(optional)]
-    pub source_title: Option<String>,
-    pub author: String,
-
-    #[serde(rename = "groupId")]
-    #[ts(rename = "groupId")]
-    #[ts(optional)]
-    pub group_id: Option<String>,
-    #[serde(rename = "groupName")]
-    #[ts(rename = "groupName")]
-    #[ts(optional)]
-    pub group_name: Option<String>,
-    #[ts(optional)]
-    pub tags: Option<Vec<String>>,
-    #[serde(rename = "coverImageUrl")]
-    #[ts(rename = "coverImageUrl")]
-    #[ts(optional)]
-    pub cover_image_url: Option<String>,
-    #[serde(rename = "createdAt")]
-    #[ts(rename = "createdAt")]
-    #[ts(type = "number")]
-    pub created_at: i64,
-    #[serde(rename = "updatedAt")]
-    #[ts(rename = "updatedAt")]
-    #[ts(type = "number")]
-    pub updated_at: i64,
-    #[serde(rename = "deletedAt")]
-    #[ts(rename = "deletedAt")]
-    #[ts(optional, type = "string")]
-    pub deleted_at: Option<i64>,
-    #[serde(rename = "uploadedAt")]
-    #[ts(rename = "uploadedAt")]
-    #[ts(optional, type = "string")]
-    pub uploaded_at: Option<i64>,
-    #[serde(rename = "downloadedAt")]
-    #[ts(rename = "downloadedAt")]
-    #[ts(optional, type = "number")]
-    pub downloaded_at: Option<i64>,
-    #[serde(rename = "coverDownloadedAt")]
-    #[ts(rename = "coverDownloadedAt")]
-    #[ts(optional, type = "string")]
-    pub cover_downloaded_at: Option<i64>,
-    #[serde(rename = "lastUpdated")]
-    #[ts(rename = "lastUpdated")]
-    #[ts(optional, type = "string")]
-    pub last_updated: Option<i64>,
-    #[serde(rename = "primaryLanguage")]
-    #[ts(rename = "primaryLanguage")]
-    #[ts(optional)]
-    pub primary_language: Option<String>,
-    pub metadata: Metadata,
-    pub progress: Progress,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone, TS)]
-#[ts(export, export_to = "epub.ts")]
-pub struct Epub {
-    pub book: Book,
-    pub toc: Vec<Toc>,
-    pub chapters: Vec<Chapter>,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone, TS)]
-#[ts(export, export_to = "epub.ts")]
-pub struct EpubStructure {
-    pub toc: Vec<Toc>,
-    pub chapters: Vec<Chapter>,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deserialize, Serialize)]
-#[serde(rename_all = "lowercase")]
-pub enum NewEpubBookContent {
-    Author,
-    Description,
-    Published,
-    Publisher,
-    Title,
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct EditEpubPayload {
-    pub id: String,
-    pub content: HashMap<NewEpubBookContent, String>,
+    pub toc: Option<Vec<IBindingsEpubToc>>,
+    pub sections: Vec<IBindingsEpubSection>,
+    pub format: FormatType,
 }

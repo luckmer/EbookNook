@@ -12,7 +12,14 @@ type Story = StoryObj<typeof Book>
 export const BannersStory: Story = {
   render: () => {
     return (
-      <Book img="" title="test" onClick={() => {}} onClickDetails={() => {}} progress="20.20" />
+      <Book
+        img=""
+        title="test"
+        onClick={() => {}}
+        onClickDetails={() => {}}
+        progress="20.20"
+        author="Author"
+      />
     )
   },
 }

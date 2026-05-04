@@ -29,7 +29,6 @@ tauri-build = { version = "2", features = [
 database = { path = "./database" }
 formats = { path = "./formats" }
 annotations = { path = "./annotations" }
-search = { path = "./search" }
 utils = { path = "./utils" }
 api = { path = "./api" }
 types = { path = "./types" }
@@ -42,6 +41,7 @@ serde = { version = "1", features = [
 serde_json = "1"
 
 tauri = { version = "2", features = [
+  "protocol-asset",
 ] }
 sqlx = { version = "0.8.6", features = [
   "chrono",
@@ -51,6 +51,7 @@ sqlx = { version = "0.8.6", features = [
 ] }
 ts-rs = "11.1.0"
 tauri-plugin-fs = "2"
+
 
 
 [workspace.dependencies]
@@ -73,7 +74,6 @@ tauri = { version = "2", features = [
 members = [
   "database",
   "formats",
-  "search",
   "api",
   "utils",
   "types",

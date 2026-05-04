@@ -1,9 +1,13 @@
-use crate::{EPUB_BOOK_TABLE, EPUB_CHAPTERS_TABLE, EPUB_TOC_TABLE, HIGHLIGHTS_TABLE, NOTES_TABLE};
 use sqlx::sqlite::{SqliteConnectOptions, SqliteJournalMode, SqlitePoolOptions, SqliteSynchronous};
 use sqlx::{Pool, Sqlite, SqlitePool};
 use std::fs;
 use std::str::FromStr;
 use tauri::{AppHandle, Manager};
+
+use crate::{
+    EPUB_BOOKS_TABLE, EPUB_SECTIONS_TABLE, EPUB_TOC_TABLE, MOBI_BOOKS_TABLE, MOBI_SECTIONS_TABLE,
+    MOBI_TOC_TABLE, PDF_BOOKS_TABLE, PDF_SECTIONS_TABLE, PDF_TOC_TABLE,
+};
 
 pub struct DatabaseManager {
     pub pool: Pool<Sqlite>,
@@ -11,13 +15,16 @@ pub struct DatabaseManager {
 
 impl DatabaseManager {
     pub async fn new(app_handle: &AppHandle) -> Result<Self, Box<dyn std::error::Error>> {
-        let app_dir = app_handle.path().app_data_dir()?;
+        let base_dir = app_handle.path().app_data_dir()?;
 
-        if !app_dir.exists() {
-            fs::create_dir_all(&app_dir)?;
+        let db_dir = base_dir.join("eBookNook").join("database");
+
+        if !db_dir.exists() {
+            fs::create_dir_all(&db_dir)?;
         }
 
-        let db_path = app_dir.join("database.sqlite");
+        let db_path = db_dir.join("database.sqlite");
+
         let db_url = format!(
             "sqlite:{}",
             db_path.to_str().ok_or("Invalid path encoding")?
@@ -37,6 +44,7 @@ impl DatabaseManager {
 
         let database = DatabaseManager { pool };
         database.run_migrations().await?;
+
         Ok(database)
     }
 
@@ -44,11 +52,19 @@ impl DatabaseManager {
         sqlx::query("PRAGMA foreign_keys = ON;")
             .execute(&self.pool)
             .await?;
-        sqlx::query(EPUB_BOOK_TABLE).execute(&self.pool).await?;
+
+        sqlx::query(EPUB_BOOKS_TABLE).execute(&self.pool).await?;
         sqlx::query(EPUB_TOC_TABLE).execute(&self.pool).await?;
-        sqlx::query(EPUB_CHAPTERS_TABLE).execute(&self.pool).await?;
-        sqlx::query(NOTES_TABLE).execute(&self.pool).await?;
-        sqlx::query(HIGHLIGHTS_TABLE).execute(&self.pool).await?;
+        sqlx::query(EPUB_SECTIONS_TABLE).execute(&self.pool).await?;
+
+        sqlx::query(MOBI_BOOKS_TABLE).execute(&self.pool).await?;
+        sqlx::query(MOBI_TOC_TABLE).execute(&self.pool).await?;
+        sqlx::query(MOBI_SECTIONS_TABLE).execute(&self.pool).await?;
+
+        sqlx::query(PDF_BOOKS_TABLE).execute(&self.pool).await?;
+        sqlx::query(PDF_TOC_TABLE).execute(&self.pool).await?;
+        sqlx::query(PDF_SECTIONS_TABLE).execute(&self.pool).await?;
+
         Ok(())
     }
 

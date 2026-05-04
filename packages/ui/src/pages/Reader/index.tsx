@@ -3,10 +3,12 @@ import Show from '@components/Show'
 import Spin from '@components/Spin'
 import { Typography } from '@components/Typography'
 import clsx from 'clsx'
-import { FC, memo, useRef } from 'react'
+import { FC, memo, RefObject } from 'react'
 
 export interface IProps {
   pageInfo: { current: number; total: number; percentage: number }
+  containerRef: RefObject<HTMLDivElement | null>
+  sectionInfo: { current: number; total: number }
   loading: boolean
   onHideHeader: () => void
   onShowHeader: () => void
@@ -20,6 +22,8 @@ export interface IProps {
 const Reader: FC<IProps> = ({
   hideContent,
   pageInfo,
+  sectionInfo,
+  containerRef,
   loading,
   onHideHeader,
   onShowHeader,
@@ -28,8 +32,6 @@ const Reader: FC<IProps> = ({
   onClickNextPage,
   onClickPrevPage,
 }) => {
-  const containerRef = useRef<HTMLDivElement | null>(null)
-
   return (
     <main className="w-full h-full flex flex-col relative">
       <EpubNavigation
@@ -38,6 +40,11 @@ const Reader: FC<IProps> = ({
         onClickNextPage={onClickNextPage}
         onClickPrevPage={onClickPrevPage}
         hideContent={hideContent}>
+        <div className="absolute bottom-[20px] left-[20px]">
+          <Typography text="small" color="muted">
+            {Math.max(0, sectionInfo.total - sectionInfo.current)} pages left
+          </Typography>
+        </div>
         <div className="h-full relative">
           <Show when={loading}>
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
@@ -63,7 +70,7 @@ const Reader: FC<IProps> = ({
           />
         </div>
         <div className="absolute bottom-[20px] right-[20px]">
-          <Typography text="caption" color="muted">
+          <Typography text="small" color="muted">
             {pageInfo.current} / {pageInfo.total} ({pageInfo.percentage.toFixed(2)}%)
           </Typography>
         </div>

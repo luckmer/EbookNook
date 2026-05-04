@@ -1,9 +1,9 @@
 import { configureStore } from '@reduxjs/toolkit'
-import createSagaMiddleware from 'redux-saga'
 import { batchDispatchMiddleware } from 'redux-batched-actions'
+import { persistStore } from 'redux-persist'
+import createSagaMiddleware from 'redux-saga'
 import reducer from './reducers'
 import Saga from './sagas'
-import { persistStore } from 'redux-persist'
 
 const sagaMiddleware = createSagaMiddleware()
 const store = configureStore({

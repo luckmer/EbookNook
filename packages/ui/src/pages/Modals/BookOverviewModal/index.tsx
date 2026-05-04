@@ -1,4 +1,6 @@
+import { IBindingsBookContent } from '@bindings/book'
 import DefaultButton from '@components/Buttons/DefaultButton'
+import ImgCover from '@components/ImgCover'
 import ContentArea from '@components/Inputs/ContentArea'
 import ContentInput from '@components/Inputs/ContentInput'
 import DateContentInput from '@components/Inputs/DateContentInput'
@@ -8,7 +10,7 @@ import Show from '@components/Show'
 import Spin from '@components/Spin'
 import { Typography } from '@components/Typography'
 import { useWindowSize } from '@hooks/useWindowSize'
-import { BOOK_STATUS, NEW_EPUB_BOOK_CONTENT } from '@interfaces/book/enums'
+import { BOOK_STATUS } from '@interfaces/book/enums'
 import { DATE_REGEX } from '@web-utils/regex'
 import clsx from 'clsx'
 import { FC, useEffect, useMemo, useRef, useState } from 'react'
@@ -27,7 +29,7 @@ export interface IBook {
 }
 
 export interface IProps {
-  onClickEdit: (newContent: Partial<Record<NEW_EPUB_BOOK_CONTENT, string>>) => void
+  onClickEdit: (newContent: Partial<Record<IBindingsBookContent, string>>) => void
   onClickDelete: () => void
   onClickClose: () => void
   isOpen: boolean
@@ -41,7 +43,8 @@ const BookOverviewModal: FC<IProps> = ({
   isOpen,
   book,
 }) => {
-  const [newContent, setNewContent] = useState<Partial<Record<NEW_EPUB_BOOK_CONTENT, string>>>({})
+  const [hasLoadError, setHasLoadError] = useState(false)
+  const [newContent, setNewContent] = useState<Partial<Record<IBindingsBookContent, string>>>({})
   const [isEditing, setIsEditing] = useState(false)
   const [isError, setIsError] = useState(false)
   const { width } = useWindowSize()
@@ -66,12 +69,12 @@ const BookOverviewModal: FC<IProps> = ({
 
       const style = doc.createElement('style')
       style.textContent = `
-      body { 
-        margin: 0; padding: 0; color: white; 
-        font-family: system-ui, -apple-system, sans-serif; 
-        font-size: 14px; line-height: 1.5; overflow: hidden; 
-        * { 
-          color: #9CA3AF; 
+      body {
+        margin: 0; padding: 0; color: white;
+        font-family: system-ui, -apple-system, sans-serif;
+        font-size: 14px; line-height: 1.5; overflow: hidden;
+        * {
+          color: #9CA3AF;
         }
       }
     `
@@ -106,6 +109,10 @@ const BookOverviewModal: FC<IProps> = ({
       setNewContent({})
     }
   }, [isOpen])
+
+  useEffect(() => {
+    setHasLoadError(false)
+  }, [book.cover])
 
   return (
     <Modal
@@ -156,30 +163,40 @@ const BookOverviewModal: FC<IProps> = ({
           </div>
           <div className="flex flex-col gap-24 overflow-y-auto px-24">
             <div className="flex flex-row gap-24">
-              <img
-                src={book.cover}
-                alt="cover"
-                loading="lazy"
-                className="rounded-6  max-h-[200px] min-h-[200px] min-w-[130px] max-w-[130px] object-cover bg-neutral-800"
-              />
-              <div className="flex flex-col justify-between items-start py-4 w-full">
+              <Show
+                when={!hasLoadError}
+                fallback={
+                  <div className="rounded-6  max-h-[200px] min-h-[200px] min-w-[130px] max-w-[130px] object-cover bg-neutral-800">
+                    <ImgCover name={book.title ?? '--'} author={book.author ?? '--'} />
+                  </div>
+                }>
+                <img
+                  className="rounded-6  max-h-[200px] min-h-[200px] min-w-[130px] max-w-[130px] object-cover bg-neutral-800"
+                  src={book.cover}
+                  onError={(e) => {
+                    e.stopPropagation()
+                    setHasLoadError(true)
+                  }}
+                />
+              </Show>
+              <div className="flex flex-col justify-between items-start w-full">
                 <div className="flex flex-col gap-24 py-4 w-full">
                   <div className="flex flex-col gap-8 w-full">
                     <ContentInput
                       isEditing={isEditing}
                       placeholder={t('author')}
-                      value={newContent[NEW_EPUB_BOOK_CONTENT.AUTHOR] ?? book?.author ?? ''}
+                      value={newContent['author'] ?? book?.author ?? ''}
                       onChange={(val) => {
-                        setNewContent((prev) => ({ ...prev, [NEW_EPUB_BOOK_CONTENT.AUTHOR]: val }))
+                        setNewContent((prev) => ({ ...prev, ['author']: val }))
                       }}>
                       <Typography text="h2">{book?.author || t('unknownAuthor')}</Typography>
                     </ContentInput>
                     <ContentInput
                       isEditing={isEditing}
                       placeholder={t('title')}
-                      value={newContent[NEW_EPUB_BOOK_CONTENT.TITLE] ?? book?.title ?? ''}
+                      value={newContent['title'] ?? book?.title ?? ''}
                       onChange={(val) => {
-                        setNewContent((prev) => ({ ...prev, [NEW_EPUB_BOOK_CONTENT.TITLE]: val }))
+                        setNewContent((prev) => ({ ...prev, ['title']: val }))
                       }}>
                       <Typography text="caption" color="secondary">
                         {book?.title || t('unknownTitle')}
@@ -191,12 +208,12 @@ const BookOverviewModal: FC<IProps> = ({
                       isError={isError}
                       isEditing={isEditing}
                       placeholder={t('date')}
-                      value={newContent[NEW_EPUB_BOOK_CONTENT.PUBLISHED] ?? book?.published ?? ''}
+                      value={newContent['published'] ?? book?.published ?? ''}
                       onChange={(val) => {
                         setIsError(false)
                         setNewContent((prev) => ({
                           ...prev,
-                          [NEW_EPUB_BOOK_CONTENT.PUBLISHED]: val,
+                          ['published']: val,
                         }))
                       }}>
                       <Typography text="body">{book?.published || t('unknownDate')}</Typography>
@@ -204,11 +221,11 @@ const BookOverviewModal: FC<IProps> = ({
                     <ContentInput
                       isEditing={isEditing}
                       placeholder={t('publisher')}
-                      value={newContent[NEW_EPUB_BOOK_CONTENT.PUBLISHER] ?? book?.publisher ?? ''}
+                      value={newContent['publisher'] ?? book?.publisher ?? ''}
                       onChange={(val) => {
                         setNewContent((prev) => ({
                           ...prev,
-                          [NEW_EPUB_BOOK_CONTENT.PUBLISHER]: val,
+                          ['publisher']: val,
                         }))
                       }}>
                       <Typography text="caption" color="secondary">
@@ -229,9 +246,9 @@ const BookOverviewModal: FC<IProps> = ({
                 isEditing={isEditing}
                 placeholder={t('description')}
                 onChange={(val) => {
-                  setNewContent((prev) => ({ ...prev, [NEW_EPUB_BOOK_CONTENT.DESCRIPTION]: val }))
+                  setNewContent((prev) => ({ ...prev, ['description']: val }))
                 }}
-                value={newContent[NEW_EPUB_BOOK_CONTENT.DESCRIPTION] ?? bookDesc ?? ''}>
+                value={newContent['description'] ?? bookDesc ?? ''}>
                 <Show when={!bookDesc}>
                   <Typography text="caption" color="secondary">
                     {t('noDescription')}
@@ -252,7 +269,7 @@ const BookOverviewModal: FC<IProps> = ({
                 <DefaultButton
                   disabled={book.status === BOOK_STATUS.UPDATING}
                   onClick={() => {
-                    const date = newContent[NEW_EPUB_BOOK_CONTENT.PUBLISHED]
+                    const date = newContent['published']
                     if ((date?.trim()?.length ?? 0) > 0) {
                       if (!date?.match(DATE_REGEX)) {
                         setIsError(true)

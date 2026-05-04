@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "veloflow",
+        "title": "ebooknook",
         "width": 800,
         "height": 600,
         "decorations": false,
@@ -20,8 +20,32 @@
       }
     ],
     "security": {
-      "csp": null,
+      "csp": {
+        "default-src": "'self' 'unsafe-inline' blob: data: asset: http://asset.localhost ipc: http://ipc.localhost",
+        "connect-src": "'self' ipc: http://ipc.localhost asset: http://asset.localhost blob:",
+        "img-src": "'self' blob: data: asset: http://asset.localhost https://asset.localhost",
+        "style-src": "'self' 'unsafe-inline' blob: asset: http://asset.localhost",
+        "style-src-elem": "'self' 'unsafe-inline' blob: asset: http://asset.localhost",
+        "font-src": "'self' blob: data: asset: http://asset.localhost",
+        "frame-src": "'self' blob: asset: http://asset.localhost",
+        "script-src": "'self' 'unsafe-inline' 'unsafe-eval' blob: asset: http://asset.localhost"
+      },
+      "assetProtocol": {
+        "enable": true,
+        "scope": {
+          "requireLiteralLeadingDot": false,
+          "allow": [
+            "C:/Users/**",
+            "$APPDATA/**",
+            "$DOCUMENT/**",
+            "$DOWNLOAD/**",
+            "/**"
+          ],
+          "deny": []
+        }
+      },
       "capabilities": [
+        "default",
         {
           "identifier": "draggable-window",
           "windows": [
@@ -32,7 +56,41 @@
             "core:window:allow-toggle-maximize",
             "core:window:allow-internal-toggle-maximize",
             "core:window:allow-close",
-            "core:window:allow-minimize"
+            "core:window:allow-minimize",
+            "fs:allow-remove",
+            "fs:allow-copy-file",
+            "fs:allow-mkdir",
+            "fs:allow-exists",
+            "fs:allow-read-file",
+            "fs:allow-write-file",
+            {
+              "identifier": "fs:scope",
+              "allow": [
+                {
+                  "path": "$APPDATA/**"
+                },
+                {
+                  "path": "$DOCUMENT/**"
+                },
+                {
+                  "path": "$DOWNLOAD/**"
+                }
+              ]
+            },
+            {
+              "identifier": "fs:allow-read",
+              "allow": [
+                {
+                  "path": "$APPDATA/**"
+                },
+                {
+                  "path": "$DOCUMENT/**"
+                },
+                {
+                  "path": "$DOWNLOAD/**"
+                }
+              ]
+            }
           ]
         }
       ]

@@ -1,23 +1,34 @@
-import { Books } from '@bindings/book'
-import { Book, Epub, EpubStructure, Progress } from '@bindings/epub'
-import { BOOK_STATUS, BookFormat, NEW_EPUB_BOOK_CONTENT } from '@interfaces/book/enums'
+import { IBindingsBookContent, IBookMetadata } from '@bindings/book'
+import { FormatType } from '@bindings/format'
+import { ProgressType } from '@bindings/progress'
+import { BOOK_STATUS } from '@interfaces/book/enums'
+import { IBookStructure, IBookType, ILocalBookToc } from '@interfaces/book/types'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { PayloadType } from '@store/helper'
 
 export const booksStore = 'booksStore'
 
 export interface IBookState {
-  books: Books
   selectedChapter: string
   statuses: Record<string, BOOK_STATUS>
+  books: Partial<Record<FormatType, Partial<Record<string, IBookType>>>>
+  activeToc: ILocalBookToc
+  files: Record<string, File | null>
+}
+
+export const defaultActiveToc = {
+  id: -1,
+  label: '',
+  href: '',
+  index: -1,
 }
 
 const defaultState: IBookState = {
   selectedChapter: '',
+  activeToc: defaultActiveToc,
+  files: {},
   statuses: {},
-  books: {
-    epub: [],
-  },
+  books: {},
 }
 
 export const store = createSlice({
@@ -32,12 +43,20 @@ export const store = createSlice({
       state.statuses[action.payload.id] = action.payload.status
       return state
     },
-    setBooks(state, action: PayloadAction<Books>) {
-      state.books = action.payload
-      return state
+
+    setBook(state, action: PayloadAction<{ id: string; book: IBookType }>) {
+      const { id, book } = action.payload
+      const format = book.format
+
+      if (!state.books[format]) {
+        state.books[format] = {}
+      }
+
+      state.books[format][id] = book
     },
 
-    importBook(state, _: PayloadAction<File>) {
+    setActiveBook(state, action: PayloadAction<{ id: string; book: File }>) {
+      state.files[action.payload.id] = action.payload.book
       return state
     },
 
@@ -45,63 +64,148 @@ export const store = createSlice({
       state.selectedChapter = action.payload
       return state
     },
-
-    getEpubStructure(state, _: PayloadAction<string>) {
+    setOpenBook(state, _: PayloadAction<string>) {
       return state
     },
 
-    setUpdateEpubBookProgress(state, action: PayloadAction<{ progress: Progress; id: string }>) {
-      const epubState = state.books[BookFormat.EPUB]
+    getBookStructure(state, _: PayloadAction<{ id: string; format: FormatType }>) {
+      return state
+    },
+    importBook(state, _: PayloadAction<File>) {
+      return state
+    },
+    setActiveToc(state, action: PayloadAction<ILocalBookToc>) {
+      state.activeToc = action.payload
+      return state
+    },
 
-      epubState.forEach((epub) => {
-        if (epub.book.id === action.payload.id) {
-          epub.book.progress = action.payload.progress
+    setBookStructure(state, action: PayloadAction<{ id: string; structure: IBookStructure }>) {
+      const { id } = action.payload
+
+      switch (action.payload.structure.format) {
+        case 'EPUB': {
+          const book = state.books.EPUB?.[id]
+          if (!book || book.format !== 'EPUB') return state
+          book.sections = action.payload.structure.sections
+          book.toc = action.payload.structure.toc
+          break
         }
-      })
-    },
-
-    setEpubBook(state, action: PayloadAction<Epub>) {
-      state.books[BookFormat.EPUB].push(action.payload)
-      return state
-    },
-
-    updateEpubBook(state, action: PayloadAction<Book>) {
-      const index = state.books[BookFormat.EPUB].findIndex(
-        (epub) => epub.book.id === action.payload.id,
-      )
-
-      if (index !== -1) {
-        state.books[BookFormat.EPUB][index].book = action.payload
+        case 'MOBI': {
+          const book = state.books.MOBI?.[id]
+          if (!book || book.format !== 'MOBI') return state
+          book.sections = action.payload.structure.sections
+          book.toc = action.payload.structure.toc
+          break
+        }
+        case 'PDF': {
+          const book = state.books.PDF?.[id]
+          if (!book || book.format !== 'PDF') return state
+          book.sections = action.payload.structure.sections
+          book.toc = action.payload.structure.toc
+          break
+        }
       }
-    },
-
-    setEpubStructure(state, action: PayloadAction<{ structure: EpubStructure; id: string }>) {
-      const epubState = state.books[BookFormat.EPUB]
-
-      epubState.forEach((epub) => {
-        if (epub.book.id === action.payload.id) {
-          epub.chapters = action.payload.structure.chapters
-          epub.toc = action.payload.structure.toc
-        }
-      })
 
       return state
     },
 
-    setDeleteEpub(state, _: PayloadAction<string>) {
+    setUpdateBookMetadata(
+      state,
+      action: PayloadAction<{ id: string; format: FormatType; metadata: IBookMetadata }>,
+    ) {
+      const bookShelf = state.books[action.payload.format]
+
+      if (!bookShelf) {
+        return state
+      }
+
+      const book = bookShelf[action.payload.id]
+
+      if (!book) {
+        return state
+      }
+
+      book.metadata.author = action.payload.metadata.metadata.author ?? book.metadata.author
+      book.metadata.description =
+        action.payload.metadata.metadata.description ?? book.metadata.description
+      book.metadata.published =
+        action.payload.metadata.metadata.published ?? book.metadata.published
+      book.metadata.publisher =
+        action.payload.metadata.metadata.publisher ?? book.metadata.publisher
+      book.metadata.title = action.payload.metadata.metadata.title ?? book.metadata.title
+
       return state
     },
 
-    deleteEpub(state, action: PayloadAction<string>) {
-      state.books.epub = state.books.epub.filter((epub) => epub.book.id !== action.payload)
+    deleteBook(state, action: PayloadAction<{ id: string; format: FormatType }>) {
+      const bookShelf = state.books[action.payload.format]
+
+      if (!bookShelf?.[action.payload.id]) return state
+
+      if (Object.keys(bookShelf).length === 1) {
+        delete state.books[action.payload.format]
+      } else {
+        delete bookShelf[action.payload.id]
+      }
+
       return state
     },
 
-    setEditEpub(
+    setFile(state, action: PayloadAction<{ id: string; file: File }>) {
+      state.files[action.payload.id] = action.payload.file
+      return state
+    },
+    setUpdateBookProgress(
+      state,
+      action: PayloadAction<{
+        id: string
+        format: FormatType
+        progress: Partial<Record<ProgressType, string>>
+        percentageProgress: string
+      }>,
+    ) {
+      const bookShelf = state.books[action.payload.format]
+      if (!bookShelf) return state
+
+      const book = bookShelf[action.payload.id]
+
+      if (!book) {
+        return state
+      }
+
+      book.progress = action.payload.progress
+      book.percentageProgress = action.payload.percentageProgress
+
+      return state
+    },
+
+    setBooks(
+      state,
+      action: PayloadAction<Partial<Record<FormatType, Partial<Record<string, IBookType>>>>>,
+    ) {
+      state.books = action.payload
+      return state
+    },
+    setDeleteBook(state, _: PayloadAction<{ id: string; format: FormatType }>) {
+      return state
+    },
+    updateBookMetadata(
       state,
       _: PayloadAction<{
         id: string
-        content: Partial<Record<NEW_EPUB_BOOK_CONTENT, string>>
+        format: FormatType
+        metadata: Partial<Record<IBindingsBookContent, string>>
+      }>,
+    ) {
+      return state
+    },
+    updateBookProgress(
+      state,
+      _: PayloadAction<{
+        id: string
+        format: FormatType
+        percentageProgress: string
+        progress: Partial<Record<ProgressType, string>>
       }>,
     ) {
       return state

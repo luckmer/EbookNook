@@ -30,6 +30,7 @@ const EpubNavigation: FC<IProps> = ({
         )}>
         <div className="flex flex-row gap-6">
           <DefaultButton
+            disabled
             onClick={onClickPrevChapter}
             className="transition-colors hover:bg-button-primary-hover hover:text-text-primary text-text-secondary duration-300 rounded-4 px-6 py-6">
             <TbPlayerTrackPrevFilled className="w-18 h-18 transition-colors duration-200" />
@@ -40,6 +41,7 @@ const EpubNavigation: FC<IProps> = ({
             <FaChevronLeft className="w-18 h-18 transition-colors duration-200" />
           </DefaultButton>
         </div>
+
         <div className="flex flex-row gap-6">
           <DefaultButton
             onClick={onClickNextPage}
@@ -47,6 +49,7 @@ const EpubNavigation: FC<IProps> = ({
             <FaChevronRight className="w-18 h-18 transition-colors duration-200" />
           </DefaultButton>
           <DefaultButton
+            disabled
             onClick={onClickNextChapter}
             className="transition-colors hover:bg-button-primary-hover hover:text-text-primary text-text-secondary duration-300 rounded-4 px-6 py-6">
             <TbPlayerTrackNextFilled className="w-18 h-18 transition-colors duration-200" />

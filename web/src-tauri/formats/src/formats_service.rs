@@ -1,89 +1,159 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, error::Error};
 
 use database::DatabaseManager;
-use types::{Books, Epub, EpubStructure, NewEpubBookContent, Progress};
+use types::{
+    Books, FormatType, IAddBookType, IBookMetadata, IBookStructure, IBookType, ProgressType,
+};
 
-use crate::init_epub_service;
+use crate::{
+    EpubService, MobiService, PDFService, init_epub_service, init_mobi_service, init_pdf_service,
+};
 
-pub struct FormatsService {}
+pub struct FormatsService {
+    epub_service: EpubService,
+    mobi_service: MobiService,
+    pdf_service: PDFService,
+}
 
 impl FormatsService {
     pub fn new() -> FormatsService {
-        FormatsService {}
+        FormatsService {
+            epub_service: init_epub_service(),
+            mobi_service: init_mobi_service(),
+            pdf_service: init_pdf_service(),
+        }
     }
 
-    pub async fn get_books(
-        &self,
-        db: &DatabaseManager,
-    ) -> Result<Books, Box<dyn std::error::Error>> {
-        let epub_service = init_epub_service();
-
-        let epub_books = epub_service.get_books(db).await?;
-
-        Ok(Books { epub: epub_books })
+    pub async fn get_books(&self, db: &DatabaseManager) -> Result<Books, Box<dyn Error>> {
+        let mobi = self.mobi_service.get_books(db).await?;
+        let epub = self.epub_service.get_books(db).await?;
+        let pdf = self.pdf_service.get_books(db).await?;
+        Ok(Books { epub, mobi, pdf })
     }
 
-    pub async fn add_epub_book(
+    pub async fn add_book(
         &self,
         db: &DatabaseManager,
-        epub: Epub,
-    ) -> Result<(), Box<dyn std::error::Error>> {
-        let epub_service = init_epub_service();
-
-        epub_service.add_book(db, epub).await?;
+        book: IAddBookType,
+    ) -> Result<(), Box<dyn Error>> {
+        match book {
+            IAddBookType::Epub(epub) => self.epub_service.add_book(db, epub).await?,
+            IAddBookType::Mobi(mobi) => self.mobi_service.add_book(db, mobi).await?,
+            IAddBookType::Pdf(pdf) => self.pdf_service.add_book(db, pdf).await?,
+        }
 
         Ok(())
     }
 
-    pub async fn get_epub_structure_by_id(
+    pub async fn delete_book(
         &self,
         db: &DatabaseManager,
         id: String,
-    ) -> Result<EpubStructure, Box<dyn std::error::Error>> {
-        let epub_service = init_epub_service();
-
-        let epub_structure = epub_service.get_epub_structure_by_id(db, id).await?;
-
-        Ok(epub_structure)
-    }
-
-    pub async fn set_epub_book_progress(
-        &self,
-        db: &DatabaseManager,
-        id: String,
-        progress: Progress,
-    ) -> Result<(), Box<dyn std::error::Error>> {
-        let epub_service = init_epub_service();
-
-        epub_service
-            .set_epub_book_progress(db, id, progress)
-            .await?;
-
+        format: FormatType,
+    ) -> Result<(), Box<dyn Error>> {
+        match format {
+            FormatType::Epub => self.epub_service.delete_book(db, id).await?,
+            FormatType::Mobi => self.mobi_service.delete_book(db, id).await?,
+            FormatType::Pdf => self.pdf_service.delete_book(db, id).await?,
+            _ => return Err(format!("unsupported format: {:?}", format).into()),
+        }
         Ok(())
     }
 
-    pub async fn delete_epub_book(
+    pub async fn update_book_metadata(
         &self,
         db: &DatabaseManager,
         id: String,
-    ) -> Result<(), Box<dyn std::error::Error>> {
-        let epub_service = init_epub_service();
+        request: IBookMetadata,
+    ) -> Result<IBookType, Box<dyn Error>> {
+        match request {
+            IBookMetadata::Epub(data) => {
+                let book = self.epub_service.update_book_metadata(db, id, data).await?;
+                Ok(IBookType::Epub(book))
+            }
+            IBookMetadata::Mobi(data) => {
+                let book = self.mobi_service.update_book_metadata(db, id, data).await?;
+                Ok(IBookType::Mobi(book))
+            }
+            IBookMetadata::Pdf(data) => {
+                let book = self.pdf_service.update_book_metadata(db, id, data).await?;
+                Ok(IBookType::Pdf(book))
+            }
+        }
+    }
 
-        epub_service.delete_epub_book(db, id).await?;
-
+    pub async fn set_book_percentage_progress(
+        &self,
+        db: &DatabaseManager,
+        id: String,
+        percentage_progress: String,
+        format: FormatType,
+    ) -> Result<(), Box<dyn Error>> {
+        match format {
+            FormatType::Epub => {
+                self.epub_service
+                    .set_book_percentage_progress(db, id, percentage_progress)
+                    .await?
+            }
+            FormatType::Mobi => {
+                self.mobi_service
+                    .set_book_percentage_progress(db, id, percentage_progress)
+                    .await?
+            }
+            FormatType::Pdf => {
+                self.pdf_service
+                    .set_book_percentage_progress(db, id, percentage_progress)
+                    .await?
+            }
+            _ => return Err(format!("unsupported format: {:?}", format).into()),
+        }
         Ok(())
     }
 
-    pub async fn edit_epub_book(
+    pub async fn set_book_progress(
         &self,
         db: &DatabaseManager,
         id: String,
-        content: HashMap<NewEpubBookContent, String>,
-    ) -> Result<Epub, Box<dyn std::error::Error>> {
-        let epub_service = init_epub_service();
+        progress: HashMap<ProgressType, String>,
+        format: FormatType,
+    ) -> Result<(), Box<dyn Error>> {
+        match format {
+            FormatType::Epub => {
+                self.epub_service
+                    .set_book_progress(db, id, progress)
+                    .await?
+            }
+            FormatType::Mobi => {
+                self.mobi_service
+                    .set_book_progress(db, id, progress)
+                    .await?
+            }
+            FormatType::Pdf => self.pdf_service.set_book_progress(db, id, progress).await?,
+            _ => return Err(format!("unsupported format: {:?}", format).into()),
+        }
+        Ok(())
+    }
 
-        let response = epub_service.edit_epub_book(db, id, content).await?;
-
-        Ok(response)
+    pub async fn get_book_structure_by_id(
+        &self,
+        db: &DatabaseManager,
+        id: String,
+        format: FormatType,
+    ) -> Result<IBookStructure, Box<dyn Error>> {
+        match format {
+            FormatType::Epub => {
+                let structure = self.epub_service.get_book_structure_by_id(db, &id).await?;
+                Ok(IBookStructure::Epub(structure))
+            }
+            FormatType::Mobi => {
+                let structure = self.mobi_service.get_book_structure_by_id(db, &id).await?;
+                Ok(IBookStructure::Mobi(structure))
+            }
+            FormatType::Pdf => {
+                let structure = self.pdf_service.get_book_structure_by_id(db, &id).await?;
+                Ok(IBookStructure::Pdf(structure))
+            }
+            _ => Err(format!("unsupported format: {:?}", format).into()),
+        }
     }
 }

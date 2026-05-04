@@ -1,8 +1,7 @@
 pub mod epub;
+pub mod mobi;
+pub mod pdf;
+
 pub use epub::*;
-
-pub mod notes;
-pub use notes::*;
-
-pub mod highlights;
-pub use highlights::*;
+pub use mobi::*;
+pub use pdf::*;

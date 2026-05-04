@@ -1,4 +1,3 @@
-import { type Toc as IToc } from '@bindings/epub'
 import DefaultButton from '@components/Buttons/DefaultButton'
 import Drawer from '@components/Drawer'
 import Show from '@components/Show'
@@ -6,8 +5,16 @@ import Toc from '@components/Toc'
 import { Typography } from '@components/Typography'
 import { useWindowSize } from '@hooks/useWindowSize'
 import { Skeleton } from 'antd'
-import { FC, useMemo } from 'react'
+import { FC, useEffect, useMemo, useState } from 'react'
 import { IoLibraryOutline } from 'react-icons/io5'
+
+export interface ITocItem {
+  label: string
+  href?: string
+  id?: string
+  subitems?: ITocItem[]
+}
+
 export interface IProps {
   onClick: (href: string) => void
   onClickClose: () => void
@@ -16,8 +23,9 @@ export interface IProps {
   icon?: string
   title: string
   author: string
-  toc: IToc[]
+  toc: ITocItem[]
   isLoader: boolean
+  activeToc: ITocItem
 }
 
 const ChaptersDrawer: FC<IProps> = ({
@@ -30,10 +38,19 @@ const ChaptersDrawer: FC<IProps> = ({
   title,
   author,
   isLoader,
+  activeToc,
 }) => {
+  const [hasLoadError, setHasLoadError] = useState(false)
+  const [cache, setCache] = useState<string | undefined>(undefined)
   const { width } = useWindowSize()
 
   const isMobile = useMemo(() => width <= 700, [width])
+
+  useEffect(() => {
+    if (icon === cache) return
+    setHasLoadError(false)
+    setCache(icon)
+  }, [icon])
 
   return (
     <Drawer
@@ -51,10 +68,16 @@ const ChaptersDrawer: FC<IProps> = ({
         </div>
         <Show when={!isLoader} fallback={<Skeleton active />}>
           <div className="flex flex-row gap-12">
-            <img
-              src={icon}
-              className="w-48 h-[64px] object-cover rounded-4 pointer-events-none select-none"
-            />
+            <Show when={!hasLoadError}>
+              <img
+                className="w-48 h-[64px] object-cover rounded-4 pointer-events-none select-none"
+                src={icon}
+                onError={(e) => {
+                  e.stopPropagation()
+                  setHasLoadError(true)
+                }}
+              />
+            </Show>
             <div className="flex flex-col gap-6">
               <Typography>{title}</Typography>
               <Typography text="small" color="secondary">
@@ -67,7 +90,7 @@ const ChaptersDrawer: FC<IProps> = ({
       <div className="py-12">
         <Show when={!isLoader} fallback={<Skeleton active />}>
           {toc.map((el, index) => (
-            <Toc key={index} item={el} level={0} onClick={onClick} />
+            <Toc key={index} item={el} level={0} onClick={onClick} activeToc={activeToc} />
           ))}
         </Show>
       </div>

@@ -1,24 +1,36 @@
-import { Book } from '@bindings/epub'
+import { IBookFile } from '@interfaces/book/interfaces'
 import { createSelector } from '@reduxjs/toolkit'
 import { bookSelector } from '@store/selectors/books'
 import { searchSelector } from '@store/selectors/search'
 
 export const booksState = createSelector([bookSelector.books], (books) =>
-  Object.values(books).flat()
+  Object.values(books)
+    .flatMap((booksByFormat) => Object.values(booksByFormat))
+    .filter((book) => !!book)
+    .map((book) => ({
+      percentageProgress: book.percentageProgress,
+      cover: book.metadata.cover,
+      title: book.metadata.title,
+      author: book.metadata.author,
+      format: book.format,
+      id: book.id,
+    })),
 )
-
 export const filteredBooks = createSelector(
   [booksState, searchSelector.value],
   (books, searchValue) => {
-    if (!searchValue) return books.map((b) => b.book)
+    if (!searchValue) return books
 
     const query = searchValue.toLowerCase()
 
-    return books.reduce((acc, bookWrapper) => {
-      if (bookWrapper.book.title.toLowerCase().includes(query)) {
-        acc.push(bookWrapper.book)
+    const acc: IBookFile[] = []
+
+    books.forEach((book) => {
+      if (book.title.toLowerCase().includes(query)) {
+        acc.push(book)
       }
-      return acc
-    }, [] as Book[])
-  }
+    })
+
+    return acc
+  },
 )

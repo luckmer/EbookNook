@@ -28,7 +28,11 @@ const notes = new Array(20).fill(0).map(() => ({
 }))
 
 export const Default: Story = {
-  render: (args) => {
+  render: (args: {
+    isOpen: boolean
+    isFetchingHighlightsStructure: boolean
+    isFetchingNotesStructure: boolean
+  }) => {
     return (
       <NotebookDrawer
         highlights={data}
