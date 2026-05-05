@@ -7,15 +7,19 @@ export const booksState = createSelector([bookSelector.books], (books) =>
   Object.values(books)
     .flatMap((booksByFormat) => Object.values(booksByFormat))
     .filter((book) => !!book)
+    .sort((a, b) => +a.createdAt - +b.createdAt)
     .map((book) => ({
       percentageProgress: book.percentageProgress,
       cover: book.metadata.cover,
       title: book.metadata.title,
       author: book.metadata.author,
+      createdAt: book.createdAt,
+      updatedAt: book.updatedAt,
       format: book.format,
       id: book.id,
-    })),
+    }))
 )
+
 export const filteredBooks = createSelector(
   [booksState, searchSelector.value],
   (books, searchValue) => {

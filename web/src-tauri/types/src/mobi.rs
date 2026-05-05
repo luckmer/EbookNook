@@ -72,6 +72,12 @@ pub struct IBindingsMobiBook {
     #[serde(rename = "percentageProgress")]
     #[ts(rename = "percentageProgress")]
     pub percentage_progress: String,
+    #[serde(rename = "createdAt")]
+    #[ts(rename = "createdAt")]
+    pub created_at: String,
+    #[serde(rename = "updatedAt")]
+    #[ts(rename = "updatedAt")]
+    pub updated_at: String,
     pub progress: HashMap<ProgressType, String>,
     pub format: FormatType,
     #[serde(skip_serializing_if = "Option::is_none")]

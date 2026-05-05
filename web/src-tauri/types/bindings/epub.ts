@@ -2,7 +2,7 @@
 import type { FormatType } from "./format";
 import type { ProgressType } from "./progress";
 
-export type IBindingsEpubBook = { metadata: IBindingsEpubMetadata, rendition: IBindingsEpubRendition, percentageProgress: string, progress: { [key in ProgressType]?: string }, format: FormatType, toc?: Array<IBindingsEpubToc>, sections: Array<IBindingsEpubSection>, id: string, };
+export type IBindingsEpubBook = { metadata: IBindingsEpubMetadata, rendition: IBindingsEpubRendition, createdAt: string, updatedAt: string, percentageProgress: string, progress: { [key in ProgressType]?: string }, format: FormatType, toc?: Array<IBindingsEpubToc>, sections: Array<IBindingsEpubSection>, id: string, };
 
 export type IBindingsEpubBookStructure = { toc?: Array<IBindingsEpubToc>, sections: Array<IBindingsEpubSection>, format: FormatType, };
 

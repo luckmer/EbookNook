@@ -31,6 +31,8 @@ export class BookAdapterCore {
     switch (content.format) {
       case 'EPUB': {
         const epubFormat: IEpubBookType = {
+          createdAt: Date.now().toString(),
+          updatedAt: Date.now().toString(),
           percentageProgress: content.percentageProgress,
           metadata: {
             author: this._getContent(content.metadata.author),
@@ -71,6 +73,8 @@ export class BookAdapterCore {
       }
       case 'MOBI': {
         const mobiFormat: IMobiBookType = {
+          createdAt: Date.now().toString(),
+          updatedAt: Date.now().toString(),
           id: content.id,
           format: content.format,
           percentageProgress: content.percentageProgress,
@@ -104,6 +108,8 @@ export class BookAdapterCore {
       }
       case 'PDF': {
         const pdfFormat: IPDFBookType = {
+          createdAt: Date.now().toString(),
+          updatedAt: Date.now().toString(),
           id: content.id,
           format: content.format,
           percentageProgress: content.percentageProgress,

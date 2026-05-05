@@ -2,7 +2,7 @@
 import type { FormatType } from "./format";
 import type { ProgressType } from "./progress";
 
-export type IBindingsPDFBook = { metadata: IBindingsPDFMetadata, percentageProgress: string, progress: { [key in ProgressType]?: string }, format: FormatType, toc?: Array<IBindingsPDFToc>, sections: Array<IBindingsPDFSection>, id: string, };
+export type IBindingsPDFBook = { metadata: IBindingsPDFMetadata, percentageProgress: string, progress: { [key in ProgressType]?: string }, format: FormatType, createdAt: string, updatedAt: string, toc?: Array<IBindingsPDFToc>, sections: Array<IBindingsPDFSection>, id: string, };
 
 export type IBindingsPDFBookStructure = { sections: Array<IBindingsPDFSection>, toc?: Array<IBindingsPDFToc>, format: FormatType, };
 

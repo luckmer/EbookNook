@@ -146,6 +146,12 @@ pub struct IBindingsEpubMetadata {
 pub struct IBindingsEpubBook {
     pub metadata: IBindingsEpubMetadata,
     pub rendition: IBindingsEpubRendition,
+    #[serde(rename = "createdAt")]
+    #[ts(rename = "createdAt")]
+    pub created_at: String,
+    #[serde(rename = "updatedAt")]
+    #[ts(rename = "updatedAt")]
+    pub updated_at: String,
     #[serde(rename = "percentageProgress")]
     #[ts(rename = "percentageProgress")]
     pub percentage_progress: String,

@@ -4,7 +4,9 @@ CREATE TABLE IF NOT EXISTS pdf_books_table (
     metadata            TEXT NOT NULL,
     percentage_progress TEXT NOT NULL,
     progress            TEXT NOT NULL,
-    format              TEXT NOT NULL
+    format              TEXT NOT NULL,
+    updated_at          TEXT NOT NULL,
+    created_at          TEXT NOT NULL
 );
 "#;
 
@@ -31,8 +33,8 @@ SELECT sections FROM pdf_book_sections_table WHERE id = ?;
 "#;
 
 pub const INSERT_PDF_BOOK: &str = r#"
-INSERT OR REPLACE INTO pdf_books_table (id, metadata, percentage_progress, progress, format)
-VALUES (?, ?, ?, ?, ?);
+INSERT OR REPLACE INTO pdf_books_table (id, metadata, percentage_progress, progress, format, created_at, updated_at)
+VALUES (?, ?, ?, ?, ?, ?, ?);
 "#;
 
 pub const UPDATE_PDF_BOOK_PROGRESS: &str = r#"

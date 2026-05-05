@@ -2,7 +2,7 @@
 import type { FormatType } from "./format";
 import type { ProgressType } from "./progress";
 
-export type IBindingsMobiBook = { metadata: IBindingsMobiMetadata, percentageProgress: string, progress: { [key in ProgressType]?: string }, format: FormatType, toc?: Array<IBindingsMobiToc>, sections: Array<IBindingsMobiSection>, id: string, };
+export type IBindingsMobiBook = { metadata: IBindingsMobiMetadata, percentageProgress: string, createdAt: string, updatedAt: string, progress: { [key in ProgressType]?: string }, format: FormatType, toc?: Array<IBindingsMobiToc>, sections: Array<IBindingsMobiSection>, id: string, };
 
 export type IBindingsMobiBookStructure = { toc?: Array<IBindingsMobiToc>, sections: Array<IBindingsMobiSection>, format: FormatType, };
 

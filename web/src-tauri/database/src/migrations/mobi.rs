@@ -4,13 +4,15 @@ CREATE TABLE IF NOT EXISTS mobi_books_table (
     metadata            TEXT NOT NULL,
     percentage_progress TEXT NOT NULL,
     progress            TEXT NOT NULL,
-    format              TEXT NOT NULL
+    format              TEXT NOT NULL,
+    updated_at          TEXT NOT NULL,
+    created_at          TEXT NOT NULL
 );
 "#;
 
 pub const INSERT_MOBI_BOOK: &str = r#"
-INSERT OR REPLACE INTO mobi_books_table (id, metadata, percentage_progress, progress, format)
-VALUES (?, ?, ?, ?, ?);
+INSERT OR REPLACE INTO mobi_books_table (id, metadata, percentage_progress, progress, format,created_at,updated_at)
+VALUES (?, ?, ?, ?, ?, ?, ?);
 "#;
 
 pub const MOBI_TOC_TABLE: &str = r#"

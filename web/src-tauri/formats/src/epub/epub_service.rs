@@ -48,10 +48,14 @@ impl EpubService {
         let progress: HashMap<ProgressType, String> =
             serde_json::from_str(row.try_get("progress")?)?;
         let format: FormatType = serde_json::from_str(row.try_get("format")?)?;
+        let created_at: String = serde_json::from_str(row.try_get("created_at")?)?;
+        let updated_at: String = serde_json::from_str(row.try_get("updated_at")?)?;
 
         Ok(IBindingsEpubBook {
             metadata,
             rendition,
+            created_at,
+            updated_at,
             percentage_progress: row.try_get("percentage_progress")?,
             progress,
             format,
@@ -73,6 +77,8 @@ impl EpubService {
         let sections = serde_json::to_string(&book.sections)?;
         let progress = serde_json::to_string(&book.progress)?;
         let rendition = serde_json::to_string(&book.rendition)?;
+        let created_at = serde_json::to_string(&book.created_at)?;
+        let updated_at = serde_json::to_string(&book.updated_at)?;
         let format = serde_json::to_string(&book.format)?;
 
         sqlx::query(INSERT_EPUB_BOOK)
@@ -82,6 +88,8 @@ impl EpubService {
             .bind(&book.percentage_progress)
             .bind(progress)
             .bind(format)
+            .bind(created_at)
+            .bind(updated_at)
             .execute(conn)
             .await?;
 

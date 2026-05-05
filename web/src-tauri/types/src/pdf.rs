@@ -67,6 +67,12 @@ pub struct IBindingsPDFBook {
     pub percentage_progress: String,
     pub progress: HashMap<ProgressType, String>,
     pub format: FormatType,
+    #[serde(rename = "createdAt")]
+    #[ts(rename = "createdAt")]
+    pub created_at: String,
+    #[serde(rename = "updatedAt")]
+    #[ts(rename = "updatedAt")]
+    pub updated_at: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[ts(optional)]
     pub toc: Option<Vec<IBindingsPDFToc>>,

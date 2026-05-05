@@ -5,7 +5,9 @@ CREATE TABLE IF NOT EXISTS epub_books_table (
     rendition           TEXT NOT NULL,
     percentage_progress TEXT NOT NULL,
     progress            TEXT NOT NULL,
-    format              TEXT NOT NULL
+    format              TEXT NOT NULL,
+    updated_at          TEXT NOT NULL,
+    created_at          TEXT NOT NULL
 );
 "#;
 
@@ -40,8 +42,8 @@ SELECT toc FROM epub_book_toc_table WHERE id = ?;
 "#;
 
 pub const INSERT_EPUB_BOOK: &str = r#"
-INSERT OR REPLACE INTO epub_books_table (id, metadata, rendition, percentage_progress, progress, format)
-VALUES (?, ?, ?, ?, ?, ?);
+INSERT OR REPLACE INTO epub_books_table (id, metadata, rendition, percentage_progress, progress, format,created_at,updated_at)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?);
 "#;
 
 pub const UPDATE_EPUB_BOOK_PROGRESS: &str = r#"
