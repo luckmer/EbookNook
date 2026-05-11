@@ -17,6 +17,7 @@ const DrawerRoot: FC<IProps> = ({ placement, isOpen, children, height, onClickCl
       onClose={onClickClose}
       open={isOpen}
       height={height ?? '100%'}
+      styles={{ body: { paddingRight: 0, height: '100%', overflow: 'hidden' } }}
       key={placement}>
       {children}
     </Drawer>

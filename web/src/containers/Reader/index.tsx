@@ -1,8 +1,10 @@
 import { FormatType } from '@bindings/format'
 import { ProgressType } from '@bindings/progress'
 import { getDocumentClient } from '@libs/document'
+import { getEventEmitter } from '@libs/eventEmitter'
 import { getPDFClient } from '@libs/pdf'
 import Reader from '@pages/Reader'
+import { actions as bookmarkActions } from '@store/reducers/bookmarks'
 import { actions as bookActions } from '@store/reducers/books'
 import { actions } from '@store/reducers/ui'
 import { bookSelector } from '@store/selectors/books'
@@ -13,13 +15,55 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation } from 'react-router-dom'
 
+export interface ILocation {
+  cfi: string
+  fraction: number
+  location: {
+    current: number
+    next: number
+    total: number
+  }
+  time: {
+    current: number
+    total: number
+  }
+  tocItem: {
+    href: string
+    label: string
+    id: number
+    subitems: Array<{
+      id: number
+      href: string
+      label: string
+    }>
+  }
+}
+
+const defaultReaderLocation = {
+  cfi: '',
+  fraction: 0,
+  location: {
+    current: 0,
+    next: 0,
+    total: 0,
+  },
+  time: {
+    current: 0,
+    total: 0,
+  },
+  tocItem: {
+    href: '',
+    label: '',
+    id: 0,
+    subitems: [],
+  },
+}
+
 const ReaderRoot = () => {
   const [isLoadingStructure, setIsLoadingStructure] = useState(true)
-  const [sectionProgress, setSectionProgress] = useState({ current: 0, total: 0 })
-  const [bookProgress, setBookProgress] = useState({ current: 0, next: 0, total: 0 })
-  const [fraction, setFraction] = useState(0)
-  const [isViewReady, setIsViewReady] = useState(false)
+  const [readerLocation, setReaderLocation] = useState<ILocation>(defaultReaderLocation)
   const [isContentViewReady, setIsContentViewReady] = useState(false)
+  const [isViewReady, setIsViewReady] = useState(false)
 
   const books = useSelector(bookSelector.books)
   const files = useSelector(bookSelector.files)
@@ -49,6 +93,8 @@ const ReaderRoot = () => {
     return bookShelf[bookState.id]
   }, [bookState, books])
 
+  const eventEmitter = getEventEmitter()
+
   const handleHideHeader = useCallback(() => {
     dispatch(actions.setHideHeader(true))
   }, [dispatch])
@@ -56,28 +102,6 @@ const ReaderRoot = () => {
   const handleShowHeader = useCallback(() => {
     dispatch(actions.setHideHeader(false))
   }, [dispatch])
-
-  const handleRelocate = (e: any) => {
-    if (!activeBook) return
-
-    const progress: Partial<Record<ProgressType, string>> = {
-      CFI: e.detail.cfi,
-    }
-
-    setSectionProgress(e.detail.section)
-    setBookProgress(e.detail.location)
-    setFraction(e.detail.fraction)
-
-    dispatch(bookActions.setActiveToc(e.detail.tocItem))
-    dispatch(
-      bookActions.updateBookProgress({
-        percentageProgress: String(e.detail.fraction * 100),
-        format: activeBook.format,
-        id: activeBook.id,
-        progress,
-      }),
-    )
-  }
 
   useEffect(() => {
     if (!file) {
@@ -88,10 +112,9 @@ const ReaderRoot = () => {
       setIsViewReady(false)
       viewRef.current = null
       setIsLoadingStructure(true)
-      setSectionProgress({ current: 0, total: 0 })
-      setBookProgress({ current: 0, next: 0, total: 0 })
+      setReaderLocation(defaultReaderLocation)
+
       setIsContentViewReady(false)
-      setFraction(0)
       return
     }
 
@@ -139,16 +162,76 @@ const ReaderRoot = () => {
     }
   }, [file, activeBook])
 
+  const saveProgress = useMemo(
+    () =>
+      debounce((location: ILocation, book: typeof activeBook) => {
+        if (!book) return
+
+        const progress: Partial<Record<ProgressType, string>> = {
+          CFI: location.cfi,
+        }
+
+        dispatch(bookActions.setActiveToc(location.tocItem))
+        dispatch(
+          bookActions.updateBookProgress({
+            percentageProgress: String(location.fraction * 100),
+            format: book.format,
+            id: book.id,
+            progress,
+          }),
+        )
+      }, 300),
+    [dispatch],
+  )
+
+  useEffect(() => {
+    if (!activeBook || !isContentViewReady) return
+
+    const handler = () => {
+      if (JSON.stringify(defaultReaderLocation) === JSON.stringify(readerLocation)) return
+
+      dispatch(
+        bookmarkActions.saveBookmark({
+          label: readerLocation.tocItem.label,
+          date: Date.now().toString(),
+          format: activeBook.format,
+          cfi: readerLocation.cfi,
+          id: activeBook.id,
+        }),
+      )
+    }
+
+    eventEmitter.on('save_bookmark', handler)
+
+    return () => {
+      eventEmitter.off('save_bookmark', handler)
+    }
+  }, [readerLocation, activeBook, isContentViewReady])
+
+  useEffect(() => {
+    if (
+      !activeBook ||
+      !isContentViewReady ||
+      JSON.stringify(defaultReaderLocation) === JSON.stringify(readerLocation)
+    ) {
+      return
+    }
+
+    saveProgress(readerLocation, activeBook)
+  }, [readerLocation, activeBook, isContentViewReady])
+
   useEffect(() => {
     if (!isContentViewReady) return
 
     const view = viewRef.current
     if (!view) return
 
-    view.addEventListener('relocate', debounce(handleRelocate, 100))
+    view.addEventListener('relocate', (e: { detail: ILocation }) => setReaderLocation(e.detail))
 
     return () => {
-      view.removeEventListener('relocate', handleRelocate)
+      view.removeEventListener('relocate', (e: { detail: ILocation }) =>
+        setReaderLocation(e.detail),
+      )
     }
   }, [isContentViewReady])
 
@@ -172,13 +255,13 @@ const ReaderRoot = () => {
     <Reader
       containerRef={containerRef}
       sectionInfo={{
-        current: Math.max(1, sectionProgress.current),
-        total: sectionProgress.total,
+        current: Math.max(1, readerLocation.location.current),
+        total: readerLocation.location.total,
       }}
       pageInfo={{
-        percentage: fraction * 100,
-        current: Math.max(1, bookProgress.current),
-        total: bookProgress.total,
+        percentage: readerLocation.fraction * 100,
+        current: Math.max(1, readerLocation.location.current),
+        total: readerLocation.location.total,
       }}
       loading={isLoadingStructure || isLoader}
       hideContent={hideContent}

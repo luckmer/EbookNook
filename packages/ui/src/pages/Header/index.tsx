@@ -7,8 +7,9 @@ import clsx from 'clsx'
 import { FC, memo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { BsLayoutSidebarInset } from 'react-icons/bs'
+import { FaRegBookmark } from 'react-icons/fa6'
+import { FcBookmark } from 'react-icons/fc'
 import { GiHamburgerMenu } from 'react-icons/gi'
-import { LuNotebookPen } from 'react-icons/lu'
 
 export interface IProps {
   onClickClose: () => void
@@ -18,9 +19,11 @@ export interface IProps {
   onClickOpenNotebook: () => void
   onClickOpenSidebar: () => void
   onChange: (value: string) => void
+  onClickBookmark: () => void
   hideHeader: boolean
   location: string
   value: string
+  isBookmarkActive: boolean
   bookName?: string
 }
 
@@ -30,8 +33,10 @@ export const Header: FC<IProps> = ({
   onClickMinimize,
   onClickOpenSidebar,
   onClickOpenNotebook,
+  onClickBookmark,
   onClickSettings,
   value,
+  isBookmarkActive,
   location,
   hideHeader,
   bookName,
@@ -48,11 +53,22 @@ export const Header: FC<IProps> = ({
         'relative flex flex-row items-center justify-between gap-48 p-12 rounded-8 transition-opacity duration-300 h-[70px]',
       )}>
       <Show when={isReader !== null}>
-        <DefaultButton
-          onClick={onClickOpenSidebar}
-          className="transition-colors hover:bg-button-primary-hover hover:text-text-primary text-text-secondary duration-300 rounded-4 px-6 py-6">
-          <BsLayoutSidebarInset className="w-18 h-18 transition-colors duration-200" />
-        </DefaultButton>
+        <div className="flex flex-row gap-4">
+          <DefaultButton
+            onClick={onClickOpenSidebar}
+            className="transition-colors hover:bg-button-primary-hover hover:text-text-primary text-text-secondary duration-300 rounded-4 px-6 py-6">
+            <BsLayoutSidebarInset className="w-18 h-18 transition-colors duration-200" />
+          </DefaultButton>
+          <DefaultButton
+            onClick={onClickBookmark}
+            className="transition-colors hover:bg-button-primary-hover hover:text-text-primary text-text-secondary duration-300 rounded-4 px-6 py-6">
+            <Show
+              when={isBookmarkActive}
+              fallback={<FaRegBookmark className="w-18 h-18 transition-colors duration-200" />}>
+              <FcBookmark className="w-18 h-18 transition-colors duration-200" />
+            </Show>
+          </DefaultButton>
+        </div>
       </Show>
       <Show when={!!bookName}>
         <div
@@ -76,15 +92,6 @@ export const Header: FC<IProps> = ({
         </div>
       </Show>
       <div className="flex flex-row gap-4 ml-auto" data-tauri-drag-region>
-        <Show when={!!isReader}>
-          <DefaultButton
-            disabled
-            onClick={onClickOpenNotebook}
-            className="transition-colors hover:bg-button-primary-hover hover:text-text-primary text-text-secondary duration-300 rounded-4 px-6 py-6">
-            <LuNotebookPen className="w-18 h-18 transition-colors duration-200" />
-          </DefaultButton>
-        </Show>
-
         <DefaultButton
           onClick={onClickSettings}
           className="transition-colors hover:bg-button-primary-hover hover:text-text-primary text-text-secondary duration-300 rounded-4 px-6 py-6">

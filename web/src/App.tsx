@@ -1,5 +1,6 @@
 import { FormatType } from '@bindings/format'
 import Annotator from '@containers/Annotator'
+import { getEventEmitter } from '@libs/eventEmitter'
 import Header from '@pages/Header'
 import { actions as bookActions } from '@store/reducers/books/index'
 import { actions } from '@store/reducers/search'
@@ -59,11 +60,17 @@ function App() {
     return bookShelf[bookState.id]
   }, [bookState, booksMap])
 
+  const eventEmitter = getEventEmitter()
+
   return (
     <div className="w-full h-full flex flex-col gap-4">
       <Header
+        isBookmarkActive={false}
         bookName={book?.metadata.title}
         hideHeader={hideHeader}
+        onClickBookmark={() => {
+          eventEmitter.dispatch('save_bookmark')
+        }}
         onClickSettings={() => {
           dispatch(uiActions.setOpenSettingsModal(!isSettingsOpen))
         }}

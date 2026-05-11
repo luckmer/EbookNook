@@ -1,5 +1,6 @@
 import { FormatType } from '@bindings/format'
-import ChaptersDrawer from '@pages/Drawers/chaptersDrawer'
+import { BOOK_STATUS } from '@interfaces/book/enums'
+import ReaderContentDrawer from '@pages/Drawers/ReaderContentDrawer'
 import { actions as bookActions } from '@store/reducers/books'
 import { actions as uiActions } from '@store/reducers/ui'
 import { bookSelector } from '@store/selectors/books'
@@ -13,12 +14,13 @@ export interface ICache {
   format: FormatType
 }
 
-const ChaptersDrawerRoot = () => {
+const BookContentDrawerRoot = () => {
   const [cache, setCache] = useState<ICache | null>(null)
   const isOpen = useSelector(uiSelector.openChaptersDrawer)
   const isLoader = useSelector(uiSelector.isFetchingStructure)
   const books = useSelector(bookSelector.books)
   const activeToc = useSelector(bookSelector.activeToc)
+  const status = useSelector(bookSelector.statuses)
 
   const navigate = useNavigate()
 
@@ -43,12 +45,22 @@ const ChaptersDrawerRoot = () => {
     }
   }, [bookState])
 
+  const book = useMemo(() => {
+    return {
+      author: activeBook?.metadata?.author ?? '--',
+      title: activeBook?.metadata?.title ?? '--',
+      cover: activeBook?.metadata?.cover,
+      published: activeBook?.metadata?.published,
+      publisher: activeBook?.metadata?.publisher,
+      description: activeBook?.metadata?.description,
+      status: status[cache?.id ?? ''] ?? BOOK_STATUS.IDLE,
+    }
+  }, [activeBook])
+
   return (
-    <ChaptersDrawer
+    <ReaderContentDrawer
       activeToc={activeToc}
-      author={activeBook?.metadata?.author ?? '--'}
-      icon={activeBook?.metadata?.cover}
-      title={activeBook?.metadata?.title ?? '--'}
+      book={book}
       toc={activeBook?.toc ?? []}
       isLoader={isLoader}
       isOpen={isOpen}
@@ -68,4 +80,4 @@ const ChaptersDrawerRoot = () => {
   )
 }
 
-export default ChaptersDrawerRoot
+export default BookContentDrawerRoot

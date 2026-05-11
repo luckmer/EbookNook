@@ -332,6 +332,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "bookmarks"
+version = "0.1.0"
+dependencies = [
+ "database",
+ "serde",
+ "serde_json",
+ "sqlx",
+ "ts-rs",
+ "types",
+]
+
+[[package]]
 name = "brotli"
 version = "8.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -939,6 +951,7 @@ version = "0.1.0"
 dependencies = [
  "annotations",
  "api",
+ "bookmarks",
  "database",
  "formats",
  "serde",
@@ -4103,6 +4116,7 @@ name = "state"
 version = "0.1.0"
 dependencies = [
  "annotations",
+ "bookmarks",
  "database",
  "formats",
 ]
