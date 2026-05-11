@@ -1,11 +1,10 @@
 import { Fragment } from 'react/jsx-runtime'
-import ChaptersDrawerRoot from './chaptersDrawer'
+import BookContentDrawer from './BookContentDrawer'
 
 const DrawersRoot = () => {
   return (
     <Fragment>
-      <ChaptersDrawerRoot />
-      {/* <NotebookDrawerRoot /> */}
+      <BookContentDrawer />
     </Fragment>
   )
 }

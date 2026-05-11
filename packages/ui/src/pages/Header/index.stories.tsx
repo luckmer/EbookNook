@@ -15,6 +15,8 @@ export const BannersStory: Story = {
       <Header
         hideHeader={false}
         location="/"
+        isBookmarkActive={false}
+        onClickBookmark={() => {}}
         onClickOpenNotebook={() => {}}
         onClickOpenSidebar={() => {}}
         onClickSettings={() => {}}

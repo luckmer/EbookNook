@@ -45,3 +45,9 @@
   display: flex;
   flex-direction: column;
 }
+
+.ant-segmented-item-label {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

@@ -1,18 +1,18 @@
 import { Meta, StoryObj } from '@storybook/react-vite'
-import ChaptersDrawer from '.'
+import ReaderContentDrawer from '.'
 
-const meta: Meta<typeof ChaptersDrawer> = {
-  component: ChaptersDrawer,
-  title: 'Pages/Drawers/ChaptersDrawer',
+const meta: Meta<typeof ReaderContentDrawer> = {
+  component: ReaderContentDrawer,
+  title: 'Pages/Drawers/ReaderContentDrawer',
 }
 
 export default meta
-type Story = StoryObj<typeof ChaptersDrawer>
+type Story = StoryObj<typeof ReaderContentDrawer>
 
 export const Default: Story = {
   render: (args) => {
     return (
-      <ChaptersDrawer
+      <ReaderContentDrawer
         isOpen
         activeToc={{
           href: 'epub30-overview.xhtml#sec-intro',
