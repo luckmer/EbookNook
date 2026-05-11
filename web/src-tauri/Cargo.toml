@@ -33,6 +33,7 @@ utils = { path = "./utils" }
 api = { path = "./api" }
 types = { path = "./types" }
 state = { path = "./state" }
+bookmarks = { path = "./bookmarks" }
 
 tauri-plugin-opener = "2"
 serde = { version = "1", features = [
@@ -79,4 +80,5 @@ members = [
   "types",
   "state",
   "annotations",
+  "bookmarks",
 ]
