@@ -16,7 +16,6 @@ export interface IProps {
   onClickMaximize: () => void
   onClickMinimize: () => void
   onClickSettings: () => void
-  onClickOpenNotebook: () => void
   onClickOpenSidebar: () => void
   onChange: (value: string) => void
   onClickBookmark: () => void
@@ -32,7 +31,6 @@ export const Header: FC<IProps> = ({
   onClickMaximize,
   onClickMinimize,
   onClickOpenSidebar,
-  onClickOpenNotebook,
   onClickBookmark,
   onClickSettings,
   value,

@@ -1,13 +1,13 @@
 import { FormatType } from '@bindings/format'
 import { ProgressType } from '@bindings/progress'
 import { getDocumentClient } from '@libs/document'
-import { getEventEmitter } from '@libs/eventEmitter'
 import { getPDFClient } from '@libs/pdf'
 import Reader from '@pages/Reader'
-import { actions as bookmarkActions } from '@store/reducers/bookmarks'
 import { actions as bookActions } from '@store/reducers/books'
+import { IReaderLocation, actions as readerActions } from '@store/reducers/reader'
 import { actions } from '@store/reducers/ui'
-import { bookSelector } from '@store/selectors/books'
+import { booksSelector } from '@store/selectors/books'
+import { readerSelector } from '@store/selectors/reader'
 import { settingsStyles } from '@store/selectors/settings'
 import { uiSelector } from '@store/selectors/ui'
 import { debounce } from '@utils/debounce'
@@ -15,62 +15,19 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation } from 'react-router-dom'
 
-export interface ILocation {
-  cfi: string
-  fraction: number
-  location: {
-    current: number
-    next: number
-    total: number
-  }
-  time: {
-    current: number
-    total: number
-  }
-  tocItem: {
-    href: string
-    label: string
-    id: number
-    subitems: Array<{
-      id: number
-      href: string
-      label: string
-    }>
-  }
-}
-
-const defaultReaderLocation = {
-  cfi: '',
-  fraction: 0,
-  location: {
-    current: 0,
-    next: 0,
-    total: 0,
-  },
-  time: {
-    current: 0,
-    total: 0,
-  },
-  tocItem: {
-    href: '',
-    label: '',
-    id: 0,
-    subitems: [],
-  },
-}
-
 const ReaderRoot = () => {
   const [isLoadingStructure, setIsLoadingStructure] = useState(true)
-  const [readerLocation, setReaderLocation] = useState<ILocation>(defaultReaderLocation)
   const [isContentViewReady, setIsContentViewReady] = useState(false)
   const [isViewReady, setIsViewReady] = useState(false)
-
-  const books = useSelector(bookSelector.books)
-  const files = useSelector(bookSelector.files)
+  const books = useSelector(booksSelector.books)
+  const files = useSelector(booksSelector.files)
   const styles = useSelector(settingsStyles)
-  const selectedChapter = useSelector(bookSelector.selectedChapter)
+  const selectedChapter = useSelector(booksSelector.selectedChapter)
   const isLoader = useSelector(uiSelector.isFetchingStructure)
   const hideContent = useSelector(uiSelector.hideHeader)
+  const readerLocation = useSelector(readerSelector.readerLocation)
+  const selectedBookmark = useSelector(readerSelector.selectedBookmark)
+
   const location = useLocation()
 
   const bookState: { id: string; format: FormatType } = useMemo(() => {
@@ -93,7 +50,9 @@ const ReaderRoot = () => {
     return bookShelf[bookState.id]
   }, [bookState, books])
 
-  const eventEmitter = getEventEmitter()
+  useEffect(() => {
+    console.log(selectedBookmark)
+  }, [selectedBookmark])
 
   const handleHideHeader = useCallback(() => {
     dispatch(actions.setHideHeader(true))
@@ -112,7 +71,6 @@ const ReaderRoot = () => {
       setIsViewReady(false)
       viewRef.current = null
       setIsLoadingStructure(true)
-      setReaderLocation(defaultReaderLocation)
 
       setIsContentViewReady(false)
       return
@@ -164,7 +122,7 @@ const ReaderRoot = () => {
 
   const saveProgress = useMemo(
     () =>
-      debounce((location: ILocation, book: typeof activeBook) => {
+      debounce((location: IReaderLocation, book: typeof activeBook) => {
         if (!book) return
 
         const progress: Partial<Record<ProgressType, string>> = {
@@ -185,53 +143,21 @@ const ReaderRoot = () => {
   )
 
   useEffect(() => {
-    if (!activeBook || !isContentViewReady) return
-
-    const handler = () => {
-      if (JSON.stringify(defaultReaderLocation) === JSON.stringify(readerLocation)) return
-
-      dispatch(
-        bookmarkActions.saveBookmark({
-          label: readerLocation.tocItem.label,
-          date: Date.now().toString(),
-          format: activeBook.format,
-          cfi: readerLocation.cfi,
-          id: activeBook.id,
-        }),
-      )
-    }
-
-    eventEmitter.on('save_bookmark', handler)
-
-    return () => {
-      eventEmitter.off('save_bookmark', handler)
-    }
-  }, [readerLocation, activeBook, isContentViewReady])
-
-  useEffect(() => {
-    if (
-      !activeBook ||
-      !isContentViewReady ||
-      JSON.stringify(defaultReaderLocation) === JSON.stringify(readerLocation)
-    ) {
-      return
-    }
-
-    saveProgress(readerLocation, activeBook)
-  }, [readerLocation, activeBook, isContentViewReady])
-
-  useEffect(() => {
     if (!isContentViewReady) return
 
     const view = viewRef.current
     if (!view) return
 
-    view.addEventListener('relocate', (e: { detail: ILocation }) => setReaderLocation(e.detail))
+    view.addEventListener('relocate', (e: { detail: IReaderLocation }) => {
+      dispatch(readerActions.setReaderLocation(e.detail))
+      saveProgress(e.detail, activeBook)
+    })
 
     return () => {
-      view.removeEventListener('relocate', (e: { detail: ILocation }) =>
-        setReaderLocation(e.detail),
-      )
+      view.removeEventListener('relocate', (e: { detail: IReaderLocation }) => {
+        dispatch(readerActions.setReaderLocation(e.detail))
+        saveProgress(e.detail, activeBook)
+      })
     }
   }, [isContentViewReady])
 

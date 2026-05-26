@@ -4,7 +4,7 @@ import LanguageSettings, { IProps } from '.'
 
 const meta: Meta<typeof LanguageSettings> = {
   component: LanguageSettings,
-  title: 'Pages/Settings/LanguageSettings',
+  title: 'Pages/Modals/Settings/LanguageSettings',
 }
 
 export default meta

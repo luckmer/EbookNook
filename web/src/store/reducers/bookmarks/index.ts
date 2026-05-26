@@ -1,12 +1,16 @@
-import { FormatType } from '@bindings/format'
+import { IBindingsBookmark } from '@bindings/bookmarks'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { PayloadType } from '@store/helper'
 
 export const bookmarksStore = 'bookmarksStore'
 
-export interface IBookmarksState {}
+export interface IBookmarksState {
+  bookmarks: Record<string, IBindingsBookmark[]>
+}
 
-const defaultState: IBookmarksState = {}
+const defaultState: IBookmarksState = {
+  bookmarks: {},
+}
 
 export const store = createSlice({
   name: bookmarksStore,
@@ -15,22 +19,55 @@ export const store = createSlice({
     load(state) {
       return state
     },
-    saveBookmark(
-      state,
-      _: PayloadAction<{
-        id: string
-        format: FormatType
-        date: string
-        cfi: string
-        label: string
-      }>,
-    ) {
+    saveBookmark(state, _: PayloadAction<IBindingsBookmark>) {
       return state
     },
-    deleteBookmark(state) {
+    setBookmarks(state, action: PayloadAction<{ id: string; bookmarks: IBindingsBookmark[] }>) {
+      state.bookmarks[action.payload.id] = action.payload.bookmarks
+    },
+
+    deleteBookmark(state, _: PayloadAction<{ id: string; cfi: string }>) {
       return state
     },
-    updateBookmark(state) {
+
+    updateBookmark(state, _: PayloadAction<IBindingsBookmark>) {
+      return state
+    },
+    setAddBookmark(state, action: PayloadAction<IBindingsBookmark>) {
+      if (!state.bookmarks[action.payload.bookId]) {
+        state.bookmarks[action.payload.bookId] = []
+      }
+
+      state.bookmarks[action.payload.bookId].push(action.payload)
+
+      return state
+    },
+    setUpdateBookmark(state, action: PayloadAction<IBindingsBookmark>) {
+      const bookmarks = state.bookmarks[action.payload.bookId]
+
+      if (!bookmarks) {
+        return state
+      }
+
+      const index = bookmarks.findIndex((b) => b.cfi === action.payload.cfi)
+
+      if (index === -1) return state
+
+      bookmarks[index] = action.payload
+
+      return state
+    },
+    setDeleteBookmark(state, action: PayloadAction<{ id: string; cfi: string }>) {
+      const { id, cfi } = action.payload
+
+      if (!state.bookmarks[id]) return state
+
+      const index = state.bookmarks[id].findIndex((b) => b.cfi === cfi)
+
+      if (index === -1) return state
+
+      delete state.bookmarks[id][index]
+
       return state
     },
   },

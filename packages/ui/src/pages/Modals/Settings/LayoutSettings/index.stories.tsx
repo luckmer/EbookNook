@@ -3,7 +3,7 @@ import LayoutSettings from '.'
 
 const meta: Meta<typeof LayoutSettings> = {
   component: LayoutSettings,
-  title: 'Pages/Settings/LayoutSettings',
+  title: 'Pages/Modals/Settings/LayoutSettings',
 }
 
 export default meta

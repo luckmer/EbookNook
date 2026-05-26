@@ -22,9 +22,13 @@ impl BookmarksService {
         let created_at: String = row.try_get("created_at")?;
         let updated_at: String = row.try_get("updated_at")?;
         let book_id: String = row.try_get("book_id")?;
+        let title:String = row.try_get("title")?;
+        let chapter:String = row.try_get("chapter")?;
 
         Ok(IBindingsBookmark {
             book_id,
+            title,
+            chapter,
             cfi,
             format,
             created_at,
@@ -64,6 +68,8 @@ impl BookmarksService {
             .bind(payload.book_id)
             .bind(payload.cfi)
             .bind(format)
+            .bind(payload.chapter)
+            .bind(payload.title)
             .bind(payload.updated_at)
             .bind(payload.created_at)
             .execute(conn)

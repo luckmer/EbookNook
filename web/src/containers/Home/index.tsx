@@ -2,14 +2,14 @@ import Home from '@pages/Home'
 import { actions } from '@store/reducers/books'
 import { actions as uiActions } from '@store/reducers/ui'
 import { filteredBooks } from '@store/selectors/aggregated/books'
-import { bookSelector } from '@store/selectors/books'
+import { booksSelector } from '@store/selectors/books'
 import { uiSelector } from '@store/selectors/ui'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
 const HomeRoot = () => {
   const dispatch = useDispatch()
-  const availableBooks = useSelector(bookSelector.books)
+  const availableBooks = useSelector(booksSelector.books)
   const isLoadingState = useSelector(uiSelector.isLoadingState)
   const isAddingBook = useSelector(uiSelector.isAddingBook)
   const books = useSelector(filteredBooks)

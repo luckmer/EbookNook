@@ -17,7 +17,6 @@ export const BannersStory: Story = {
         location="/"
         isBookmarkActive={false}
         onClickBookmark={() => {}}
-        onClickOpenNotebook={() => {}}
         onClickOpenSidebar={() => {}}
         onClickSettings={() => {}}
         onClickClose={() => {}}

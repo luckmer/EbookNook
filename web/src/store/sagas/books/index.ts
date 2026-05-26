@@ -7,7 +7,7 @@ import { getBookAdapterClient } from '@libs/BookAdapter'
 import { PayloadAction } from '@reduxjs/toolkit'
 import { actions, PayloadTypes } from '@store/reducers/books'
 import { actions as uiActions } from '@store/reducers/ui'
-import { bookSelector } from '@store/selectors/books'
+import { booksSelector } from '@store/selectors/books'
 import { invoke } from '@tauri-apps/api/core'
 import { notify } from '@utils/notification'
 import { getDocumentClient } from 'src/libs/document'
@@ -74,7 +74,7 @@ export function* ImportBook(action: PayloadAction<PayloadTypes['importBook']>) {
 export function* setOpenBook(action: PayloadAction<PayloadTypes['setOpenBook']>) {
   yield* put(uiActions.setIsFetchingStructure(true))
   try {
-    const files = yield* select(bookSelector.files)
+    const files = yield* select(booksSelector.files)
     if (files[action.payload]) {
       yield* put(uiActions.setIsFetchingStructure(false))
       return
@@ -208,15 +208,10 @@ export function* loadStateSaga() {
   yield* takeLatest(actions.load, loadState)
 }
 
-export function* setOpenBookSaga() {
-  yield* takeLatest(actions.setOpenBook, setOpenBook)
-}
-
 export default function* RootSaga() {
   yield all([
     ImportBookSaga(),
     loadStateSaga(),
-    setOpenBookSaga(),
     getBookStructureSaga(),
     updateBookMetadataSaga(),
     updateBookProgressSaga(),

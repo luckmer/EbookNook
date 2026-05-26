@@ -4,7 +4,7 @@ import BookOverviewModal from '.'
 
 const meta: Meta<typeof BookOverviewModal> = {
   component: BookOverviewModal,
-  title: 'Pages/BookOverviewModal',
+  title: 'Pages/Modals/BookOverviewModal',
 }
 
 export default meta

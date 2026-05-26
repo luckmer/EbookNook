@@ -3,7 +3,7 @@ import FontSettings from '.'
 
 const meta: Meta<typeof FontSettings> = {
   component: FontSettings,
-  title: 'Pages/Settings/FontSettings',
+  title: 'Pages/Modals/Settings/FontSettings',
 }
 
 export default meta

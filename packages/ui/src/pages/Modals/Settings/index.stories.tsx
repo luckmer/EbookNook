@@ -4,7 +4,7 @@ import Settings from '.'
 
 const meta: Meta<typeof Settings> = {
   component: Settings,
-  title: 'Pages/Settings',
+  title: 'Pages/Modals/Settings',
 }
 
 export default meta

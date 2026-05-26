@@ -19,6 +19,7 @@ impl DatabaseManager {
 
         let db_dir = base_dir.join("eBookNook").join("database");
 
+
         if !db_dir.exists() {
             fs::create_dir_all(&db_dir)?;
         }

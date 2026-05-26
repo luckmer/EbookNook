@@ -2,15 +2,15 @@ import { BOOK_STATUS } from '@interfaces/book/enums'
 import BookOverviewModal from '@pages/Modals/BookOverviewModal'
 import { actions as bookActions } from '@store/reducers/books'
 import { actions } from '@store/reducers/ui'
-import { bookSelector } from '@store/selectors/books'
+import { booksSelector } from '@store/selectors/books'
 import { uiSelector } from '@store/selectors/ui'
 import { useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 const BookOverviewModalRoot = () => {
   const openSettingsModal = useSelector(uiSelector.openBookOverviewModal)
-  const status = useSelector(bookSelector.statuses)
-  const booksMap = useSelector(bookSelector.books)
+  const status = useSelector(booksSelector.statuses)
+  const booksMap = useSelector(booksSelector.books)
   const dispatch = useDispatch()
 
   const book = useMemo(() => {

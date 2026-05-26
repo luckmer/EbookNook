@@ -1,3 +1,4 @@
+import { IBindingsBookmark } from '@bindings/bookmarks'
 import DefaultButton from '@components/Buttons/DefaultButton'
 import Drawer from '@components/Drawer'
 import Match from '@components/Match'
@@ -12,7 +13,6 @@ import { IoLibraryOutline } from 'react-icons/io5'
 import AnnotationsLayout from './AnnotationsLayout'
 import ContentsLayout from './ContentsLayout'
 import OverviewLayout from './OverviewLayout'
-
 export interface ITocItem {
   label: string
   href?: string
@@ -34,9 +34,11 @@ export interface IProps {
   onClick: (href: string) => void
   onClickClose: () => void
   onClickBack: () => void
+  onClickBookmark: (bookmark: IBindingsBookmark) => void
   isOpen: boolean
   toc: ITocItem[]
   isLoader: boolean
+  bookmarks: Array<IBindingsBookmark>
   activeToc: ITocItem
   book: IBook
 }
@@ -44,11 +46,13 @@ const ReaderContentDrawer: FC<IProps> = ({
   isOpen,
   onClickClose,
   onClickBack,
+  onClickBookmark,
   onClick,
   book,
   toc,
   isLoader,
   activeToc,
+  bookmarks,
 }) => {
   const [option, setOption] = useState<OPTIONS>(OPTIONS.OVERVIEW)
   const [hasLoadError, setHasLoadError] = useState(false)
@@ -97,7 +101,7 @@ const ReaderContentDrawer: FC<IProps> = ({
                   value: OPTIONS.CONTENTS,
                 },
                 {
-                  label: <Typography>Bookmarks</Typography>,
+                  label: <Typography>Annotations</Typography>,
                   value: OPTIONS.ANNOTATIONS,
                 },
               ]}
@@ -125,7 +129,7 @@ const ReaderContentDrawer: FC<IProps> = ({
               />
             </Match>
             <Match when={option === OPTIONS.ANNOTATIONS}>
-              <AnnotationsLayout />
+              <AnnotationsLayout bookmarks={bookmarks} onClick={onClickBookmark} />
             </Match>
           </Switch>
         </div>
