@@ -1,6 +1,7 @@
 import { combineReducers } from '@reduxjs/toolkit'
 import { persistReducer } from 'redux-persist'
 import { reducers as bookmarksReducers, bookmarksStore } from './bookmarks'
+import { persistBookmarks } from './bookmarks/config'
 import { reducers as booksReducers, booksStore } from './books'
 import { reducers as languageReducers, languageStore } from './language'
 import { persistLanguage } from './language/config'
@@ -13,7 +14,7 @@ import { reducers as uiReducers, uiStore } from './ui'
 const Index = combineReducers({
   [settingsStore]: persistReducer(persistSettings, settingsReducers),
   [languageStore]: persistReducer(persistLanguage, languageReducers),
-  [bookmarksStore]: bookmarksReducers,
+  [bookmarksStore]: persistReducer(persistBookmarks, bookmarksReducers),
   [searchStore]: searchReducers,
   [booksStore]: booksReducers,
   [readerStore]: bookReducers,

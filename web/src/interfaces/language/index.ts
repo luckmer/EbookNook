@@ -16,6 +16,7 @@ export type IDictionary = {
   extraLarge: string
   light: string
   semiMedium: string
+  name: string
   semiBold: string
   bold: string
   fontSize: string
@@ -55,4 +56,10 @@ export type IDictionary = {
   notesPlaceholder: string
   cancel: string
   enterValidDate: string
+  createBookmark: string
+  bookmarkNamePlaceholder: string
+  overview: string
+  contents: string
+  annotations: string
+  pagesLeft: string
 }

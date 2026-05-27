@@ -15,7 +15,7 @@ export interface IReaderLocation {
     current: number
     total: number
   }
-  tocItem: {
+  tocItem?: {
     href: string
     label: string
     id: number
@@ -47,24 +47,12 @@ export const defaultReaderLocation = {
   },
 }
 
-export interface ISelectedBookmark {
-  cfi: string | null
-  selectedAt: string
-}
-
-export interface IBookState {
+export interface IReaderState {
   readerLocation: IReaderLocation
-  selectedBookmark: ISelectedBookmark
 }
 
-export const defaultSelectedBookmark = {
-  cfi: null,
-  selectedAt: Date.now().toString(),
-}
-
-export const defaultState: IBookState = {
+export const defaultState: IReaderState = {
   readerLocation: defaultReaderLocation,
-  selectedBookmark: defaultSelectedBookmark,
 }
 
 export const store = createSlice({
@@ -74,11 +62,11 @@ export const store = createSlice({
     load(state) {
       return state
     },
+    reset(state) {
+      state.readerLocation = defaultReaderLocation
+    },
     setReaderLocation(state, action: PayloadAction<IReaderLocation>) {
       state.readerLocation = action.payload
-    },
-    setSelectedBookmark(state, action: PayloadAction<ISelectedBookmark>) {
-      state.selectedBookmark = action.payload
     },
   },
 })

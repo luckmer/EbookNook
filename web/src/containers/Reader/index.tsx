@@ -6,6 +6,7 @@ import Reader from '@pages/Reader'
 import { actions as bookActions } from '@store/reducers/books'
 import { IReaderLocation, actions as readerActions } from '@store/reducers/reader'
 import { actions } from '@store/reducers/ui'
+import { bookmarksSelector } from '@store/selectors/bookmarks'
 import { booksSelector } from '@store/selectors/books'
 import { readerSelector } from '@store/selectors/reader'
 import { settingsStyles } from '@store/selectors/settings'
@@ -26,7 +27,7 @@ const ReaderRoot = () => {
   const isLoader = useSelector(uiSelector.isFetchingStructure)
   const hideContent = useSelector(uiSelector.hideHeader)
   const readerLocation = useSelector(readerSelector.readerLocation)
-  const selectedBookmark = useSelector(readerSelector.selectedBookmark)
+  const selectedBookmark = useSelector(bookmarksSelector.selectedBookmark)
 
   const location = useLocation()
 
@@ -49,10 +50,6 @@ const ReaderRoot = () => {
 
     return bookShelf[bookState.id]
   }, [bookState, books])
-
-  useEffect(() => {
-    console.log(selectedBookmark)
-  }, [selectedBookmark])
 
   const handleHideHeader = useCallback(() => {
     dispatch(actions.setHideHeader(true))
@@ -129,7 +126,10 @@ const ReaderRoot = () => {
           CFI: location.cfi,
         }
 
-        dispatch(bookActions.setActiveToc(location.tocItem))
+        if (location.tocItem) {
+          dispatch(bookActions.setActiveToc(location.tocItem))
+        }
+
         dispatch(
           bookActions.updateBookProgress({
             percentageProgress: String(location.fraction * 100),
@@ -176,6 +176,14 @@ const ReaderRoot = () => {
 
     view.renderer.setStyles?.(styles)
   }, [styles, isLoadingStructure])
+
+  useEffect(() => {
+    if (isLoadingStructure) return
+
+    if (viewRef.current && selectedBookmark.cfi !== null) {
+      viewRef.current.init({ lastLocation: selectedBookmark.cfi })
+    }
+  }, [selectedBookmark, isLoadingStructure])
 
   return (
     <Reader

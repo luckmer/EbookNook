@@ -50,6 +50,7 @@ export const polish: IDictionary = {
   title: 'Tytuł',
   author: 'Autor',
   language: 'Język',
+  name: 'Nazwa',
   languageDescription: 'Wybierz swój język',
   notebook: 'Notatnik',
   excerpts: 'Fragmenty',
@@ -59,4 +60,10 @@ export const polish: IDictionary = {
   notesPlaceholder: 'Dodaj swoje notatki tutaj...',
   cancel: 'Anuluj',
   enterValidDate: 'Proszę podać prawidłowy rok wydania',
+  createBookmark: 'Utwórz zakładkę',
+  bookmarkNamePlaceholder: 'Nazwa zakładki',
+  overview: 'Podgląd',
+  annotations: 'Notatki',
+  contents: 'Spis treści',
+  pagesLeft: 'Liczba stron',
 }

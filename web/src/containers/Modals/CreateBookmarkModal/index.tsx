@@ -55,7 +55,7 @@ const CreateBookmarkModalRoot = () => {
         const data: IBindingsBookmark = {
           bookId: activeBook.id,
           cfi: readerLocation.cfi,
-          chapter: readerLocation.tocItem.label,
+          chapter: readerLocation?.tocItem?.label ?? '----',
           title: title.trim(),
           createdAt: Date.now().toString(),
           updatedAt: Date.now().toString(),

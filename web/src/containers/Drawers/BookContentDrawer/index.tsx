@@ -1,8 +1,8 @@
 import { FormatType } from '@bindings/format'
 import { BOOK_STATUS } from '@interfaces/book/enums'
 import ReaderContentDrawer from '@pages/Drawers/ReaderContentDrawer'
+import { actions as bookmarkActions } from '@store/reducers/bookmarks'
 import { actions as bookActions } from '@store/reducers/books'
-import { actions as readerActions } from '@store/reducers/reader'
 import { actions as uiActions } from '@store/reducers/ui'
 import { bookmarksSelector } from '@store/selectors/bookmarks'
 import { booksSelector } from '@store/selectors/books'
@@ -85,8 +85,9 @@ const BookContentDrawerRoot = () => {
       }}
       onClickBookmark={(bookmark) => {
         dispatch(uiActions.setOpenChaptersDrawer(false))
+        dispatch(uiActions.setHideHeader(true))
         dispatch(
-          readerActions.setSelectedBookmark({
+          bookmarkActions.setSelectedBookmark({
             selectedAt: Date.now().toString(),
             cfi: bookmark.cfi,
           }),
@@ -94,6 +95,7 @@ const BookContentDrawerRoot = () => {
       }}
       onClick={(href) => {
         dispatch(bookActions.setSelectedChapter(href))
+        dispatch(uiActions.setHideHeader(true))
       }}
     />
   )

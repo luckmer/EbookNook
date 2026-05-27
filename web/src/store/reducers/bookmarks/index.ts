@@ -4,11 +4,23 @@ import { PayloadType } from '@store/helper'
 
 export const bookmarksStore = 'bookmarksStore'
 
+export interface ISelectedBookmark {
+  cfi: string | null
+  selectedAt: string
+}
+
 export interface IBookmarksState {
+  selectedBookmark: ISelectedBookmark
   bookmarks: Record<string, IBindingsBookmark[]>
 }
 
+export const defaultSelectedBookmark = {
+  cfi: null,
+  selectedAt: Date.now().toString(),
+}
+
 const defaultState: IBookmarksState = {
+  selectedBookmark: defaultSelectedBookmark,
   bookmarks: {},
 }
 
@@ -18,6 +30,9 @@ export const store = createSlice({
   reducers: {
     load(state) {
       return state
+    },
+    reset(state) {
+      state.selectedBookmark = defaultState.selectedBookmark
     },
     saveBookmark(state, _: PayloadAction<IBindingsBookmark>) {
       return state
@@ -69,6 +84,9 @@ export const store = createSlice({
       delete state.bookmarks[id][index]
 
       return state
+    },
+    setSelectedBookmark(state, action: PayloadAction<ISelectedBookmark>) {
+      state.selectedBookmark = action.payload
     },
   },
 })

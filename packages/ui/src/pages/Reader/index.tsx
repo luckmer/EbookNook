@@ -4,6 +4,7 @@ import Spin from '@components/Spin'
 import { Typography } from '@components/Typography'
 import clsx from 'clsx'
 import { FC, memo, RefObject } from 'react'
+import { useTranslation } from 'react-i18next'
 
 export interface IProps {
   pageInfo: { current: number; total: number; percentage: number }
@@ -32,6 +33,8 @@ const Reader: FC<IProps> = ({
   onClickNextPage,
   onClickPrevPage,
 }) => {
+  const { t } = useTranslation()
+
   return (
     <main className="w-full h-full flex flex-col relative">
       <EpubNavigation
@@ -42,7 +45,7 @@ const Reader: FC<IProps> = ({
         hideContent={hideContent}>
         <div className="absolute bottom-[20px] left-[20px]">
           <Typography text="small" color="muted">
-            {Math.max(0, sectionInfo.total - sectionInfo.current)} pages left
+            {Math.max(0, sectionInfo.total - sectionInfo.current)} {t('pagesLeft')}
           </Typography>
         </div>
         <div className="h-full relative">

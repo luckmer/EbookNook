@@ -9,6 +9,7 @@ import { BOOK_STATUS } from '@interfaces/book/enums'
 import { OPTIONS } from '@interfaces/contentDrawer/enums'
 import { Segmented } from 'antd'
 import { FC, useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { IoLibraryOutline } from 'react-icons/io5'
 import AnnotationsLayout from './AnnotationsLayout'
 import ContentsLayout from './ContentsLayout'
@@ -56,6 +57,7 @@ const ReaderContentDrawer: FC<IProps> = ({
 }) => {
   const [option, setOption] = useState<OPTIONS>(OPTIONS.OVERVIEW)
   const [hasLoadError, setHasLoadError] = useState(false)
+  const { t } = useTranslation()
 
   useEffect(() => {
     setHasLoadError(false)
@@ -93,15 +95,15 @@ const ReaderContentDrawer: FC<IProps> = ({
               }}
               options={[
                 {
-                  label: <Typography>Overview</Typography>,
+                  label: <Typography>{t('overview')}</Typography>,
                   value: OPTIONS.OVERVIEW,
                 },
                 {
-                  label: <Typography>Contents</Typography>,
+                  label: <Typography>{t('contents')}</Typography>,
                   value: OPTIONS.CONTENTS,
                 },
                 {
-                  label: <Typography>Annotations</Typography>,
+                  label: <Typography>{t('annotations')}</Typography>,
                   value: OPTIONS.ANNOTATIONS,
                 },
               ]}
