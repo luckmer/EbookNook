@@ -1,4 +1,4 @@
-import { IDictionary } from '@interfaces/language'
+import type { IDictionary } from '@interfaces/language'
 
 export const polish: IDictionary = {
   noResults: 'Brak wyników',

@@ -1,5 +1,5 @@
-import { ISettingsState } from '@interfaces/settings/interfaces'
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import type { ISettingsState } from '@interfaces/settings/interfaces'
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
 
 export const settingsStore = 'settingsStore'
 

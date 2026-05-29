@@ -1,4 +1,4 @@
-import { FormatType } from '@bindings/format'
+import type { FormatType } from '@bindings/format'
 import Header from '@pages/Header'
 import { actions } from '@store/reducers/search'
 import { actions as uiActions } from '@store/reducers/ui'

@@ -1,5 +1,5 @@
 import { Typography } from '@components/Typography'
-import { Meta, StoryObj } from '@storybook/react-vite'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
 import Dropdown from './index'
 
@@ -21,8 +21,8 @@ export const Default: Story = {
 
     return (
       <div style={{ width: 320 }}>
-        <Dropdown label="Dropdown label" isOpen={open} onToggle={() => setOpen(!open)}>
-          <Typography text="body">This is dropdown content.</Typography>
+        <Dropdown label='Dropdown label' isOpen={open} onToggle={() => setOpen(!open)}>
+          <Typography text='body'>This is dropdown content.</Typography>
         </Dropdown>
       </div>
     )

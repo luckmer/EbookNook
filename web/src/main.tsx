@@ -15,7 +15,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
     <Provider store={store}>
       <I18Provider>
         <BrowserRouter>
-          <Toaster position="top-center" visibleToasts={3} richColors />
+          <Toaster position='top-center' visibleToasts={3} richColors />
           <DrawersRoot />
           <ModalsRoot />
           <App />

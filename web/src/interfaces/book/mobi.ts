@@ -1,5 +1,5 @@
-import { FormatType } from '@bindings/format'
-import { ILanguage, ILanguageMap } from './types'
+import type { FormatType } from '@bindings/format'
+import type { ILanguage, ILanguageMap } from './types'
 
 export interface IMobiMetadata {
   author: string | string[] | ILanguageMap

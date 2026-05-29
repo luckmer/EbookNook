@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { FC } from 'react'
+import type { FC } from 'react'
 
 export interface IProps {
   onClick: () => void
@@ -8,9 +8,9 @@ export interface IProps {
 
 const SwitchButton: FC<IProps> = ({ onClick, active }) => {
   return (
-    <label className="inline-flex items-center cursor-pointer group">
+    <label className='inline-flex items-center cursor-pointer group'>
       <input
-        type="checkbox"
+        type='checkbox'
         className={clsx('sr-only', active && 'peer')}
         checked={active}
         onChange={onClick}

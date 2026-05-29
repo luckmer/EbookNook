@@ -1,6 +1,6 @@
 import { LANGUAGE } from '@interfaces/language/enums'
-import { Meta, StoryObj } from '@storybook/react-vite'
-import LanguageSettings, { IProps } from '.'
+import type { Meta, StoryObj } from '@storybook/react-vite'
+import LanguageSettings, { type IProps } from '.'
 
 const meta: Meta<typeof LanguageSettings> = {
   component: LanguageSettings,

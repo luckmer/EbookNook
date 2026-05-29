@@ -1,9 +1,9 @@
 //https://github.com/johnfactotum/foliate-js/blob/main/pdf.js
-import { IBindingsPDFToc } from '@bindings/pdf'
-import { IPDFMetadata, IPDFSections, IZoomEvent } from '@interfaces/book/pdf'
+import type { IBindingsPDFToc } from '@bindings/pdf'
+import type { IPDFMetadata, IPDFSections, IZoomEvent } from '@interfaces/book/pdf'
 import * as pdfjsLib from 'pdfjs-dist'
 import workerUrl from 'pdfjs-dist/build/pdf.worker?url'
-import { Metadata } from 'pdfjs-dist/types/src/display/metadata'
+import type { Metadata } from 'pdfjs-dist/types/src/display/metadata'
 
 const pdfjsBase = new URL('./vendor/', import.meta.url).toString()
 const pdfjsPath = (path: string) => `${pdfjsBase}/${path}`
@@ -48,8 +48,7 @@ export class PDFServiceCore {
   makeTOCItem = (item: IOutline): IBindingsPDFToc => ({
     label: item.title,
     href: JSON.stringify(item.dest),
-    subitems:
-      item.items && item.items.length ? item.items.map((sub) => this.makeTOCItem(sub)) : undefined,
+    subitems: item.items?.length ? item.items.map((sub) => this.makeTOCItem(sub)) : undefined,
   })
 
   render = async (page: any, doc: Document, zoom: number) => {
@@ -67,7 +66,7 @@ export class PDFServiceCore {
     const canvasContext = canvas.getContext('2d')
     await page.render({ canvasContext, viewport }).promise
 
-    doc.querySelector('#canvas')!.replaceChildren(doc.adoptNode(canvas))
+    doc.querySelector('#canvas')?.replaceChildren(doc.adoptNode(canvas))
 
     const container = doc.querySelector('.textLayer') as HTMLElement
     const textLayer = new pdfjsLib.TextLayer({
@@ -108,7 +107,7 @@ export class PDFServiceCore {
     }
 
     const annotations = await page.getAnnotations()
-    // @ts-expect-error
+    // @ts-expect-error foliate
     await new pdfjsLib.AnnotationLayer({ page, viewport, div, linkService }).render({
       annotations: annotations,
     })

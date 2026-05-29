@@ -19,7 +19,7 @@ const BookOverviewModalRoot = () => {
     if (!bookShelf) return
 
     return bookShelf[openSettingsModal.bookId]
-  }, [openSettingsModal.bookId, booksMap])
+  }, [booksMap, openSettingsModal])
 
   const [cachedBook, setCachedBook] = useState(book)
 
@@ -33,7 +33,7 @@ const BookOverviewModalRoot = () => {
     if (!book) {
       dispatch(actions.setOpenBookOverviewModal({ status: false, bookId: '', format: 'EPUB' }))
     }
-  }, [book])
+  }, [book, dispatch])
 
   return (
     <BookOverviewModal

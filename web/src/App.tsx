@@ -1,4 +1,4 @@
-import { FormatType } from '@bindings/format'
+import type { FormatType } from '@bindings/format'
 import Annotator from '@containers/Annotator'
 import Header from '@containers/Header'
 import { actions as bookActions } from '@store/reducers/books/index'
@@ -8,6 +8,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Route, Routes, useLocation } from 'react-router-dom'
 import { routes } from './routes'
+
 function App() {
   const booksMap = useSelector(booksSelector.books)
   const dispatch = useDispatch()
@@ -17,7 +18,7 @@ function App() {
 
   useLayoutEffect(() => {
     dispatch(bookActions.load())
-  }, [])
+  }, [dispatch])
 
   const bookState: {
     id: string
@@ -36,12 +37,12 @@ function App() {
       dispatch(bookActions.setOpenBook(book.id))
       dispatch(bookActions.getBookStructure({ id: book.id, format: book.format }))
     }
-  }, [booksMap])
+  }, [booksMap, bookState, dispatch, location])
 
   return (
-    <div className="w-full h-full flex flex-col gap-4">
+    <div className='w-full h-full flex flex-col gap-4'>
       <Header />
-      <div className="overflow-hidden h-full w-full flex flex-col">
+      <div className='overflow-hidden h-full w-full flex flex-col'>
         <Annotator />
         <Routes>
           {routes.map((route) => (

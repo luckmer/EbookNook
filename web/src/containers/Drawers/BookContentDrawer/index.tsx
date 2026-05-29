@@ -1,4 +1,4 @@
-import { FormatType } from '@bindings/format'
+import type { FormatType } from '@bindings/format'
 import { BOOK_STATUS } from '@interfaces/book/enums'
 import ReaderContentDrawer from '@pages/Drawers/ReaderContentDrawer'
 import { actions as bookmarkActions } from '@store/reducers/bookmarks'
@@ -52,7 +52,7 @@ const BookContentDrawerRoot = () => {
     if (bookState.id !== cache?.id || bookState.format !== cache?.format) {
       setCache(bookState)
     }
-  }, [bookState])
+  }, [bookState, cache])
 
   const book = useMemo(() => {
     return {
@@ -64,7 +64,7 @@ const BookContentDrawerRoot = () => {
       description: activeBook?.metadata?.description,
       status: status[cache?.id ?? ''] ?? BOOK_STATUS.IDLE,
     }
-  }, [activeBook])
+  }, [activeBook, cache, status])
 
   return (
     <ReaderContentDrawer

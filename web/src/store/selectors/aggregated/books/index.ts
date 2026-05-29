@@ -1,4 +1,4 @@
-import { IBookFile } from '@interfaces/book/interfaces'
+import type { IBookFile } from '@interfaces/book/interfaces'
 import { createSelector } from '@reduxjs/toolkit'
 import { booksSelector } from '@store/selectors/books'
 import { searchSelector } from '@store/selectors/search'

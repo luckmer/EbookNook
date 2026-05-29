@@ -1,6 +1,6 @@
 import { languageSelector } from '@store/selectors/language'
 import i18n from 'i18next'
-import { FC, JSX, useEffect, useState } from 'react'
+import { type FC, type JSX, useEffect, useState } from 'react'
 import { I18nextProvider, initReactI18next } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { LANGUAGE } from '../interfaces/language/enums'
@@ -27,7 +27,7 @@ export const I18Provider: FC<IProps> = ({ children }) => {
       })
       .then(() => setReady(true))
       .catch(console.error)
-  }, [])
+  }, [lng])
 
   useEffect(() => {
     if (ready) {

@@ -1,5 +1,5 @@
 import { BOOK_STATUS } from '@interfaces/book/enums'
-import { Meta, StoryObj } from '@storybook/react-vite'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import OverviewLayout from '.'
 
 const meta: Meta<typeof OverviewLayout> = {

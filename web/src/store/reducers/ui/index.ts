@@ -1,5 +1,5 @@
-import { FormatType } from '@bindings/format'
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import type { FormatType } from '@bindings/format'
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
 
 export const uiStore = 'uiStore'
 

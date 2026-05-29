@@ -1,5 +1,5 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { PayloadType } from '@store/helper'
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
+import type { PayloadType } from '@store/helper'
 
 export const readerStore = 'readerStore'
 

@@ -1,4 +1,4 @@
-import { FC } from 'react'
+import type { FC } from 'react'
 import { FiLoader } from 'react-icons/fi'
 
 export interface IProps {
@@ -6,7 +6,7 @@ export interface IProps {
 }
 
 const index: FC<IProps> = ({ size }) => {
-  return <FiLoader className="animate-spin text-text-muted" size={size ?? 48} />
+  return <FiLoader className='animate-spin text-text-muted' size={size ?? 48} />
 }
 
 export default index

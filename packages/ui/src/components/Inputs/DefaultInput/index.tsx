@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { FC, memo } from 'react'
+import { type FC, memo } from 'react'
 
 export interface IProps {
   id?: string

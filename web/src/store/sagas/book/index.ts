@@ -1,6 +1,6 @@
-import { PayloadAction } from '@reduxjs/toolkit'
+import type { PayloadAction } from '@reduxjs/toolkit'
 import { actions as bookmarkActions } from '@store/reducers/bookmarks'
-import { actions, PayloadTypes } from '@store/reducers/books'
+import { actions, type PayloadTypes } from '@store/reducers/books'
 import { actions as readerActions } from '@store/reducers/reader'
 import { all, call, put, takeLatest } from 'typed-redux-saga'
 import { loadBookmarksById } from '../bookmarks'

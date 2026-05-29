@@ -1,10 +1,10 @@
-import { FormatType } from '@bindings/format'
-import { ProgressType } from '@bindings/progress'
+import type { FormatType } from '@bindings/format'
+import type { ProgressType } from '@bindings/progress'
 import { getDocumentClient } from '@libs/document'
 import { getPDFClient } from '@libs/pdf'
 import Reader from '@pages/Reader'
 import { actions as bookActions } from '@store/reducers/books'
-import { IReaderLocation, actions as readerActions } from '@store/reducers/reader'
+import { type IReaderLocation, actions as readerActions } from '@store/reducers/reader'
 import { actions } from '@store/reducers/ui'
 import { bookmarksSelector } from '@store/selectors/bookmarks'
 import { booksSelector } from '@store/selectors/books'
@@ -42,6 +42,7 @@ const ReaderRoot = () => {
   const dispatch = useDispatch()
   const containerRef = useRef<HTMLDivElement | null>(null)
   const viewRef = useRef<any | null>(null)
+  const isInitializingRef = useRef(false)
 
   const activeBook = useMemo(() => {
     const bookShelf = books[bookState.format]
@@ -62,60 +63,80 @@ const ReaderRoot = () => {
   useEffect(() => {
     if (!file) {
       if (viewRef.current) {
-        viewRef.current.close()
-        viewRef.current.remove()
+        try {
+          viewRef.current.close()
+          viewRef.current.remove()
+        } catch {
+          //
+        }
       }
-      setIsViewReady(false)
       viewRef.current = null
-      setIsLoadingStructure(true)
+      isInitializingRef.current = false
 
-      setIsContentViewReady(false)
-      return
+      const timer = setTimeout(() => {
+        setIsViewReady(false)
+        setIsContentViewReady(false)
+        setIsLoadingStructure(true)
+      }, 0)
+
+      return () => clearTimeout(timer)
     }
 
-    if (isViewReady) return
-    setIsViewReady(true)
+    if (isInitializingRef.current || isViewReady) return
+    isInitializingRef.current = true
 
     const openBook = async () => {
-      await import('@foliate/view.js')
+      try {
+        await import('@foliate/view.js')
 
-      const container = containerRef.current
-      if (!container) return
+        const container = containerRef.current
+        if (!container) {
+          isInitializingRef.current = false
+          return
+        }
 
-      const view = document.createElement('foliate-view') as any
-      view.id = `foliate-view-${Date.now()}`
-      view.style.width = '100%'
-      view.style.height = '100vh'
-      container.appendChild(view)
+        const view = document.createElement('foliate-view') as any
+        view.id = `foliate-view-${Date.now()}`
+        view.style.width = '100%'
+        view.style.height = '100vh'
+        container.appendChild(view)
+        viewRef.current = view
 
-      viewRef.current = view
-      setIsContentViewReady(true)
-      const client = getDocumentClient()
-      const isPDF = await client.isPDF(file)
+        setIsViewReady(true)
+        setIsContentViewReady(true)
 
-      if (isPDF) {
-        const pdfClient = getPDFClient()
-        const content = await pdfClient.init(file)
-        await view.open(content)
-      } else {
-        await view.open(file)
+        const client = getDocumentClient()
+        const isPDF = await client.isPDF(file)
+
+        if (isPDF) {
+          const pdfClient = getPDFClient()
+          const content = await pdfClient.init(file)
+          await view.open(content)
+        } else {
+          await view.open(file)
+        }
+
+        const lastLocation = activeBook?.progress?.CFI
+        if (lastLocation) {
+          await view.init({ lastLocation })
+        } else {
+          await view.goToFraction(0)
+        }
+
+        setIsLoadingStructure(false)
+      } catch {
+        isInitializingRef.current = false
       }
-
-      const lastLocation = activeBook?.progress?.CFI
-
-      if (lastLocation) {
-        await view.init({ lastLocation })
-      } else {
-        await view.goToFraction(0)
-      }
-
-      setIsLoadingStructure(false)
     }
 
     if (activeBook) {
       openBook().catch(console.error)
     }
-  }, [file, activeBook])
+
+    return () => {
+      isInitializingRef.current = false
+    }
+  }, [file, activeBook, isViewReady])
 
   const saveProgress = useMemo(
     () =>
@@ -159,7 +180,7 @@ const ReaderRoot = () => {
         saveProgress(e.detail, activeBook)
       })
     }
-  }, [isContentViewReady])
+  }, [isContentViewReady, dispatch, saveProgress, activeBook])
 
   useEffect(() => {
     if (viewRef.current && selectedChapter !== '') {

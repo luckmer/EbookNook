@@ -1,6 +1,6 @@
-import { IBindingsBookmark } from '@bindings/bookmarks'
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { PayloadType } from '@store/helper'
+import type { IBindingsBookmark } from '@bindings/bookmarks'
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
+import type { PayloadType } from '@store/helper'
 
 export const bookmarksStore = 'bookmarksStore'
 

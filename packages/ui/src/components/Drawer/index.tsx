@@ -1,5 +1,5 @@
-import { Drawer, DrawerProps } from 'antd'
-import { FC, memo } from 'react'
+import { Drawer, type DrawerProps } from 'antd'
+import { type FC, memo } from 'react'
 
 export interface IProps {
   placement: DrawerProps['placement']

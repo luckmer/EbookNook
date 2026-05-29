@@ -1,7 +1,7 @@
-import { IBindingsEpubBook, IBindingsEpubBookStructure } from '@bindings/epub'
-import { FormatType } from '@bindings/format'
-import { IBindingsMobiBook, IBindingsMobiBookStructure } from '@bindings/mobi'
-import { IBindingsPDFBook, IBindingsPDFBookStructure } from '@bindings/pdf'
+import type { IBindingsEpubBook, IBindingsEpubBookStructure } from '@bindings/epub'
+import type { FormatType } from '@bindings/format'
+import type { IBindingsMobiBook, IBindingsMobiBookStructure } from '@bindings/mobi'
+import type { IBindingsPDFBook, IBindingsPDFBookStructure } from '@bindings/pdf'
 export interface IBookFile {
   percentageProgress: string
   format: FormatType

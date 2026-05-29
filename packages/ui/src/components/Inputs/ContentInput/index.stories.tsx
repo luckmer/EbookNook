@@ -1,6 +1,6 @@
-import { Meta, StoryObj } from '@storybook/react-vite'
-import ContentInput from './index'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Typography } from 'antd'
+import ContentInput from './index'
 
 const meta: Meta<typeof ContentInput> = {
   component: ContentInput,
@@ -13,7 +13,7 @@ type Story = StoryObj<typeof ContentInput>
 export const Default: Story = {
   render: (args) => {
     return (
-      <ContentInput placeholder="Search" value="" onChange={() => {}} isEditing={args.isEditing}>
+      <ContentInput placeholder='Search' value='' onChange={() => {}} isEditing={args.isEditing}>
         <Typography>Content</Typography>
       </ContentInput>
     )

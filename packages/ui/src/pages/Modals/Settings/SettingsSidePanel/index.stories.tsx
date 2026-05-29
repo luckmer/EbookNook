@@ -1,5 +1,5 @@
 import { OPTIONS } from '@interfaces/settings/enums'
-import { Meta, StoryObj } from '@storybook/react-vite'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import SettingsSidePanel from '.'
 
 const meta: Meta<typeof SettingsSidePanel> = {

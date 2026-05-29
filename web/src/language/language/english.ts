@@ -1,4 +1,4 @@
-import { IDictionary } from '@interfaces/language'
+import type { IDictionary } from '@interfaces/language'
 
 export const english: IDictionary = {
   noResults: 'No results',

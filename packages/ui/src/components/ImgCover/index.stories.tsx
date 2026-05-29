@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react-vite'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import ImgCover from './index'
 
 const meta: Meta<typeof ImgCover> = {
@@ -11,6 +11,6 @@ type Story = StoryObj<typeof ImgCover>
 
 export const BannersStory: Story = {
   render: () => {
-    return <ImgCover name="Cover" author="Author" />
+    return <ImgCover name='Cover' author='Author' />
   },
 }

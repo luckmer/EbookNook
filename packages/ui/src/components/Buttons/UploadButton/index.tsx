@@ -1,7 +1,8 @@
 import Show from '@components/Show'
 import { Typography } from '@components/Typography'
 import clsx from 'clsx'
-import React, { JSX, memo } from 'react'
+import type React from 'react'
+import { type JSX, memo } from 'react'
 
 export interface IProps {
   label?: string
@@ -14,14 +15,14 @@ export interface IProps {
 const UploadButton: React.FC<IProps> = ({ label, onClick, className, labelClassName, icon }) => {
   return (
     <div className={clsx('flex flex-col ', className)}>
-      <label htmlFor="epubUpload" className={clsx('cursor-pointer h-full ', labelClassName)}>
-        <Show when={typeof label !== 'undefined'} fallback={<>{icon}</>}>
+      <label htmlFor='epubUpload' className={clsx('cursor-pointer h-full ', labelClassName)}>
+        <Show when={typeof label !== 'undefined'} fallback={icon}>
           <Typography>{label}</Typography>
         </Show>
       </label>
       <input
-        id="epubUpload"
-        type="file"
+        id='epubUpload'
+        type='file'
         onChange={(event) => {
           event.preventDefault()
           const file = event.target.files?.[0]
@@ -30,7 +31,7 @@ const UploadButton: React.FC<IProps> = ({ label, onClick, className, labelClassN
           }
           event.target.value = ''
         }}
-        className="hidden"
+        className='hidden'
       />
     </div>
   )

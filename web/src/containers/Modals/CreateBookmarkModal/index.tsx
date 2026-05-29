@@ -1,5 +1,5 @@
-import { IBindingsBookmark } from '@bindings/bookmarks'
-import { FormatType } from '@bindings/format'
+import type { IBindingsBookmark } from '@bindings/bookmarks'
+import type { FormatType } from '@bindings/format'
 import CreateBookmarkModal from '@pages/Modals/CreateBookmarkModal'
 import { actions as bookmarkActions } from '@store/reducers/bookmarks'
 import { actions } from '@store/reducers/ui'
@@ -29,7 +29,7 @@ const CreateBookmarkModalRoot = () => {
     if (bookState.id !== cache?.id || bookState.format !== cache?.format) {
       setCache(bookState)
     }
-  }, [bookState])
+  }, [bookState, cache])
 
   const activeBook = useMemo(() => {
     if (!cache) return

@@ -1,6 +1,6 @@
-import { IBindingsBookmark } from '@bindings/bookmarks'
-import { PayloadAction } from '@reduxjs/toolkit'
-import { actions, PayloadTypes } from '@store/reducers/bookmarks'
+import type { IBindingsBookmark } from '@bindings/bookmarks'
+import type { PayloadAction } from '@reduxjs/toolkit'
+import { actions, type PayloadTypes } from '@store/reducers/bookmarks'
 import { bookmarksSelector } from '@store/selectors/bookmarks'
 import { invoke } from '@tauri-apps/api/core'
 import { notify } from '@utils/notification'
@@ -15,7 +15,6 @@ export function* loadBookmarksById(id: string) {
     }
 
     const data = yield* call(invoke<IBindingsBookmark[]>, 'get_bookmarks_by_book_id', { id })
-    console.log(data)
     yield* put(actions.setBookmarks({ id, bookmarks: data }))
   } catch (err) {
     console.log('Failed to load bookmark state', err)

@@ -1,6 +1,6 @@
 import { Typography } from '@components/Typography'
 import { InputNumber, Slider } from 'antd'
-import { FC } from 'react'
+import type { FC } from 'react'
 
 export interface IProps {
   onChange: (value: number) => void
@@ -12,9 +12,9 @@ export interface IProps {
 
 const RangeInput: FC<IProps> = ({ min, max, value, step, onChange }) => {
   return (
-    <div className="flex flex-row gap-12 items-center w-full">
-      <div className="flex flex-row gap-12 w-full items-center">
-        <Typography color="muted" text="small">
+    <div className='flex flex-row gap-12 items-center w-full'>
+      <div className='flex flex-row gap-12 w-full items-center'>
+        <Typography color='muted' text='small'>
           {min}
         </Typography>
         <Slider
@@ -23,9 +23,9 @@ const RangeInput: FC<IProps> = ({ min, max, value, step, onChange }) => {
           step={step}
           value={value}
           onChange={onChange}
-          className="w-full"
+          className='w-full'
         />
-        <Typography color="muted" text="small">
+        <Typography color='muted' text='small'>
           {max}
         </Typography>
       </div>

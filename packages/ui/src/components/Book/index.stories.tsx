@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react-vite'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import Book from './index'
 
 const meta: Meta<typeof Book> = {
@@ -13,12 +13,12 @@ export const BannersStory: Story = {
   render: () => {
     return (
       <Book
-        img=""
-        title="test"
+        img=''
+        title='test'
         onClick={() => {}}
         onClickDetails={() => {}}
-        progress="20.20"
-        author="Author"
+        progress='20.20'
+        author='Author'
       />
     )
   },

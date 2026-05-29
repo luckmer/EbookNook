@@ -1,5 +1,5 @@
 import { LANGUAGE } from '@interfaces/language/enums'
-import { Meta, StoryObj } from '@storybook/react-vite'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import Settings from '.'
 
 const meta: Meta<typeof Settings> = {

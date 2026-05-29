@@ -1,5 +1,5 @@
-import { IEpubBookType, IMobiBookType, IPDFBookType } from '@interfaces/book/interfaces'
-import { IAddBookType, ILanguageMap, ILocalBookType, ITocItem } from '@interfaces/book/types'
+import type { IEpubBookType, IMobiBookType, IPDFBookType } from '@interfaces/book/interfaces'
+import type { IAddBookType, ILanguageMap, ILocalBookType, ITocItem } from '@interfaces/book/types'
 import { getAppClient } from '@libs/appService'
 import { convertFileSrc } from '@tauri-apps/api/core'
 
@@ -11,13 +11,14 @@ export class BookAdapterCore {
 
     if (Array.isArray(content)) {
       const first = content[0]
+
       if (!first) return '--'
-      return (typeof first === 'object' ? first['name'] : first) ?? '--'
+      //@ts-expect-error name is optional
+      return typeof first === 'string' ? first : (first.name ?? '--')
     }
 
-    return content['name'] ?? '--'
+    return content.name ?? '--'
   }
-
   _formatToc(toc: ITocItem[]): ITocItem[] {
     if (!toc) return []
     return toc.map((item) => ({

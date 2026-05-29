@@ -2,11 +2,7 @@
   "compilerOptions": {
     "target": "ES2022",
     "useDefineForClassFields": true,
-    "lib": [
-      "ES2022",
-      "DOM",
-      "DOM.Iterable"
-    ],
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
     "ignoreDeprecations": "5.0",
@@ -26,52 +22,26 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "paths": {
-      "@interfaces/*": [
-        "../../web/src/interfaces/*"
-      ],
-      "@hooks/*": [
-        "./src/hooks/*"
-      ],
-      "@bindings/*": [
-        "../../web/src-tauri/types/bindings/*"
-      ],
-      "@common/*": [
-        "./common/*"
-      ],
-      "@components/*": [
-        "./src/components/*"
-      ],
-      "@libs/*": [
-        "../../web/src/libs/*"
-      ],
-      "@pages/*": [
-        "./src/pages/*"
-      ],
-      "@theme/*": [
-        "./common/*"
-      ],
-      "@utils/*": [
-        "./src/utils/*"
-      ],
-      "@foliate/*": [
-        "../../web/src/foliate/*"
-      ],
-      "@language/*": [
-        "../../web/src/language/*"
-      ],
-      "@web-utils/*": [
-        "../../web/src/utils/*"
-      ]
+      "@interfaces/*": ["../../web/src/interfaces/*"],
+      "@hooks/*": ["./src/hooks/*"],
+      "@bindings/*": ["../../web/src-tauri/types/bindings/*"],
+      "@common/*": ["./common/*"],
+      "@components/*": ["./src/components/*"],
+      "@libs/*": ["../../web/src/libs/*"],
+      "@pages/*": ["./src/pages/*"],
+      "@theme/*": ["./common/*"],
+      "@utils/*": ["./src/utils/*"],
+      "@foliate/*": ["../../web/src/foliate/*"],
+      "@language/*": ["../../web/src/language/*"],
+      "@web-utils/*": ["../../web/src/utils/*"]
     }
   },
-  "include": [
-    "."
-  ],
+  "include": ["src"],
   "exclude": [
     "node_modules",
     "./node_modules",
     "./node_modules/*",
-    "./node_modules/@types/node/index.d.ts",
+    "./node_modules/@types/node/index.d.ts"
   ],
   "references": [
     {

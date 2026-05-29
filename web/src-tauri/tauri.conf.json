@@ -34,13 +34,7 @@
         "enable": true,
         "scope": {
           "requireLiteralLeadingDot": false,
-          "allow": [
-            "C:/Users/**",
-            "$APPDATA/**",
-            "$DOCUMENT/**",
-            "$DOWNLOAD/**",
-            "/**"
-          ],
+          "allow": ["C:/Users/**", "$APPDATA/**", "$DOCUMENT/**", "$DOWNLOAD/**", "/**"],
           "deny": []
         }
       },
@@ -48,9 +42,7 @@
         "default",
         {
           "identifier": "draggable-window",
-          "windows": [
-            "*"
-          ],
+          "windows": ["*"],
           "permissions": [
             "core:window:allow-start-dragging",
             "core:window:allow-toggle-maximize",

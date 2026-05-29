@@ -1,5 +1,5 @@
 import { LANGUAGE } from '@interfaces/language/enums'
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
 
 export const languageStore = 'languageStore'
 

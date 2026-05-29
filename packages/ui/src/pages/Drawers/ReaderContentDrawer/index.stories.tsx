@@ -1,6 +1,6 @@
-import { IBindingsBookmark } from '@bindings/bookmarks'
+import type { IBindingsBookmark } from '@bindings/bookmarks'
 import { BOOK_STATUS } from '@interfaces/book/enums'
-import { Meta, StoryObj } from '@storybook/react-vite'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import ReaderContentDrawer from '.'
 
 const meta: Meta<typeof ReaderContentDrawer> = {

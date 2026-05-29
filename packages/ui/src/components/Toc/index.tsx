@@ -2,7 +2,7 @@ import DefaultButton from '@components/Buttons/DefaultButton'
 import Show from '@components/Show'
 import { Typography } from '@components/Typography'
 import clsx from 'clsx'
-import { FC, memo, useEffect, useMemo, useState } from 'react'
+import { type FC, memo, useEffect, useMemo, useState } from 'react'
 import { IoIosArrowUp } from 'react-icons/io'
 
 export interface ITocItem {
@@ -41,19 +41,19 @@ const Toc: FC<IProps> = ({ item, level, activeToc, onClick }) => {
     [item.subitems],
   )
 
-  const containsActiveItem = (currentItem: ITocItem, target: ITocItem): boolean => {
-    if (!currentItem.subitems) return false
-
-    return currentItem.subitems.some((sub) => {
-      const isMatch = (sub.id && sub.id === target?.id) || (sub.href && sub.href === target?.href)
-      if (isMatch) return true
-
-      return containsActiveItem(sub, target)
-    })
-  }
-
   useEffect(() => {
     if (!activeToc) return
+
+    const containsActiveItem = (currentItem: ITocItem, target: ITocItem): boolean => {
+      if (!currentItem.subitems) return false
+
+      return currentItem.subitems.some((sub) => {
+        const isMatch = (sub.id && sub.id === target?.id) || (sub.href && sub.href === target?.href)
+        if (isMatch) return true
+
+        return containsActiveItem(sub, target)
+      })
+    }
 
     const shouldBeOpen = containsActiveItem(item, activeToc)
 
@@ -82,7 +82,7 @@ const Toc: FC<IProps> = ({ item, level, activeToc, onClick }) => {
           onClick(item?.href ?? item?.id ?? '')
           if (hasSubitems) setOpen(true)
         }}>
-        <div className="flex flex-row gap-12 items-center w-full">
+        <div className='flex flex-row gap-12 items-center w-full'>
           <Show when={hasSubitems}>
             <div
               onClick={(e) => {
@@ -110,7 +110,7 @@ const Toc: FC<IProps> = ({ item, level, activeToc, onClick }) => {
             'overflow-hidden transition-all duration-300 ease-in-out',
             open ? 'max-h-fit opacity-100' : 'max-h-0 opacity-0 pointer-events-none',
           )}>
-          <div className="pl-12">
+          <div className='pl-12'>
             {(item.subitems ?? []).map((sub, index) => (
               <Toc
                 key={sub.id ?? index}

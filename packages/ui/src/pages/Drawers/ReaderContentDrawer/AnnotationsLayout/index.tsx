@@ -1,6 +1,6 @@
-import { IBindingsBookmark } from '@bindings/bookmarks'
+import type { IBindingsBookmark } from '@bindings/bookmarks'
 import Bookmark from '@components/Bookmark'
-import { FC } from 'react'
+import type { FC } from 'react'
 
 export interface IProps {
   bookmarks: Array<IBindingsBookmark>
@@ -9,7 +9,7 @@ export interface IProps {
 
 const AnnotationsLayout: FC<IProps> = ({ bookmarks, onClick }) => {
   return (
-    <div className="pr-24 flex flex-col gap-6">
+    <div className='pr-24 flex flex-col gap-6'>
       {bookmarks.map((bookmark) => (
         <Bookmark
           onClick={() => {

@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react-vite'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import DefaultInput from './index'
 
 const meta: Meta<typeof DefaultInput> = {
@@ -11,6 +11,6 @@ type Story = StoryObj<typeof DefaultInput>
 
 export const BannersStory: Story = {
   render: () => {
-    return <DefaultInput placeholder="Search" value="" onChange={() => {}} />
+    return <DefaultInput placeholder='Search' value='' onChange={() => {}} />
   },
 }

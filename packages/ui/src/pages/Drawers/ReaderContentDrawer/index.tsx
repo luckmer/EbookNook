@@ -1,14 +1,14 @@
-import { IBindingsBookmark } from '@bindings/bookmarks'
+import type { IBindingsBookmark } from '@bindings/bookmarks'
 import DefaultButton from '@components/Buttons/DefaultButton'
 import Drawer from '@components/Drawer'
 import Match from '@components/Match'
 import Switch from '@components/Switch'
 import { Typography } from '@components/Typography'
 import { useWindowSize } from '@hooks/useWindowSize'
-import { BOOK_STATUS } from '@interfaces/book/enums'
+import type { BOOK_STATUS } from '@interfaces/book/enums'
 import { OPTIONS } from '@interfaces/contentDrawer/enums'
 import { Segmented } from 'antd'
-import { FC, useEffect, useMemo, useState } from 'react'
+import { type FC, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { IoLibraryOutline } from 'react-icons/io5'
 import AnnotationsLayout from './AnnotationsLayout'
@@ -61,7 +61,7 @@ const ReaderContentDrawer: FC<IProps> = ({
 
   useEffect(() => {
     setHasLoadError(false)
-  }, [book.cover])
+  }, [])
 
   const { width } = useWindowSize()
   const isMobile = useMemo(() => width <= 700, [width])
@@ -72,16 +72,16 @@ const ReaderContentDrawer: FC<IProps> = ({
       isOpen={isOpen}
       placement={isMobile ? 'bottom' : 'left'}
       height={isMobile ? '80%' : '100%'}>
-      <div className="h-full flex flex-col overflow-hidden">
-        <div className="flex flex-col gap-24 shrink-0 pb-12">
+      <div className='h-full flex flex-col overflow-hidden'>
+        <div className='flex flex-col gap-24 shrink-0 pb-12'>
           <div>
             <DefaultButton
               onClick={onClickBack}
-              className="transition-colors hover:bg-button-primary-hover hover:text-text-primary text-text-secondary duration-300 rounded-4 px-6 py-6">
-              <IoLibraryOutline className="w-24 h-24 transition-colors duration-200" />
+              className='transition-colors hover:bg-button-primary-hover hover:text-text-primary text-text-secondary duration-300 rounded-4 px-6 py-6'>
+              <IoLibraryOutline className='w-24 h-24 transition-colors duration-200' />
             </DefaultButton>
           </div>
-          <div className="pb-12 pr-24">
+          <div className='pb-12 pr-24'>
             <Segmented
               block
               value={option}
@@ -110,7 +110,7 @@ const ReaderContentDrawer: FC<IProps> = ({
             />
           </div>
         </div>
-        <div className="flex-1 overflow-y-auto">
+        <div className='flex-1 overflow-y-auto'>
           <Switch>
             <Match when={option === OPTIONS.OVERVIEW}>
               <OverviewLayout

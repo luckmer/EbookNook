@@ -1,5 +1,5 @@
-import { FormatType } from '@bindings/format'
-import { ILocalBookType } from '@interfaces/book/types'
+import type { FormatType } from '@bindings/format'
+import type { ILocalBookType } from '@interfaces/book/types'
 import { getPDFClient } from '@libs/pdf'
 import { rstr2hex } from '@utils/index'
 
@@ -24,6 +24,7 @@ export default class DocumentClientCore {
     type === 'application/vnd.comicbook+zip' || name.endsWith('.cbz')
 
   makeZipLoader = async (file: File) => {
+    // biome-ignore format: dynamic import multiline style
     const { configure, ZipReader, BlobReader, TextWriter, BlobWriter } =
       await import('@foliate/vendor/zip.js')
 
@@ -102,7 +103,7 @@ export default class DocumentClientCore {
       throw new Error('File type not supported')
     }
 
-    let book
+    let book: any
 
     if (format === 'PDF') {
       book = await this.PDFClient.init(file)
@@ -113,7 +114,7 @@ export default class DocumentClientCore {
     return {
       ...book,
       async getCover() {
-        let cover
+        let cover: { href: string; mediaType: string } | undefined
 
         if (format === 'EPUB') {
           cover = book.resources?.cover

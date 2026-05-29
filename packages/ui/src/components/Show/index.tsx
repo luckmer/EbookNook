@@ -1,4 +1,5 @@
-import React, { Fragment, ReactNode } from 'react'
+import type React from 'react'
+import { Fragment, type ReactNode } from 'react'
 
 interface ShowProps {
   when: boolean
