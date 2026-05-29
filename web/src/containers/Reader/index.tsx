@@ -42,7 +42,6 @@ const ReaderRoot = () => {
   const dispatch = useDispatch()
   const containerRef = useRef<HTMLDivElement | null>(null)
   const viewRef = useRef<any | null>(null)
-  const isInitializingRef = useRef(false)
 
   const activeBook = useMemo(() => {
     const bookShelf = books[bookState.format]
@@ -63,78 +62,58 @@ const ReaderRoot = () => {
   useEffect(() => {
     if (!file) {
       if (viewRef.current) {
-        try {
-          viewRef.current.close()
-          viewRef.current.remove()
-        } catch {
-          //
-        }
+        viewRef.current.close()
+        viewRef.current.remove()
       }
+      setIsViewReady(false)
       viewRef.current = null
-      isInitializingRef.current = false
+      setIsLoadingStructure(true)
 
-      const timer = setTimeout(() => {
-        setIsViewReady(false)
-        setIsContentViewReady(false)
-        setIsLoadingStructure(true)
-      }, 0)
-
-      return () => clearTimeout(timer)
+      setIsContentViewReady(false)
+      return
     }
 
-    if (isInitializingRef.current || isViewReady) return
-    isInitializingRef.current = true
+    if (isViewReady) return
+    setIsViewReady(true)
 
     const openBook = async () => {
-      try {
-        await import('@foliate/view.js')
+      await import('@foliate/view.js')
 
-        const container = containerRef.current
-        if (!container) {
-          isInitializingRef.current = false
-          return
-        }
+      const container = containerRef.current
+      if (!container) return
 
-        const view = document.createElement('foliate-view') as any
-        view.id = `foliate-view-${Date.now()}`
-        view.style.width = '100%'
-        view.style.height = '100vh'
-        container.appendChild(view)
-        viewRef.current = view
+      const view = document.createElement('foliate-view') as any
+      view.id = `foliate-view-${Date.now()}`
+      view.style.width = '100%'
+      view.style.height = '100vh'
+      container.appendChild(view)
 
-        setIsViewReady(true)
-        setIsContentViewReady(true)
+      viewRef.current = view
+      setIsContentViewReady(true)
+      const client = getDocumentClient()
+      const isPDF = await client.isPDF(file)
 
-        const client = getDocumentClient()
-        const isPDF = await client.isPDF(file)
-
-        if (isPDF) {
-          const pdfClient = getPDFClient()
-          const content = await pdfClient.init(file)
-          await view.open(content)
-        } else {
-          await view.open(file)
-        }
-
-        const lastLocation = activeBook?.progress?.CFI
-        if (lastLocation) {
-          await view.init({ lastLocation })
-        } else {
-          await view.goToFraction(0)
-        }
-
-        setIsLoadingStructure(false)
-      } catch {
-        isInitializingRef.current = false
+      if (isPDF) {
+        const pdfClient = getPDFClient()
+        const content = await pdfClient.init(file)
+        await view.open(content)
+      } else {
+        await view.open(file)
       }
+
+      const lastLocation = activeBook?.progress?.CFI
+
+      if (lastLocation) {
+        await view.init({ lastLocation })
+      } else {
+        await view.goToFraction(0)
+      }
+
+      setIsLoadingStructure(false)
     }
 
     if (activeBook) {
       openBook().catch(console.error)
-    }
-
-    return () => {
-      isInitializingRef.current = false
     }
   }, [file, activeBook, isViewReady])
 
