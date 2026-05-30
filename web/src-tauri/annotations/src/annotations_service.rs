@@ -1,7 +1,8 @@
-// use database::{
-//     DatabaseManager, INSERT_HIGHLIGHTS_BOOK, INSERT_NOTES_BOOK, SELECT_HIGHLIGHTS_BY_ID,
-//     SELECT_NOTES_BY_ID, SELECT_NOTES_ELEMENT, UPDATE_HIGHLIGHTS_BOOK, UPDATE_NOTES_BOOK,
-// };
+use database::{
+    DELETE_ANNOTATION, DatabaseManager, INSERT_ANNOTATION, SELECT_ANNOTATION, UPDATE_ANNOTATION,
+};
+use sqlx::types::chrono;
+use types::IBindingsAnnotation;
 
 pub struct AnnotationsService {}
 
@@ -10,147 +11,115 @@ impl AnnotationsService {
         AnnotationsService {}
     }
 
-    // pub async fn insert(
-    //     id: String,
-    //     db: &DatabaseManager,
-    //     json: String,
-    //     query: &str,
-    // ) -> Result<(), Box<dyn std::error::Error>> {
-    //     let conn = db.get_pool();
+    pub fn parse_annotation(
+        &self,
+        row: sqlx::sqlite::SqliteRow,
+    ) -> Result<IBindingsAnnotation, Box<dyn std::error::Error>> {
+        use sqlx::Row;
 
-    //     sqlx::query(query)
-    //         .bind(&id)
-    //         .bind(&json)
-    //         .execute(conn)
-    //         .await?;
+        Ok(IBindingsAnnotation {
+            annotation_id: row.try_get("annotation_id")?,
+            text: row.try_get("text")?,
+            value: row.try_get("value")?,
+            book_id: row.try_get("book_id")?,
+            note: row.try_get("note")?,
+            page: row.try_get("page")?,
+            created_at: row.try_get("created_at")?,
+            updated_at: row.try_get("updated_at")?,
+        })
+    }
 
-    //     Ok(())
-    // }
+    pub async fn add_annotation(
+        &self,
+        db: &DatabaseManager,
+        annotation: IBindingsAnnotation,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        let conn = db.get_pool();
 
-    // pub async fn fetch_optional(
-    //     db: &DatabaseManager,
-    //     query: &str,
-    //     id: &str,
-    // ) -> Result<Option<String>, Box<dyn std::error::Error>> {
-    //     let conn = db.get_pool();
+        let res = sqlx::query(INSERT_ANNOTATION)
+            .bind(annotation.book_id)
+            .bind(annotation.annotation_id)
+            .bind(annotation.value)
+            .bind(annotation.note)
+            .bind(annotation.page)
+            .bind(annotation.created_at)
+            .bind(annotation.updated_at)
+            .execute(conn)
+            .await?;
 
-    //     let result: Option<String> = sqlx::query_scalar(query)
-    //         .bind(id)
-    //         .fetch_optional(conn)
-    //         .await?;
+        if res.rows_affected() == 0 {
+            return Err("Failed to add annotation".into());
+        }
 
-    //     Ok(result)
-    // }
+        Ok(())
+    }
 
-    // pub async fn edit_note() -> Result<(), Box<dyn std::error::Error>> {
-    //     Ok(())
-    // }
+    pub async fn get_annotations_by_book_id(
+        &self,
+        db: &DatabaseManager,
+        id: String,
+    ) -> Result<Vec<IBindingsAnnotation>, Box<dyn std::error::Error>> {
+        let conn = db.get_pool();
 
-    // pub async fn add_note(
-    //     &self,
-    //     db: &DatabaseManager,
-    //     note: Note,
-    //     id: String,
-    // ) -> Result<Note, Box<dyn std::error::Error>> {
-    //     let mut notes = self.get_notes_by_id(db, id.clone()).await?;
+        let raw_annotations = sqlx::query(SELECT_ANNOTATION)
+            .bind(id)
+            .fetch_all(conn)
+            .await?;
 
-    //     notes.push(note.clone());
+        let mut annotations = Vec::new();
 
-    //     let json = serde_json::to_string(&notes)?;
+        for row in raw_annotations {
+            let annotation = self.parse_annotation(row)?;
+            annotations.push(annotation);
+        }
 
-    //     let content = Self::fetch_optional(db, SELECT_NOTES_ELEMENT, &id).await?;
+        Ok(annotations)
+    }
 
-    //     match content {
-    //         Some(_) => Self::insert(json, db, id, UPDATE_NOTES_BOOK).await?,
-    //         None => Self::insert(id, db, json, INSERT_NOTES_BOOK).await?,
-    //     }
+    pub async fn delete_annotation(
+        &self,
+        db: &DatabaseManager,
+        id: String,
+        annotation_id: String,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        let conn = db.get_pool();
 
-    //     Ok(note)
-    // }
+        let res = sqlx::query(DELETE_ANNOTATION)
+            .bind(id)
+            .bind(annotation_id)
+            .execute(conn)
+            .await?;
 
-    // pub async fn get_notes_by_id(
-    //     &self,
-    //     db: &DatabaseManager,
-    //     id: String,
-    // ) -> Result<Vec<Note>, Box<dyn std::error::Error>> {
-    //     let json = Self::fetch_optional(db, SELECT_NOTES_BY_ID, &id).await?;
+        if res.rows_affected() == 0 {
+            return Err("Failed to delete annotation".into());
+        }
 
-    //     let notes: Vec<Note> = match json {
-    //         Some(json) => serde_json::from_str(&json)?,
-    //         None => vec![],
-    //     };
+        Ok(())
+    }
 
-    //     Ok(notes)
-    // }
+    pub async fn update_annotation(
+        &self,
+        db: &DatabaseManager,
+        annotation: IBindingsAnnotation,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        let conn = db.get_pool();
 
-    // pub async fn delete_note(
-    //     &self,
-    //     db: &DatabaseManager,
-    //     id: String,
-    //     book_id: String,
-    // ) -> Result<(), Box<dyn std::error::Error>> {
-    //     let mut notes = self.get_notes_by_id(db, book_id.clone()).await?;
+        let now = chrono::Utc::now().timestamp();
 
-    //     notes.retain(|a| a.id != id);
-    //     let json = serde_json::to_string(&notes)?;
-    //     Self::insert(json, db, book_id, UPDATE_NOTES_BOOK).await?;
+        let res = sqlx::query(UPDATE_ANNOTATION)
+            .bind(annotation.page)
+            .bind(annotation.value)
+            .bind(annotation.text)
+            .bind(now)
+            .bind(annotation.book_id)
+            .bind(annotation.annotation_id)
+            .execute(conn)
+            .await?;
 
-    //     Ok(())
-    // }
+        if res.rows_affected() == 0 {
+            return Err("Failed to update annotation".into());
+        }
 
-    // pub async fn edit_highlight() -> Result<(), Box<dyn std::error::Error>> {
-    //     Ok(())
-    // }
-
-    // pub async fn add_highlight(
-    //     &self,
-    //     db: &DatabaseManager,
-    //     highlight: Highlight,
-    //     id: String,
-    // ) -> Result<Highlight, Box<dyn std::error::Error>> {
-    //     let mut highlights = self.get_highlights_by_id(db, id.clone()).await?;
-
-    //     highlights.push(highlight.clone());
-
-    //     let json = serde_json::to_string(&highlights)?;
-
-    //     let content = Self::fetch_optional(db, SELECT_HIGHLIGHTS_BY_ID, &id).await?;
-
-    //     match content {
-    //         Some(_) => Self::insert(json, db, id, UPDATE_HIGHLIGHTS_BOOK).await?,
-    //         None => Self::insert(id, db, json, INSERT_HIGHLIGHTS_BOOK).await?,
-    //     }
-
-    //     Ok(highlight)
-    // }
-
-    // pub async fn get_highlights_by_id(
-    //     &self,
-    //     db: &DatabaseManager,
-    //     id: String,
-    // ) -> Result<Vec<Highlight>, Box<dyn std::error::Error>> {
-    //     let json = Self::fetch_optional(db, SELECT_HIGHLIGHTS_BY_ID, &id).await?;
-
-    //     let highlights: Vec<Highlight> = match json {
-    //         Some(json) => serde_json::from_str(&json)?,
-    //         None => vec![],
-    //     };
-
-    //     Ok(highlights)
-    // }
-
-    // pub async fn delete_highlight(
-    //     &self,
-    //     db: &DatabaseManager,
-    //     id: String,
-    //     book_id: String,
-    // ) -> Result<(), Box<dyn std::error::Error>> {
-    //     let mut highlights = self.get_highlights_by_id(db, book_id.clone()).await?;
-
-    //     highlights.retain(|a| a.id != id);
-    //     let json = serde_json::to_string(&highlights)?;
-    //     Self::insert(json, db, book_id, UPDATE_HIGHLIGHTS_BOOK).await?;
-
-    //     Ok(())
-    // }
+        Ok(())
+    }
 }

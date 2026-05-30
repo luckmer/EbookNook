@@ -1,5 +1,6 @@
 import type { FormatType } from '@bindings/format'
 import type { ProgressType } from '@bindings/progress'
+import { Overlayer } from '@foliate/overlayer.js'
 import { LOADER_STATE, LOADER_STATUS } from '@interfaces/ui/enums'
 import { getDocumentClient } from '@libs/document'
 import { getEventEmitter } from '@libs/eventEmitter'
@@ -95,26 +96,53 @@ const ReaderRoot = () => {
 
   const load = (e: any) => {
     const doc = e.detail.doc
+    const index = e.detail.index
     if (!doc) return
 
+    const view = viewRef.current
+
+    // loadAnnotations()
     getFoliateDocEvents(doc, {
       mouseUp: () => {
-        const iframe: HTMLIFrameElement | null = doc.defaultView?.frameElement
-        if (!iframe) return
+        const selection = doc.getSelection()
 
-        const stats = {
-          selected: doc.getSelection(),
-          iframe: iframe,
+        // const range = selection.getRangeAt(0)
+        // const cfi = view.getCFI(index, range)
+
+        // if (!cfi) return
+        // const annotation = {
+        //   value: cfi,
+        //   color: '#fff',
+        //   note: 'optional note, idk what it does',
+        //   page: index + 1,
+        //   text: selection.toString(),
+        //   createdAt: Date.now().toString(),
+        //   updatedAt: Date.now().toString(),
+        // }
+
+        // view.addAnnotation(annotation, false)
+
+        emitter.dispatch('annotationClick', {
+          selected: selection,
+          iframe: doc.defaultView?.frameElement,
           doc,
-        }
-        emitter.dispatch('annotationClick', stats)
+        })
       },
       mouseDown: () => emitter.dispatch('restartAnnotator'),
-      resize: () => emitter.dispatch('restartAnnotator'),
+      resize: () => {
+        emitter.dispatch('restartAnnotator')
+      },
     })
   }
 
-  getFoliateEvents(viewRef.current, isContentViewReady, { relocate, load })
+  const drawAnnotation = (e: any) => {
+    const { draw, annotation } = e.detail
+
+    console.log(e.detail)
+    draw(Overlayer.highlight, { color: annotation.color ?? '#ffff00' })
+  }
+
+  getFoliateEvents(viewRef.current, isContentViewReady, { relocate, load, drawAnnotation })
 
   useEffect(() => {
     if (!file) {

@@ -5,8 +5,9 @@ use std::str::FromStr;
 use tauri::{AppHandle, Manager};
 
 use crate::{
-    BOOKMARKS_TABLE, EPUB_BOOKS_TABLE, EPUB_SECTIONS_TABLE, EPUB_TOC_TABLE, MOBI_BOOKS_TABLE,
-    MOBI_SECTIONS_TABLE, MOBI_TOC_TABLE, PDF_BOOKS_TABLE, PDF_SECTIONS_TABLE, PDF_TOC_TABLE,
+    ANNOTATIONS_TABLE, BOOKMARKS_TABLE, EPUB_BOOKS_TABLE, EPUB_SECTIONS_TABLE, EPUB_TOC_TABLE,
+    MOBI_BOOKS_TABLE, MOBI_SECTIONS_TABLE, MOBI_TOC_TABLE, PDF_BOOKS_TABLE, PDF_SECTIONS_TABLE,
+    PDF_TOC_TABLE,
 };
 
 pub struct DatabaseManager {
@@ -18,7 +19,6 @@ impl DatabaseManager {
         let base_dir = app_handle.path().app_data_dir()?;
 
         let db_dir = base_dir.join("eBookNook").join("database");
-
 
         if !db_dir.exists() {
             fs::create_dir_all(&db_dir)?;
@@ -67,6 +67,8 @@ impl DatabaseManager {
         sqlx::query(PDF_SECTIONS_TABLE).execute(&self.pool).await?;
 
         sqlx::query(BOOKMARKS_TABLE).execute(&self.pool).await?;
+
+        sqlx::query(ANNOTATIONS_TABLE).execute(&self.pool).await?;
         Ok(())
     }
 

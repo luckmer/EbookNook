@@ -5,7 +5,6 @@ use database::{
     INSERT_EPUB_BOOK_TOC, SELECT_EPUB_BOOK_SECTION_BY_ID, SELECT_EPUB_BOOK_TOC_BY_ID,
     SELECT_PGORESS_FROM_EPUB, UPDATE_EPUB_BOOK_PERCENTAGE_PROGRESS, UPDATE_EPUB_BOOK_PROGRESS,
 };
-use sqlx::types::chrono;
 use types::{
     FormatType, IBindingsBookContent, IBindingsEpubBook, IBindingsEpubBookStructure,
     IBindingsEpubMetadata, IBindingsEpubRendition, IBindingsEpubSection, IBindingsEpubToc,
@@ -155,8 +154,6 @@ impl EpubService {
         percentage_progress: String,
     ) -> Result<(), Box<dyn std::error::Error>> {
         let conn = db.get_pool();
-
-        let now = chrono::Utc::now().timestamp();
 
         sqlx::query(UPDATE_EPUB_BOOK_PERCENTAGE_PROGRESS)
             .bind(percentage_progress)

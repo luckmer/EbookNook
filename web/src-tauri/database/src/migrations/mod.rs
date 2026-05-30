@@ -1,8 +1,10 @@
+pub mod annotations;
 pub mod bookmarks;
 pub mod epub;
 pub mod mobi;
 pub mod pdf;
 
+pub use annotations::*;
 pub use bookmarks::*;
 pub use epub::*;
 pub use mobi::*;

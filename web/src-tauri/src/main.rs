@@ -1,5 +1,6 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+use annotations::init_annotations_service;
 use bookmarks::init_bookmarks_service;
 use database::init_database;
 use formats::init_format_service;
@@ -20,6 +21,7 @@ fn main() {
                 let state = AppState {
                     format_service: init_format_service(),
                     bookmarks_service: init_bookmarks_service(),
+                    annotations_service: init_annotations_service(),
                     db: db_manager,
                 };
 
@@ -38,6 +40,10 @@ fn main() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
+            api::annotations::add_annotation,
+            api::annotations::get_annotations_by_book_id,
+            api::annotations::delete_annotation,
+            api::annotations::update_annotation,
             api::bookmarks::get_bookmarks_by_book_id,
             api::bookmarks::add_bookmark_by_book_id,
             api::bookmarks::update_bookmark_by_book_id,
