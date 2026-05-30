@@ -20,7 +20,6 @@ const HeaderRoot = () => {
   const searchValue = useSelector(searchSelector.value)
   const hideHeader = useSelector(uiSelector.hideHeader)
   const booksMap = useSelector(booksSelector.books)
-  const selectedBookmark = useSelector(bookmarksSelector.selectedBookmark)
   const bookmarksState = useSelector(bookmarksSelector.bookmarks)
   const readerLocation = useSelector(readerSelector.readerLocation)
 
@@ -43,11 +42,8 @@ const HeaderRoot = () => {
   )
 
   const isBookmarkActive = useMemo(() => {
-    if (selectedBookmark.cfi === null) {
-      return bookmarks.some((b) => isActiveCFI(b.cfi, readerLocation.cfi))
-    }
-    return isActiveCFI(selectedBookmark.cfi, readerLocation.cfi)
-  }, [selectedBookmark.cfi, readerLocation.cfi, bookmarks])
+    return bookmarks.some((b) => isActiveCFI(b.cfi, readerLocation.cfi))
+  }, [readerLocation.cfi, bookmarks])
 
   return (
     <Header

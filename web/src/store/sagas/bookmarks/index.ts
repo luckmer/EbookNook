@@ -1,7 +1,7 @@
 import type { IBindingsBookmark } from '@bindings/bookmarks'
 import { LOADER_STATE, LOADER_STATUS } from '@interfaces/ui/enums'
 import type { PayloadAction } from '@reduxjs/toolkit'
-import { actions, type PayloadTypes } from '@store/reducers/bookmarks'
+import { actions, defaultSelectedBookmark, type PayloadTypes } from '@store/reducers/bookmarks'
 import { actions as uiActions } from '@store/reducers/ui'
 import { bookmarksSelector } from '@store/selectors/bookmarks'
 import { invoke } from '@tauri-apps/api/core'
@@ -66,6 +66,12 @@ export function* deleteBookmark(action: PayloadAction<PayloadTypes['deleteBookma
       cfi: action.payload.cfi,
     })
     yield* put(actions.setDeleteBookmark(action.payload))
+
+    const activeBookmark = yield* select(bookmarksSelector.selectedBookmark)
+
+    if (activeBookmark.cfi === action.payload.cfi) {
+      yield* put(actions.setSelectedBookmark(defaultSelectedBookmark))
+    }
   } catch (err) {
     console.log('Failed to delete bookmark', err)
     notify('Failed to delete bookmark', 'error')
