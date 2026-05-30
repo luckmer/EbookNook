@@ -183,7 +183,7 @@ const ReaderRoot = () => {
 
     if (viewRef.current && selectedBookmark.cfi !== null) {
       viewRef.current.init({ lastLocation: selectedBookmark.cfi })
-      if (selectedBookmark.cfi.includes(',,')) {
+      if (!selectedBookmark.hasChapter) {
         viewRef.current.goToFraction(0)
       }
     }

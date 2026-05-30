@@ -88,6 +88,7 @@ const BookContentDrawerRoot = () => {
         dispatch(
           bookmarkActions.setSelectedBookmark({
             selectedAt: Date.now().toString(),
+            hasChapter: bookmark.chapter !== '----',
             cfi: bookmark.cfi,
           }),
         )

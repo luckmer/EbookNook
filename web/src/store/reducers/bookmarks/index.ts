@@ -6,6 +6,7 @@ export const bookmarksStore = 'bookmarksStore'
 
 export interface ISelectedBookmark {
   cfi: string | null
+  hasChapter: boolean
   selectedAt: string
 }
 
@@ -16,6 +17,7 @@ export interface IBookmarksState {
 
 export const defaultSelectedBookmark = {
   cfi: null,
+  hasChapter: true,
   selectedAt: Date.now().toString(),
 }
 
