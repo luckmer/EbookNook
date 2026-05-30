@@ -68,11 +68,7 @@ const Bookmark: FC<IProps> = ({
               {chapter}
             </Typography>
           </Show>
-          <ContentInput
-            isEditing={isEdit}
-            placeholder={t('title')}
-            value={label}
-            onChange={setLabel}>
+          <ContentInput isEditing={isEdit} placeholder={title} value={label} onChange={setLabel}>
             <Typography text='caption' ellipsis>
               {title}
             </Typography>
@@ -97,6 +93,7 @@ const Bookmark: FC<IProps> = ({
                 <DefaultButton
                   onClick={() => {
                     setIsEdit(false)
+                    setLabel('')
                   }}
                   className='transition-colors hover:bg-button-primary-hover duration-300 rounded-4 px-6 py-6'>
                   <Typography text='caption' color='blue'>
@@ -108,6 +105,7 @@ const Bookmark: FC<IProps> = ({
                   onClick={() => {
                     onClickEdit(label)
                     setIsEdit(false)
+                    setLabel('')
                   }}
                   className='transition-colors hover:bg-button-primary-hover  duration-300 rounded-4 px-6 py-6'>
                   <Typography text='caption' color='blue'>
