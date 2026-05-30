@@ -2,6 +2,7 @@ import type { FormatType } from '@bindings/format'
 import type { ProgressType } from '@bindings/progress'
 import { LOADER_STATE, LOADER_STATUS } from '@interfaces/ui/enums'
 import { getDocumentClient } from '@libs/document'
+import { getEventEmitter } from '@libs/eventEmitter'
 import { getPDFClient } from '@libs/pdf'
 import Reader from '@pages/Reader'
 import { actions as bookActions } from '@store/reducers/books'
@@ -13,6 +14,8 @@ import { readerSelector } from '@store/selectors/reader'
 import { settingsStyles } from '@store/selectors/settings'
 import { uiSelector } from '@store/selectors/ui'
 import { debounce } from '@utils/debounce'
+import { getFoliateDocEvents } from '@utils/docEvents'
+import { getFoliateEvents } from '@utils/foliateEvents'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation } from 'react-router-dom'
@@ -29,8 +32,8 @@ const ReaderRoot = () => {
   const hideContent = useSelector(uiSelector.hideHeader)
   const readerLocation = useSelector(readerSelector.readerLocation)
   const selectedBookmark = useSelector(bookmarksSelector.selectedBookmark)
-
   const location = useLocation()
+  const emitter = getEventEmitter()
 
   const bookState: { id: string; format: FormatType } = useMemo(() => {
     return {
@@ -59,6 +62,59 @@ const ReaderRoot = () => {
   const handleShowHeader = useCallback(() => {
     dispatch(actions.setHideHeader(false))
   }, [dispatch])
+
+  const saveProgress = useMemo(
+    () =>
+      debounce((location: IReaderLocation, book: typeof activeBook) => {
+        if (!book) return
+
+        const progress: Partial<Record<ProgressType, string>> = {
+          CFI: location.cfi,
+        }
+
+        if (location.tocItem) {
+          dispatch(bookActions.setActiveToc(location.tocItem))
+        }
+
+        dispatch(
+          bookActions.updateBookProgress({
+            percentageProgress: String(location.fraction * 100),
+            format: book.format,
+            id: book.id,
+            progress,
+          }),
+        )
+      }, 300),
+    [dispatch],
+  )
+
+  const relocate = (e: { detail: IReaderLocation }) => {
+    dispatch(readerActions.setReaderLocation(e.detail))
+    saveProgress(e.detail, activeBook)
+  }
+
+  const load = (e: any) => {
+    const doc = e.detail.doc
+    if (!doc) return
+
+    getFoliateDocEvents(doc, {
+      mouseUp: () => {
+        const iframe: HTMLIFrameElement | null = doc.defaultView?.frameElement
+        if (!iframe) return
+
+        const stats = {
+          selected: doc.getSelection(),
+          iframe: iframe,
+          doc,
+        }
+        emitter.dispatch('annotationClick', stats)
+      },
+      mouseDown: () => emitter.dispatch('restartAnnotator'),
+      resize: () => emitter.dispatch('restartAnnotator'),
+    })
+  }
+
+  getFoliateEvents(viewRef.current, isContentViewReady, { relocate, load })
 
   useEffect(() => {
     if (!file) {
@@ -118,50 +174,6 @@ const ReaderRoot = () => {
     }
   }, [file, activeBook, isViewReady])
 
-  const saveProgress = useMemo(
-    () =>
-      debounce((location: IReaderLocation, book: typeof activeBook) => {
-        if (!book) return
-
-        const progress: Partial<Record<ProgressType, string>> = {
-          CFI: location.cfi,
-        }
-
-        if (location.tocItem) {
-          dispatch(bookActions.setActiveToc(location.tocItem))
-        }
-
-        dispatch(
-          bookActions.updateBookProgress({
-            percentageProgress: String(location.fraction * 100),
-            format: book.format,
-            id: book.id,
-            progress,
-          }),
-        )
-      }, 300),
-    [dispatch],
-  )
-
-  useEffect(() => {
-    if (!isContentViewReady) return
-
-    const view = viewRef.current
-    if (!view) return
-
-    view.addEventListener('relocate', (e: { detail: IReaderLocation }) => {
-      dispatch(readerActions.setReaderLocation(e.detail))
-      saveProgress(e.detail, activeBook)
-    })
-
-    return () => {
-      view.removeEventListener('relocate', (e: { detail: IReaderLocation }) => {
-        dispatch(readerActions.setReaderLocation(e.detail))
-        saveProgress(e.detail, activeBook)
-      })
-    }
-  }, [isContentViewReady, dispatch, saveProgress, activeBook])
-
   useEffect(() => {
     if (viewRef.current && selectedChapter !== '') {
       viewRef.current.goTo(selectedChapter)
@@ -170,9 +182,7 @@ const ReaderRoot = () => {
 
   useEffect(() => {
     if (isLoadingStructure) return
-
     const view = viewRef.current
-
     if (!view) return
 
     view.renderer.setStyles?.(styles)
@@ -197,8 +207,8 @@ const ReaderRoot = () => {
         total: readerLocation.location.total,
       }}
       pageInfo={{
-        percentage: readerLocation.fraction * 100,
         current: Math.max(1, readerLocation.location.current),
+        percentage: readerLocation.fraction * 100,
         total: readerLocation.location.total,
       }}
       loading={
