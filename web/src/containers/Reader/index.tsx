@@ -183,6 +183,9 @@ const ReaderRoot = () => {
 
     if (viewRef.current && selectedBookmark.cfi !== null) {
       viewRef.current.init({ lastLocation: selectedBookmark.cfi })
+      if (selectedBookmark.cfi.includes(',,')) {
+        viewRef.current.goToFraction(0)
+      }
     }
   }, [selectedBookmark, isLoadingStructure])
 
