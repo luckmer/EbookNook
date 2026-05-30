@@ -1,4 +1,3 @@
-import { BOOK_STATUS } from '@interfaces/book/enums'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import OverviewLayout from '.'
 
@@ -18,7 +17,6 @@ export const Default: Story = {
 
 Default.args = {
   book: {
-    status: BOOK_STATUS.ERROR,
     author: 'author',
     title: 'title',
     published: 'published',

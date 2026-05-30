@@ -34,8 +34,7 @@ function App() {
     const book = bookShelf[bookState.id]
     if (book) {
       isLoaded.current = true
-      dispatch(bookActions.setOpenBook(book.id))
-      dispatch(bookActions.getBookStructure({ id: book.id, format: book.format }))
+      dispatch(bookActions.setOpenBook({ id: book.id, format: book.format }))
     }
   }, [booksMap, bookState, dispatch, location])
 

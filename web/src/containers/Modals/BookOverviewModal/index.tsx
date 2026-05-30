@@ -1,4 +1,3 @@
-import { BOOK_STATUS } from '@interfaces/book/enums'
 import BookOverviewModal from '@pages/Modals/BookOverviewModal'
 import { actions as bookActions } from '@store/reducers/books'
 import { actions } from '@store/reducers/ui'
@@ -9,7 +8,7 @@ import { useDispatch, useSelector } from 'react-redux'
 
 const BookOverviewModalRoot = () => {
   const openSettingsModal = useSelector(uiSelector.openBookOverviewModal)
-  const status = useSelector(booksSelector.statuses)
+  const status = useSelector(uiSelector.scopedLoaderState)
   const booksMap = useSelector(booksSelector.books)
   const dispatch = useDispatch()
 
@@ -35,6 +34,11 @@ const BookOverviewModalRoot = () => {
     }
   }, [book, dispatch])
 
+  const pendingStatus = useMemo(() => {
+    const bookStatus = status[openSettingsModal.bookId]
+    return bookStatus
+  }, [status, openSettingsModal?.bookId])
+
   return (
     <BookOverviewModal
       book={{
@@ -44,7 +48,7 @@ const BookOverviewModalRoot = () => {
         title: cachedBook?.metadata.title,
         published: cachedBook?.metadata?.published,
         publisher: cachedBook?.metadata?.publisher,
-        status: status[openSettingsModal.bookId] ?? BOOK_STATUS.IDLE,
+        status: pendingStatus,
       }}
       onClickClose={() => {
         dispatch(actions.setOpenBookOverviewModal({ status: false, bookId: '', format: 'EPUB' }))

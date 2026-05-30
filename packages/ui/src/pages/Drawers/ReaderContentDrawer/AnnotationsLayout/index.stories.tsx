@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import AnnotationsLayout from '.'
+import AnnotationsLayout, { type IProps } from '.'
 
 const meta: Meta<typeof AnnotationsLayout> = {
   component: AnnotationsLayout,
@@ -15,7 +15,11 @@ export const Default: Story = {
   },
 }
 
-Default.args = {
+const args: IProps = {
+  scopedLoader: {},
+  isLoader: false,
+  onClickDelete: () => {},
+  onClickEdit: () => {},
   bookmarks: [
     {
       bookId: 'bookId',
@@ -38,3 +42,5 @@ Default.args = {
   ],
   onClick: () => {},
 }
+
+Default.args = args

@@ -1,3 +1,4 @@
+import { LOADER_STATE, LOADER_STATUS } from '@interfaces/ui/enums'
 import Home from '@pages/Home'
 import { actions } from '@store/reducers/books'
 import { actions as uiActions } from '@store/reducers/ui'
@@ -10,8 +11,7 @@ import { useNavigate } from 'react-router-dom'
 const HomeRoot = () => {
   const dispatch = useDispatch()
   const availableBooks = useSelector(booksSelector.books)
-  const isLoadingState = useSelector(uiSelector.isLoadingState)
-  const isAddingBook = useSelector(uiSelector.isAddingBook)
+  const loader = useSelector(uiSelector.loaderState)
   const books = useSelector(filteredBooks)
 
   const navigate = useNavigate()
@@ -19,8 +19,8 @@ const HomeRoot = () => {
   return (
     <Home
       books={books}
-      isAddingBook={isAddingBook}
-      isLoadingState={isLoadingState}
+      isAddingBook={loader[LOADER_STATE.IS_ADDING_BOOK]?.status === LOADER_STATUS.LOADING}
+      isLoadingState={loader[LOADER_STATE.IS_LOADING_STATE]?.status === LOADER_STATUS.LOADING}
       hasBooks={Object.values(availableBooks).flat().length > 0}
       onClick={(file) => {
         dispatch(actions.importBook(file))
@@ -36,8 +36,7 @@ const HomeRoot = () => {
       }}
       onClickBook={(id, format) => {
         navigate('reader', { state: { id, format } })
-        dispatch(actions.setOpenBook(id))
-        dispatch(actions.getBookStructure({ id, format }))
+        dispatch(actions.setOpenBook({ id, format }))
         dispatch(uiActions.setHideHeader(true))
       }}
     />

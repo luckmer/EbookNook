@@ -1,5 +1,4 @@
 import type { FormatType } from '@bindings/format'
-import { BOOK_STATUS } from '@interfaces/book/enums'
 import ReaderContentDrawer from '@pages/Drawers/ReaderContentDrawer'
 import { actions as bookmarkActions } from '@store/reducers/bookmarks'
 import { actions as bookActions } from '@store/reducers/books'
@@ -18,10 +17,10 @@ export interface ICache {
 const BookContentDrawerRoot = () => {
   const [cache, setCache] = useState<ICache | null>(null)
   const isOpen = useSelector(uiSelector.openChaptersDrawer)
-  const isLoader = useSelector(uiSelector.isFetchingStructure)
+  const loaderState = useSelector(uiSelector.loaderState)
+  const scopedLoader = useSelector(uiSelector.scopedLoaderState)
   const books = useSelector(booksSelector.books)
   const activeToc = useSelector(booksSelector.activeToc)
-  const status = useSelector(booksSelector.statuses)
   const bookmarksState = useSelector(bookmarksSelector.bookmarks)
 
   const navigate = useNavigate()
@@ -62,9 +61,8 @@ const BookContentDrawerRoot = () => {
       published: activeBook?.metadata?.published,
       publisher: activeBook?.metadata?.publisher,
       description: activeBook?.metadata?.description,
-      status: status[cache?.id ?? ''] ?? BOOK_STATUS.IDLE,
     }
-  }, [activeBook, cache, status])
+  }, [activeBook])
 
   return (
     <ReaderContentDrawer
@@ -72,7 +70,8 @@ const BookContentDrawerRoot = () => {
       book={book}
       bookmarks={activeBookmarks}
       toc={activeBook?.toc ?? []}
-      isLoader={isLoader}
+      loaderState={loaderState}
+      scopedLoader={scopedLoader}
       isOpen={isOpen}
       onClickBack={() => {
         dispatch(uiActions.setOpenChaptersDrawer(false))
@@ -96,6 +95,17 @@ const BookContentDrawerRoot = () => {
       onClick={(href) => {
         dispatch(bookActions.setSelectedChapter(href))
         dispatch(uiActions.setHideHeader(true))
+      }}
+      onClickEdit={(bookmark) => {
+        dispatch(bookmarkActions.updateBookmark(bookmark))
+      }}
+      onClickDelete={(id, cfi) => {
+        dispatch(
+          bookmarkActions.deleteBookmark({
+            id,
+            cfi,
+          }),
+        )
       }}
     />
   )

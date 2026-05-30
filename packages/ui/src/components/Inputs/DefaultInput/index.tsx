@@ -22,12 +22,16 @@ const DefaultInput: FC<IProps> = ({ id, name, className, placeholder, value, onC
       )}
       placeholder={placeholder}
       value={value}
+      onClick={(e) => e.stopPropagation()}
+      onMouseDown={(e) => e.stopPropagation()}
+      onKeyDown={(e) => e.stopPropagation()}
+      onKeyUp={(e) => e.stopPropagation()}
       onChange={(e) => {
         e.preventDefault()
+        e.stopPropagation()
         onChange(e.target.value)
       }}
     />
   )
 }
-
 export default memo(DefaultInput)

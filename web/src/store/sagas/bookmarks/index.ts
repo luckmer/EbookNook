@@ -1,10 +1,12 @@
 import type { IBindingsBookmark } from '@bindings/bookmarks'
+import { LOADER_STATE, LOADER_STATUS } from '@interfaces/ui/enums'
 import type { PayloadAction } from '@reduxjs/toolkit'
 import { actions, type PayloadTypes } from '@store/reducers/bookmarks'
+import { actions as uiActions } from '@store/reducers/ui'
 import { bookmarksSelector } from '@store/selectors/bookmarks'
 import { invoke } from '@tauri-apps/api/core'
 import { notify } from '@utils/notification'
-import { all, call, put, select, takeLatest } from 'typed-redux-saga'
+import { all, call, put, select, takeEvery } from 'typed-redux-saga'
 
 export function* loadBookmarksById(id: string) {
   try {
@@ -22,28 +24,71 @@ export function* loadBookmarksById(id: string) {
   }
 }
 
-export function* saveBookmark(action: PayloadAction<PayloadTypes['saveBookmark']>) {
+export function* addBookmarkById(action: PayloadAction<PayloadTypes['addBookmarkById']>) {
+  yield* put(
+    uiActions.setScopedLoaderState({
+      scope: action.payload.bookId,
+      loader: LOADER_STATE.IS_ADDING_BOOKMARK,
+      state: { status: LOADER_STATUS.LOADING },
+    }),
+  )
+
   try {
-    console.log(action.payload)
     yield* call(invoke<IBindingsBookmark>, 'add_bookmark_by_book_id', { payload: action.payload })
+
     yield* put(actions.setAddBookmark(action.payload))
   } catch (err) {
     console.log('Failed to save bookmark', err)
     notify('Failed to save bookmark', 'error')
   }
+
+  yield* put(
+    uiActions.setScopedLoaderState({
+      scope: action.payload.bookId,
+      loader: LOADER_STATE.IS_ADDING_BOOKMARK,
+      state: { status: LOADER_STATUS.IDLE },
+    }),
+  )
 }
 
 export function* deleteBookmark(action: PayloadAction<PayloadTypes['deleteBookmark']>) {
+  yield* put(
+    uiActions.setScopedLoaderState({
+      scope: action.payload.id,
+      loader: LOADER_STATE.IS_DELETING_BOOKMARK,
+      state: { status: LOADER_STATUS.LOADING },
+    }),
+  )
+
   try {
-    yield* call(invoke, 'delete_bookmark_by_book_id', { id: action.payload.cfi })
+    yield* call(invoke, 'delete_bookmark_by_book_id', {
+      id: action.payload.id,
+      cfi: action.payload.cfi,
+    })
     yield* put(actions.setDeleteBookmark(action.payload))
   } catch (err) {
     console.log('Failed to delete bookmark', err)
     notify('Failed to delete bookmark', 'error')
   }
+
+  yield* put(
+    uiActions.setScopedLoaderState({
+      scope: action.payload.id,
+      loader: LOADER_STATE.IS_DELETING_BOOKMARK,
+      state: { status: LOADER_STATUS.IDLE },
+    }),
+  )
 }
 
 export function* updateBookmark(action: PayloadAction<PayloadTypes['updateBookmark']>) {
+  yield* put(
+    uiActions.setScopedLoaderState({
+      scope: action.payload.bookId,
+      loader: LOADER_STATE.IS_UPDATING_BOOKMARK,
+      state: { status: LOADER_STATUS.LOADING },
+    }),
+  )
+
   try {
     yield* call(invoke, 'update_bookmark_by_book_id', { payload: action.payload })
     yield* put(actions.setUpdateBookmark(action.payload))
@@ -51,20 +96,28 @@ export function* updateBookmark(action: PayloadAction<PayloadTypes['updateBookma
     console.log('Failed to update bookmark', err)
     notify('Failed to update bookmark', 'error')
   }
+
+  yield* put(
+    uiActions.setScopedLoaderState({
+      scope: action.payload.bookId,
+      loader: LOADER_STATE.IS_UPDATING_BOOKMARK,
+      state: { status: LOADER_STATUS.IDLE },
+    }),
+  )
 }
 
-export function* saveBookmarkSaga() {
-  yield* takeLatest(actions.saveBookmark, saveBookmark)
+export function* addBookmarkByIdSaga() {
+  yield* takeEvery(actions.addBookmarkById, addBookmarkById)
 }
 
 export function* deleteBookmarkSaga() {
-  yield* takeLatest(actions.deleteBookmark, deleteBookmark)
+  yield* takeEvery(actions.deleteBookmark, deleteBookmark)
 }
 
 export function* updateBookmarkSaga() {
-  yield* takeLatest(actions.updateBookmark, updateBookmark)
+  yield* takeEvery(actions.updateBookmark, updateBookmark)
 }
 
 export default function* RootSaga() {
-  yield all([saveBookmarkSaga(), deleteBookmarkSaga(), updateBookmarkSaga()])
+  yield all([addBookmarkByIdSaga(), deleteBookmarkSaga(), updateBookmarkSaga()])
 }

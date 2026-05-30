@@ -1,5 +1,6 @@
 import type { FormatType } from '@bindings/format'
 import type { ProgressType } from '@bindings/progress'
+import { LOADER_STATE, LOADER_STATUS } from '@interfaces/ui/enums'
 import { getDocumentClient } from '@libs/document'
 import { getPDFClient } from '@libs/pdf'
 import Reader from '@pages/Reader'
@@ -24,7 +25,7 @@ const ReaderRoot = () => {
   const files = useSelector(booksSelector.files)
   const styles = useSelector(settingsStyles)
   const selectedChapter = useSelector(booksSelector.selectedChapter)
-  const isLoader = useSelector(uiSelector.isFetchingStructure)
+  const isLoader = useSelector(uiSelector.loaderState)
   const hideContent = useSelector(uiSelector.hideHeader)
   const readerLocation = useSelector(readerSelector.readerLocation)
   const selectedBookmark = useSelector(bookmarksSelector.selectedBookmark)
@@ -197,7 +198,10 @@ const ReaderRoot = () => {
         current: Math.max(1, readerLocation.location.current),
         total: readerLocation.location.total,
       }}
-      loading={isLoadingStructure || isLoader}
+      loading={
+        isLoadingStructure ||
+        isLoader[LOADER_STATE.IS_FETCHING_STRUCTURE]?.status === LOADER_STATUS.LOADING
+      }
       hideContent={hideContent}
       onHideHeader={handleHideHeader}
       onShowHeader={handleShowHeader}

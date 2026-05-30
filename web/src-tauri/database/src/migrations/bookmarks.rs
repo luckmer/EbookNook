@@ -25,7 +25,7 @@ pub const DELETE_BOOKMARK: &str = r#"
 
 pub const UPDATE_BOOKMARK: &str = r#"
    UPDATE bookmarks_table
-   SET format = ?1, updated_at = ?2
+   SET title = ?1, updated_at = ?2
    WHERE book_id = ?3 AND cfi = ?4
 "#;
 

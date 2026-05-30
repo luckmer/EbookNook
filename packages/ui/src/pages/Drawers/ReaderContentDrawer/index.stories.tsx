@@ -1,7 +1,7 @@
 import type { IBindingsBookmark } from '@bindings/bookmarks'
-import { BOOK_STATUS } from '@interfaces/book/enums'
+import { LOADER_STATE, LOADER_STATUS } from '@interfaces/ui/enums'
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import ReaderContentDrawer from '.'
+import ReaderContentDrawer, { type IProps } from '.'
 
 const meta: Meta<typeof ReaderContentDrawer> = {
   component: ReaderContentDrawer,
@@ -83,8 +83,18 @@ export const Default: Story = {
   },
 }
 
-Default.args = {
-  isLoader: false,
+const args: IProps = {
+  onClickDelete: () => {},
+  onClickEdit: () => {},
+  loaderState: {
+    [LOADER_STATE.IS_DELETING_BOOKMARK]: {
+      status: LOADER_STATUS.LOADING,
+    },
+    [LOADER_STATE.IS_UPDATING_BOOKMARK]: {
+      status: LOADER_STATUS.LOADING,
+    },
+  },
+  scopedLoader: {},
   isOpen: true,
   bookmarks,
   activeToc: {
@@ -94,7 +104,6 @@ Default.args = {
   },
   toc,
   book: {
-    status: BOOK_STATUS.ERROR,
     author: 'author',
     title: 'title',
     published: 'published',
@@ -108,3 +117,5 @@ Default.args = {
   onClick: () => {},
   onClickClose: () => {},
 }
+
+Default.args = args

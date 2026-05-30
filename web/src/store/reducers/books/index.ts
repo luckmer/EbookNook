@@ -1,7 +1,6 @@
 import type { IBindingsBookContent, IBookMetadata } from '@bindings/book'
 import type { FormatType } from '@bindings/format'
 import type { ProgressType } from '@bindings/progress'
-import type { BOOK_STATUS } from '@interfaces/book/enums'
 import type { IBookStructure, IBookType, ILocalBookToc } from '@interfaces/book/types'
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
 import type { PayloadType } from '@store/helper'
@@ -10,7 +9,6 @@ export const booksStore = 'booksStore'
 
 export interface IBookState {
   selectedChapter: string
-  statuses: Record<string, BOOK_STATUS>
   books: Partial<Record<FormatType, Partial<Record<string, IBookType>>>>
   activeToc: ILocalBookToc
   files: Record<string, File | null>
@@ -27,7 +25,6 @@ const defaultState: IBookState = {
   selectedChapter: '',
   activeToc: defaultActiveToc,
   files: {},
-  statuses: {},
   books: {},
 }
 
@@ -37,10 +34,6 @@ export const store = createSlice({
 
   reducers: {
     load(state) {
-      return state
-    },
-    setStatus(state, action: PayloadAction<{ id: string; status: BOOK_STATUS }>) {
-      state.statuses[action.payload.id] = action.payload.status
       return state
     },
 
@@ -64,13 +57,10 @@ export const store = createSlice({
       state.selectedChapter = action.payload
       return state
     },
-    setOpenBook(state, _: PayloadAction<string>) {
+    setOpenBook(state, _: PayloadAction<{ id: string; format: FormatType }>) {
       return state
     },
 
-    getBookStructure(state, _: PayloadAction<{ id: string; format: FormatType }>) {
-      return state
-    },
     importBook(state, _: PayloadAction<File>) {
       return state
     },

@@ -62,7 +62,7 @@ const CreateBookmarkModalRoot = () => {
           format: activeBook.format,
         }
 
-        dispatch(bookmarkActions.saveBookmark(data))
+        dispatch(bookmarkActions.addBookmarkById(data))
         dispatch(actions.setOpenCreateBookmarkModal(false))
       }}
     />

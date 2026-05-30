@@ -1,4 +1,6 @@
 import type { FormatType } from '@bindings/format'
+import type { LOADER_STATE } from '@interfaces/ui/enums'
+import type { LoaderState } from '@interfaces/ui/types'
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
 
 export const uiStore = 'uiStore'
@@ -10,15 +12,12 @@ export interface IOpenBookOverviewModal {
 }
 
 export interface IUiState {
-  isFetchingStructure: boolean
+  loaderState: Partial<Record<LOADER_STATE, LoaderState>>
+  scopedLoaderState: Partial<Record<string, Partial<Record<LOADER_STATE, LoaderState>>>>
   openChaptersDrawer: boolean
   openSettingsModal: boolean
   openBookOverviewModal: IOpenBookOverviewModal
-  isFetchingHighlightsStructure: boolean
-  isFetchingNotesStructure: boolean
   openCreateBookmarkModal: boolean
-  isAddingBook: boolean
-  isLoadingState: boolean
   hideHeader: boolean
 }
 
@@ -30,14 +29,11 @@ const defaultOpenBookOverviewModalState: IOpenBookOverviewModal = {
 
 const defaultState: IUiState = {
   openBookOverviewModal: defaultOpenBookOverviewModalState,
-  isFetchingHighlightsStructure: true,
-  isFetchingNotesStructure: true,
-  isFetchingStructure: true,
+  loaderState: {},
+  scopedLoaderState: {},
   openChaptersDrawer: false,
   openCreateBookmarkModal: false,
   openSettingsModal: false,
-  isLoadingState: true,
-  isAddingBook: false,
   hideHeader: false,
 }
 
@@ -46,6 +42,24 @@ export const store = createSlice({
   initialState: defaultState,
   reducers: {
     load(state) {
+      return state
+    },
+    setLoaderState(state, action: PayloadAction<{ loader: LOADER_STATE; state: LoaderState }>) {
+      state.loaderState[action.payload.loader] = action.payload.state
+      return state
+    },
+    setScopedLoaderState(
+      state,
+      action: PayloadAction<{ scope: string; loader: LOADER_STATE; state: LoaderState }>,
+    ) {
+      const { scope, loader, state: loaderState } = action.payload
+
+      if (!state.scopedLoaderState[scope]) {
+        state.scopedLoaderState[scope] = {}
+      }
+
+      state.scopedLoaderState[scope][loader] = loaderState
+
       return state
     },
     setOpenChaptersDrawer(state, action: PayloadAction<boolean>) {
@@ -64,29 +78,8 @@ export const store = createSlice({
       state.hideHeader = action.payload
       return state
     },
-    setIsLoadingState(state, action: PayloadAction<boolean>) {
-      state.isLoadingState = action.payload
-      return state
-    },
-    setIsFetchingStructure(state, action: PayloadAction<boolean>) {
-      state.isFetchingStructure = action.payload
-      return state
-    },
     setOpenCreateBookmarkModal(state, action: PayloadAction<boolean>) {
       state.openCreateBookmarkModal = action.payload
-      return state
-    },
-    setIsFetchingHighlightsStructure(state, action: PayloadAction<boolean>) {
-      state.isFetchingHighlightsStructure = action.payload
-      return state
-    },
-    setIsFetchingNotesStructure(state, action: PayloadAction<boolean>) {
-      state.isFetchingNotesStructure = action.payload
-      return state
-    },
-
-    setIsAddingBook(state, action: PayloadAction<boolean>) {
-      state.isAddingBook = action.payload
       return state
     },
   },

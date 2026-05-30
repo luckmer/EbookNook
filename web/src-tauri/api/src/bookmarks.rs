@@ -42,10 +42,11 @@ pub async fn update_bookmark_by_book_id(
 pub async fn delete_bookmark_by_book_id(
     state: State<'_, AppState>,
     id: String,
+    cfi: String,
 ) -> Result<(), String> {
     state
         .bookmarks_service
-        .delete_bookmark_by_book_id(&state.db, id)
+        .delete_bookmark_by_book_id(&state.db, id, cfi)
         .await
         .map_err(|e| e.to_string())
 }

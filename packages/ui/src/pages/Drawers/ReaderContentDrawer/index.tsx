@@ -5,8 +5,9 @@ import Match from '@components/Match'
 import Switch from '@components/Switch'
 import { Typography } from '@components/Typography'
 import { useWindowSize } from '@hooks/useWindowSize'
-import type { BOOK_STATUS } from '@interfaces/book/enums'
 import { OPTIONS } from '@interfaces/contentDrawer/enums'
+import { LOADER_STATE, LOADER_STATUS } from '@interfaces/ui/enums'
+import type { LoaderState } from '@interfaces/ui/types'
 import { Segmented } from 'antd'
 import { type FC, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -28,7 +29,6 @@ export interface IBook {
   title?: string
   published?: string
   publisher?: string
-  status: BOOK_STATUS
 }
 
 export interface IProps {
@@ -36,9 +36,12 @@ export interface IProps {
   onClickClose: () => void
   onClickBack: () => void
   onClickBookmark: (bookmark: IBindingsBookmark) => void
+  onClickDelete: (id: string, cfi: string) => void
+  onClickEdit: (bookmark: IBindingsBookmark) => void
   isOpen: boolean
   toc: ITocItem[]
-  isLoader: boolean
+  loaderState: Partial<Record<LOADER_STATE, LoaderState>>
+  scopedLoader: Partial<Record<string, Partial<Record<LOADER_STATE, LoaderState>>>>
   bookmarks: Array<IBindingsBookmark>
   activeToc: ITocItem
   book: IBook
@@ -48,12 +51,15 @@ const ReaderContentDrawer: FC<IProps> = ({
   onClickClose,
   onClickBack,
   onClickBookmark,
+  onClickDelete,
+  onClickEdit,
   onClick,
   book,
   toc,
-  isLoader,
+  loaderState,
   activeToc,
   bookmarks,
+  scopedLoader,
 }) => {
   const [option, setOption] = useState<OPTIONS>(OPTIONS.OVERVIEW)
   const [hasLoadError, setHasLoadError] = useState(false)
@@ -115,7 +121,9 @@ const ReaderContentDrawer: FC<IProps> = ({
             <Match when={option === OPTIONS.OVERVIEW}>
               <OverviewLayout
                 book={book}
-                isLoader={isLoader}
+                isLoader={
+                  loaderState[LOADER_STATE.IS_FETCHING_STRUCTURE]?.status === LOADER_STATUS.LOADING
+                }
                 hasLoadError={hasLoadError}
                 onImgError={() => {
                   setHasLoadError(true)
@@ -127,11 +135,22 @@ const ReaderContentDrawer: FC<IProps> = ({
                 onClick={onClick}
                 toc={toc}
                 activeToc={activeToc}
-                isLoader={isLoader}
+                isLoader={
+                  loaderState[LOADER_STATE.IS_FETCHING_STRUCTURE]?.status === LOADER_STATUS.LOADING
+                }
               />
             </Match>
             <Match when={option === OPTIONS.ANNOTATIONS}>
-              <AnnotationsLayout bookmarks={bookmarks} onClick={onClickBookmark} />
+              <AnnotationsLayout
+                isLoader={
+                  loaderState[LOADER_STATE.IS_LOADING_ANNOTATIONS]?.status === LOADER_STATUS.LOADING
+                }
+                scopedLoader={scopedLoader}
+                bookmarks={bookmarks}
+                onClick={onClickBookmark}
+                onClickDelete={onClickDelete}
+                onClickEdit={onClickEdit}
+              />
             </Match>
           </Switch>
         </div>

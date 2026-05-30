@@ -10,7 +10,8 @@ import Show from '@components/Show'
 import Spin from '@components/Spin'
 import { Typography } from '@components/Typography'
 import { useWindowSize } from '@hooks/useWindowSize'
-import { BOOK_STATUS } from '@interfaces/book/enums'
+import { LOADER_STATE, LOADER_STATUS } from '@interfaces/ui/enums'
+import type { LoaderState } from '@interfaces/ui/types'
 import { DATE_REGEX } from '@web-utils/regex'
 import clsx from 'clsx'
 import { type FC, useEffect, useMemo, useRef, useState } from 'react'
@@ -25,7 +26,7 @@ export interface IBook {
   title?: string
   published?: string
   publisher?: string
-  status: BOOK_STATUS
+  status: Partial<Record<LOADER_STATE, LoaderState>> | undefined
 }
 
 export interface IProps {
@@ -133,30 +134,42 @@ const BookOverviewModal: FC<IProps> = ({
         <div className='flex flex-col overflow-hidden w-full flex-1 py-24'>
           <div className='flex flex-row items-center justify-end gap-12 w-full px-24 pb-12'>
             <DefaultButton
-              disabled={book.status === BOOK_STATUS.DELETING}
+              disabled={
+                book.status?.[LOADER_STATE.IS_DELETING_BOOK]?.status === LOADER_STATUS.LOADING
+              }
               onClick={onClickDelete}
               className={clsx(
                 'p-6  rounded-4 duration-150',
-                book.status !== BOOK_STATUS.DELETING
+                book.status?.[LOADER_STATE.IS_DELETING_BOOK]?.status !== LOADER_STATUS.LOADING
                   ? 'hover:bg-button-primary-hover cursor-pointer'
                   : 'cursor-default!',
               )}>
-              <Show when={book.status !== BOOK_STATUS.DELETING} fallback={<Spin size={18} />}>
+              <Show
+                when={
+                  book.status?.[LOADER_STATE.IS_DELETING_BOOK]?.status !== LOADER_STATUS.LOADING
+                }
+                fallback={<Spin size={18} />}>
                 <IoTrashBin className='text-status-error min-w-18 min-h-18' />
               </Show>
             </DefaultButton>
             <DefaultButton
-              disabled={book.status === BOOK_STATUS.UPDATING}
+              disabled={
+                book.status?.[LOADER_STATE.IS_UPDATING_BOOK]?.status === LOADER_STATUS.LOADING
+              }
               onClick={() => {
                 setIsEditing((prev) => !prev)
               }}
               className={clsx(
                 'p-6  rounded-4 duration-150',
-                book.status !== BOOK_STATUS.UPDATING
+                book.status?.[LOADER_STATE.IS_UPDATING_BOOK]?.status !== LOADER_STATUS.LOADING
                   ? 'hover:bg-button-primary-hover cursor-pointer'
                   : 'cursor-default!',
               )}>
-              <Show when={book.status !== BOOK_STATUS.UPDATING} fallback={<Spin size={18} />}>
+              <Show
+                when={
+                  book.status?.[LOADER_STATE.IS_UPDATING_BOOK]?.status !== LOADER_STATUS.LOADING
+                }
+                fallback={<Spin size={18} />}>
                 <MdEdit className='min-w-18 min-h-18' />
               </Show>
             </DefaultButton>
@@ -268,7 +281,9 @@ const BookOverviewModal: FC<IProps> = ({
             <Show when={isEditing}>
               <div>
                 <DefaultButton
-                  disabled={book.status === BOOK_STATUS.UPDATING}
+                  disabled={
+                    book.status?.[LOADER_STATE.IS_UPDATING_BOOK]?.status === LOADER_STATUS.LOADING
+                  }
                   onClick={() => {
                     const date = newContent.published
                     if ((date?.trim()?.length ?? 0) > 0) {
@@ -281,7 +296,11 @@ const BookOverviewModal: FC<IProps> = ({
                     onClickEdit(newContent)
                   }}
                   className='px-24 py-8 bg-button-primary-active hover:bg-button-primary-hover rounded-4 duration-150 h-full'>
-                  <Show when={book.status !== BOOK_STATUS.UPDATING} fallback={<Spin size={16} />}>
+                  <Show
+                    when={
+                      book.status?.[LOADER_STATE.IS_UPDATING_BOOK]?.status !== LOADER_STATUS.LOADING
+                    }
+                    fallback={<Spin size={16} />}>
                     <Typography text='caption' color='secondary'>
                       {t('save')}
                     </Typography>

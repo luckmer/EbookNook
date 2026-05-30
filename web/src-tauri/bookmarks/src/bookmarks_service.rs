@@ -22,8 +22,8 @@ impl BookmarksService {
         let created_at: String = row.try_get("created_at")?;
         let updated_at: String = row.try_get("updated_at")?;
         let book_id: String = row.try_get("book_id")?;
-        let title:String = row.try_get("title")?;
-        let chapter:String = row.try_get("chapter")?;
+        let title: String = row.try_get("title")?;
+        let chapter: String = row.try_get("chapter")?;
 
         Ok(IBindingsBookmark {
             book_id,
@@ -84,16 +84,19 @@ impl BookmarksService {
         payload: IBindingsBookmark,
     ) -> Result<(), Box<dyn Error>> {
         let conn = db.get_pool();
-        let format = serde_json::to_string(&payload.format)?;
         let updated_at = chrono::Utc::now().to_rfc3339();
 
-        sqlx::query(UPDATE_BOOKMARK)
-            .bind(format)
+        let result = sqlx::query(UPDATE_BOOKMARK)
+            .bind(payload.title)
             .bind(updated_at)
             .bind(payload.book_id)
             .bind(payload.cfi)
             .execute(conn)
             .await?;
+
+        if result.rows_affected() == 0 {
+            return Err("failed to update bookmark title".into());
+        }
 
         Ok(())
     }
@@ -102,9 +105,18 @@ impl BookmarksService {
         &self,
         db: &DatabaseManager,
         id: String,
+        cfi: String,
     ) -> Result<(), Box<dyn Error>> {
         let conn = db.get_pool();
-        sqlx::query(DELETE_BOOKMARK).bind(id).execute(conn).await?;
+        let result = sqlx::query(DELETE_BOOKMARK)
+            .bind(id)
+            .bind(cfi)
+            .execute(conn)
+            .await?;
+
+        if result.rows_affected() == 0 {
+            return Err("Bookmark not found or already deleted".into());
+        }
 
         Ok(())
     }

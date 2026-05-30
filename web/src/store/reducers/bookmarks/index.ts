@@ -34,7 +34,7 @@ export const store = createSlice({
     reset(state) {
       state.selectedBookmark = defaultState.selectedBookmark
     },
-    saveBookmark(state, _: PayloadAction<IBindingsBookmark>) {
+    addBookmarkById(state, _: PayloadAction<IBindingsBookmark>) {
       return state
     },
     setBookmarks(state, action: PayloadAction<{ id: string; bookmarks: IBindingsBookmark[] }>) {
@@ -77,11 +77,7 @@ export const store = createSlice({
 
       if (!state.bookmarks[id]) return state
 
-      const index = state.bookmarks[id].findIndex((b) => b.cfi === cfi)
-
-      if (index === -1) return state
-
-      delete state.bookmarks[id][index]
+      state.bookmarks[id] = state.bookmarks[id].filter((b) => b.cfi !== cfi)
 
       return state
     },

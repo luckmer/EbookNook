@@ -1,25 +1,62 @@
+import { LOADER_STATE, LOADER_STATUS } from '@interfaces/ui/enums'
 import type { PayloadAction } from '@reduxjs/toolkit'
 import { actions as bookmarkActions } from '@store/reducers/bookmarks'
 import { actions, type PayloadTypes } from '@store/reducers/books'
 import { actions as readerActions } from '@store/reducers/reader'
+import { actions as uiActions } from '@store/reducers/ui'
 import { all, call, put, takeLatest } from 'typed-redux-saga'
 import { loadBookmarksById } from '../bookmarks'
-import { setOpenBook } from '../books'
+import { getBookStructure, setOpenBook } from '../books'
 
 export function* resetBookState() {
   yield* all([put(bookmarkActions.reset()), put(readerActions.reset())])
 }
 
-export function* loadBookmarkState(action: PayloadAction<PayloadTypes['setOpenBook']>) {
-  yield* call(loadBookmarksById, action.payload)
+export function* loadAnnotationState(action: PayloadAction<PayloadTypes['setOpenBook']>) {
+  yield* put(
+    uiActions.setLoaderState({
+      loader: LOADER_STATE.IS_LOADING_ANNOTATIONS,
+      state: { status: LOADER_STATUS.LOADING },
+    }),
+  )
+
+  yield* call(loadBookmarksById, action.payload.id)
+
+  yield* put(
+    uiActions.setLoaderState({
+      loader: LOADER_STATE.IS_LOADING_ANNOTATIONS,
+      state: { status: LOADER_STATUS.IDLE },
+    }),
+  )
+}
+
+export function* loadBookStructure(action: PayloadAction<PayloadTypes['setOpenBook']>) {
+  yield* put(
+    uiActions.setLoaderState({
+      loader: LOADER_STATE.IS_FETCHING_STRUCTURE,
+      state: { status: LOADER_STATUS.LOADING },
+    }),
+  )
+
+  yield* all([
+    call(setOpenBook, action.payload.id),
+    call(getBookStructure, action.payload.id, action.payload.format),
+  ])
+
+  yield* put(
+    uiActions.setLoaderState({
+      loader: LOADER_STATE.IS_FETCHING_STRUCTURE,
+      state: { status: LOADER_STATUS.IDLE },
+    }),
+  )
 }
 
 export function* setGetBookmarksSaga() {
-  yield* takeLatest(actions.setOpenBook, loadBookmarkState)
+  yield* takeLatest(actions.setOpenBook, loadAnnotationState)
 }
 
 export function* setOpenBookSaga() {
-  yield* takeLatest(actions.setOpenBook, setOpenBook)
+  yield* takeLatest(actions.setOpenBook, loadBookStructure)
 }
 
 export function* resetBookStateSaga() {
