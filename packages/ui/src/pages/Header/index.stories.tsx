@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react-vite'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import Header from './index'
 
 const meta: Meta<typeof Header> = {
@@ -14,15 +14,16 @@ export const BannersStory: Story = {
     return (
       <Header
         hideHeader={false}
-        location="/"
-        onClickOpenNotebook={() => {}}
+        location='/'
+        isBookmarkActive={false}
+        onClickBookmark={() => {}}
         onClickOpenSidebar={() => {}}
         onClickSettings={() => {}}
         onClickClose={() => {}}
         onClickMaximize={() => {}}
         onClickMinimize={() => {}}
         onChange={() => {}}
-        value=""
+        value=''
       />
     )
   },

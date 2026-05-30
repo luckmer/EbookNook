@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": [
-      "ES2022",
-      "DOM",
-      "DOM.Iterable"
-    ],
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "moduleResolution": "bundler",
     "composite": true,
@@ -23,9 +19,7 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
-    "types": [
-      "node"
-    ]
+    "types": ["node"]
   },
   "include": [
     "vite.config.ts",
@@ -37,11 +31,5 @@
     "*.config.js",
     "*.config.ts"
   ],
-  "exclude": [
-    "src",
-    "../packages",
-    "dist",
-    "build",
-    "node_modules"
-  ]
+  "exclude": ["src", "../packages", "dist", "build", "node_modules"]
 }

@@ -1,0 +1,99 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.4.16/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "files": {
+    "ignoreUnknown": true,
+    "includes": ["**", "!web/src/foliate", "!**/src-tauri", "!**/vitest.config*"]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100,
+    "lineEnding": "lf",
+    "includes": ["**", "!web/src/foliate/**", "!**/src-tauri/**", "!**/vitest.config*"]
+  },
+  "assist": {
+    "enabled": true,
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
+  },
+  "linter": {
+    "enabled": true,
+    "includes": [
+      "**",
+      "!web/src/foliate/**",
+      "!**/src-tauri/**",
+      "!web/src/index.css",
+      "!**/vitest.config*"
+    ],
+    "rules": {
+      "recommended": true,
+      "a11y": {
+        "noLabelWithoutControl": "off",
+        "noStaticElementInteractions": "off",
+        "noSvgWithoutTitle": "off",
+        "useKeyWithClickEvents": "off"
+      },
+      "style": {
+        "useImportType": "error",
+        "noNonNullAssertion": "off",
+        "useSelfClosingElements": "warn"
+      },
+      "correctness": {
+        "useExhaustiveDependencies": "error",
+        "useHookAtTopLevel": "error",
+        "useJsxKeyInIterable": "error",
+        "noChildrenProp": "error"
+      },
+      "complexity": {
+        "noImportantStyles": "off",
+        "noUselessConstructor": "off",
+        "noUselessCatch": "error",
+        "noUselessFragments": "warn"
+      },
+      "suspicious": {
+        "noDuplicateJsxProps": "error",
+        "noTemplateCurlyInString": "off",
+        "noAsyncPromiseExecutor": "error",
+        "noDebugger": "error",
+        "noExplicitAny": "off",
+        "noRedeclare": "error",
+        "noShadowRestrictedNames": "error",
+        "noCatchAssign": "off",
+        "noUnknownAtRules": "off",
+        "noReactSpecificProps": "off"
+      }
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single",
+      "jsxQuoteStyle": "single",
+      "semicolons": "asNeeded",
+      "trailingCommas": "all",
+      "bracketSpacing": true,
+      "bracketSameLine": true,
+      "quoteProperties": "asNeeded"
+    }
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    },
+    "formatter": {
+      "enabled": true,
+      "quoteStyle": "single"
+    },
+    "linter": {
+      "enabled": true
+    }
+  }
+}

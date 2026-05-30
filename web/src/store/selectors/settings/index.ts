@@ -51,7 +51,7 @@ const fontStyles = createSelector(
       }
 
       b, strong, h1, h2, h3 {
-        font-weight: ${Math.min(parseInt(fontWeight.toString()), 900)} !important;
+        font-weight: ${Math.min(fontWeight, 900)} !important;
       }
     `
   },

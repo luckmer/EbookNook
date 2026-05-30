@@ -1,4 +1,4 @@
-import { IBindingsBookContent } from '@bindings/book'
+import type { IBindingsBookContent } from '@bindings/book'
 import DefaultButton from '@components/Buttons/DefaultButton'
 import ImgCover from '@components/ImgCover'
 import ContentArea from '@components/Inputs/ContentArea'
@@ -10,10 +10,11 @@ import Show from '@components/Show'
 import Spin from '@components/Spin'
 import { Typography } from '@components/Typography'
 import { useWindowSize } from '@hooks/useWindowSize'
-import { BOOK_STATUS } from '@interfaces/book/enums'
+import { LOADER_STATE, LOADER_STATUS } from '@interfaces/ui/enums'
+import type { LoaderState } from '@interfaces/ui/types'
 import { DATE_REGEX } from '@web-utils/regex'
 import clsx from 'clsx'
-import { FC, useEffect, useMemo, useRef, useState } from 'react'
+import { type FC, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { IoTrashBin } from 'react-icons/io5'
 import { MdEdit } from 'react-icons/md'
@@ -25,7 +26,7 @@ export interface IBook {
   title?: string
   published?: string
   publisher?: string
-  status: BOOK_STATUS
+  status: Partial<Record<LOADER_STATE, LoaderState>> | undefined
 }
 
 export interface IProps {
@@ -65,7 +66,7 @@ const BookOverviewModal: FC<IProps> = ({
 
     const handleLoad = () => {
       const doc = iframe.contentDocument
-      if (!doc || !doc.body) return
+      if (!doc?.body) return
 
       const style = doc.createElement('style')
       style.textContent = `
@@ -112,7 +113,7 @@ const BookOverviewModal: FC<IProps> = ({
 
   useEffect(() => {
     setHasLoadError(false)
-  }, [book.cover])
+  }, [])
 
   return (
     <Modal
@@ -130,48 +131,61 @@ const BookOverviewModal: FC<IProps> = ({
           isMobile ? 'h-full' : 'max-h-[700px]',
         )}>
         <ModalHeader onClickClose={onClickClose} label={t('bookOverview')} />
-        <div className="flex flex-col overflow-hidden w-full flex-1 py-24">
-          <div className="flex flex-row items-center justify-end gap-12 w-full px-24 pb-12">
+        <div className='flex flex-col overflow-hidden w-full flex-1 py-24'>
+          <div className='flex flex-row items-center justify-end gap-12 w-full px-24 pb-12'>
             <DefaultButton
-              disabled={book.status === BOOK_STATUS.DELETING}
+              disabled={
+                book.status?.[LOADER_STATE.IS_DELETING_BOOK]?.status === LOADER_STATUS.LOADING
+              }
               onClick={onClickDelete}
               className={clsx(
                 'p-6  rounded-4 duration-150',
-                book.status !== BOOK_STATUS.DELETING
+                book.status?.[LOADER_STATE.IS_DELETING_BOOK]?.status !== LOADER_STATUS.LOADING
                   ? 'hover:bg-button-primary-hover cursor-pointer'
                   : 'cursor-default!',
               )}>
-              <Show when={book.status !== BOOK_STATUS.DELETING} fallback={<Spin size={18} />}>
-                <IoTrashBin className="text-status-error min-w-18 min-h-18" />
+              <Show
+                when={
+                  book.status?.[LOADER_STATE.IS_DELETING_BOOK]?.status !== LOADER_STATUS.LOADING
+                }
+                fallback={<Spin size={18} />}>
+                <IoTrashBin className='text-status-error min-w-18 min-h-18' />
               </Show>
             </DefaultButton>
             <DefaultButton
-              disabled={book.status === BOOK_STATUS.UPDATING}
+              disabled={
+                book.status?.[LOADER_STATE.IS_UPDATING_BOOK]?.status === LOADER_STATUS.LOADING
+              }
               onClick={() => {
                 setIsEditing((prev) => !prev)
               }}
               className={clsx(
                 'p-6  rounded-4 duration-150',
-                book.status !== BOOK_STATUS.UPDATING
+                book.status?.[LOADER_STATE.IS_UPDATING_BOOK]?.status !== LOADER_STATUS.LOADING
                   ? 'hover:bg-button-primary-hover cursor-pointer'
                   : 'cursor-default!',
               )}>
-              <Show when={book.status !== BOOK_STATUS.UPDATING} fallback={<Spin size={18} />}>
-                <MdEdit className="min-w-18 min-h-18" />
+              <Show
+                when={
+                  book.status?.[LOADER_STATE.IS_UPDATING_BOOK]?.status !== LOADER_STATUS.LOADING
+                }
+                fallback={<Spin size={18} />}>
+                <MdEdit className='min-w-18 min-h-18' />
               </Show>
             </DefaultButton>
           </div>
-          <div className="flex flex-col gap-24 overflow-y-auto px-24">
-            <div className="flex flex-row gap-24">
+          <div className='flex flex-col gap-24 overflow-y-auto px-24'>
+            <div className='flex flex-row gap-24'>
               <Show
                 when={!hasLoadError}
                 fallback={
-                  <div className="rounded-6  max-h-[200px] min-h-[200px] min-w-[130px] max-w-[130px] object-cover bg-neutral-800">
+                  <div className='rounded-6  max-h-[200px] min-h-[200px] min-w-[130px] max-w-[130px] object-cover bg-neutral-800'>
                     <ImgCover name={book.title ?? '--'} author={book.author ?? '--'} />
                   </div>
                 }>
                 <img
-                  className="rounded-6  max-h-[200px] min-h-[200px] min-w-[130px] max-w-[130px] object-cover bg-neutral-800"
+                  aria-label='img'
+                  className='rounded-6  max-h-[200px] min-h-[200px] min-w-[130px] max-w-[130px] object-cover bg-neutral-800'
                   src={book.cover}
                   onError={(e) => {
                     e.stopPropagation()
@@ -179,56 +193,56 @@ const BookOverviewModal: FC<IProps> = ({
                   }}
                 />
               </Show>
-              <div className="flex flex-col justify-between items-start w-full">
-                <div className="flex flex-col gap-24 py-4 w-full">
-                  <div className="flex flex-col gap-8 w-full">
+              <div className='flex flex-col justify-between items-start w-full'>
+                <div className='flex flex-col gap-24 py-4 w-full'>
+                  <div className='flex flex-col gap-8 w-full'>
                     <ContentInput
                       isEditing={isEditing}
                       placeholder={t('author')}
-                      value={newContent['author'] ?? book?.author ?? ''}
+                      value={newContent.author ?? book?.author ?? ''}
                       onChange={(val) => {
-                        setNewContent((prev) => ({ ...prev, ['author']: val }))
+                        setNewContent((prev) => ({ ...prev, author: val }))
                       }}>
-                      <Typography text="h2">{book?.author || t('unknownAuthor')}</Typography>
+                      <Typography text='h2'>{book?.author || t('unknownAuthor')}</Typography>
                     </ContentInput>
                     <ContentInput
                       isEditing={isEditing}
                       placeholder={t('title')}
-                      value={newContent['title'] ?? book?.title ?? ''}
+                      value={newContent.title ?? book?.title ?? ''}
                       onChange={(val) => {
-                        setNewContent((prev) => ({ ...prev, ['title']: val }))
+                        setNewContent((prev) => ({ ...prev, title: val }))
                       }}>
-                      <Typography text="caption" color="secondary">
+                      <Typography text='caption' color='secondary'>
                         {book?.title || t('unknownTitle')}
                       </Typography>
                     </ContentInput>
                   </div>
-                  <div className="flex flex-col gap-8 w-full">
+                  <div className='flex flex-col gap-8 w-full'>
                     <DateContentInput
                       isError={isError}
                       isEditing={isEditing}
                       placeholder={t('date')}
-                      value={newContent['published'] ?? book?.published ?? ''}
+                      value={newContent.published ?? book?.published ?? ''}
                       onChange={(val) => {
                         setIsError(false)
                         setNewContent((prev) => ({
                           ...prev,
-                          ['published']: val,
+                          published: val,
                         }))
                       }}>
-                      <Typography text="body">{book?.published || t('unknownDate')}</Typography>
+                      <Typography text='body'>{book?.published || t('unknownDate')}</Typography>
                     </DateContentInput>
                     <ContentInput
                       isEditing={isEditing}
                       placeholder={t('publisher')}
-                      value={newContent['publisher'] ?? book?.publisher ?? ''}
+                      value={newContent.publisher ?? book?.publisher ?? ''}
                       onChange={(val) => {
                         setNewContent((prev) => ({
                           ...prev,
-                          ['publisher']: val,
+                          publisher: val,
                         }))
                       }}>
-                      <Typography text="caption" color="secondary">
+                      <Typography text='caption' color='secondary'>
                         {book?.publisher || t('unknownPublisher')}
                       </Typography>
                     </ContentInput>
@@ -236,9 +250,9 @@ const BookOverviewModal: FC<IProps> = ({
                 </div>
               </div>
             </div>
-            <div className="flex flex-col gap-12">
+            <div className='flex flex-col gap-12'>
               <Show when={!isEditing}>
-                <Typography text="body" color="white">
+                <Typography text='body' color='white'>
                   {t('description')}
                 </Typography>
               </Show>
@@ -246,30 +260,32 @@ const BookOverviewModal: FC<IProps> = ({
                 isEditing={isEditing}
                 placeholder={t('description')}
                 onChange={(val) => {
-                  setNewContent((prev) => ({ ...prev, ['description']: val }))
+                  setNewContent((prev) => ({ ...prev, description: val }))
                 }}
-                value={newContent['description'] ?? bookDesc ?? ''}>
+                value={newContent.description ?? bookDesc ?? ''}>
                 <Show when={!bookDesc}>
-                  <Typography text="caption" color="secondary">
+                  <Typography text='caption' color='secondary'>
                     {t('noDescription')}
                   </Typography>
                 </Show>
               </ContentArea>
               <div className={clsx('w-full', (!bookDesc || isEditing) && 'hidden')}>
                 <iframe
-                  title="book-description"
+                  title='book-description'
                   ref={refIframe}
-                  scrolling="no"
-                  className="w-full border-0 transition-all duration-200"
+                  scrolling='no'
+                  className='w-full border-0 transition-all duration-200'
                 />
               </div>
             </div>
             <Show when={isEditing}>
               <div>
                 <DefaultButton
-                  disabled={book.status === BOOK_STATUS.UPDATING}
+                  disabled={
+                    book.status?.[LOADER_STATE.IS_UPDATING_BOOK]?.status === LOADER_STATUS.LOADING
+                  }
                   onClick={() => {
-                    const date = newContent['published']
+                    const date = newContent.published
                     if ((date?.trim()?.length ?? 0) > 0) {
                       if (!date?.match(DATE_REGEX)) {
                         setIsError(true)
@@ -279,9 +295,13 @@ const BookOverviewModal: FC<IProps> = ({
                     setIsEditing(false)
                     onClickEdit(newContent)
                   }}
-                  className="px-24 py-8 bg-button-primary-active hover:bg-button-primary-hover rounded-4 duration-150 h-full">
-                  <Show when={book.status !== BOOK_STATUS.UPDATING} fallback={<Spin size={16} />}>
-                    <Typography text="caption" color="secondary">
+                  className='px-24 py-8 bg-button-primary-active hover:bg-button-primary-hover rounded-4 duration-150 h-full'>
+                  <Show
+                    when={
+                      book.status?.[LOADER_STATE.IS_UPDATING_BOOK]?.status !== LOADER_STATUS.LOADING
+                    }
+                    fallback={<Spin size={16} />}>
+                    <Typography text='caption' color='secondary'>
                       {t('save')}
                     </Typography>
                   </Show>

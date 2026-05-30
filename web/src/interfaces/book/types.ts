@@ -1,6 +1,6 @@
-import { IBindingsEpubToc } from '@bindings/epub'
-import { IEpubBook } from './epub'
-import {
+import type { IBindingsEpubToc } from '@bindings/epub'
+import type { IEpubBook } from './epub'
+import type {
   IEpubBookStructure,
   IEpubBookType,
   IMobiBookStructure,
@@ -8,8 +8,8 @@ import {
   IPDFBookStructure,
   IPDFBookType,
 } from './interfaces'
-import { IBindingsMobiToc, IMobiBook } from './mobi'
-import { IPDFBook } from './pdf'
+import type { IBindingsMobiToc, IMobiBook } from './mobi'
+import type { IPDFBook } from './pdf'
 
 export type ILanguageMap = { [key in string]?: string }
 export type ILanguage = string | Array<string>

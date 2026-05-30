@@ -1,9 +1,9 @@
-import { Meta, StoryObj } from '@storybook/react-vite'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import LayoutSettings from '.'
 
 const meta: Meta<typeof LayoutSettings> = {
   component: LayoutSettings,
-  title: 'Pages/Settings/LayoutSettings',
+  title: 'Pages/Modals/Settings/LayoutSettings',
 }
 
 export default meta

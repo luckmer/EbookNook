@@ -1,9 +1,10 @@
 // use annotations::AnnotationsService;
+use bookmarks::BookmarksService;
 use database::DatabaseManager;
 use formats::FormatsService;
 
 pub struct AppState {
     pub db: DatabaseManager,
     pub format_service: FormatsService,
-    // pub annotations_service: AnnotationsService,
+    pub bookmarks_service: BookmarksService,
 }

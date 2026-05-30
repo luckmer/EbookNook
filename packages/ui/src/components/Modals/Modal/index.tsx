@@ -1,6 +1,6 @@
-import { Breakpoint, Modal } from 'antd'
+import { type Breakpoint, Modal } from 'antd'
 import clsx from 'clsx'
-import { FC, memo } from 'react'
+import { type FC, memo } from 'react'
 
 export interface IProps {
   children: React.ReactNode

@@ -2,7 +2,7 @@ import Show from '@components/Show'
 import { Typography } from '@components/Typography'
 import { formatDate } from '@web-utils/index'
 import clsx from 'clsx'
-import { FC, memo } from 'react'
+import { type FC, memo } from 'react'
 import { useTranslation } from 'react-i18next'
 import DefaultInput from '../DefaultInput'
 export interface IProps {
@@ -35,7 +35,7 @@ const DateContentInput: FC<IProps> = ({
         placeholder={placeholder}
       />
       <Show when={isError ?? false}>
-        <Typography color="error" text="small">
+        <Typography color='error' text='small'>
           {t('enterValidDate')}
         </Typography>
       </Show>

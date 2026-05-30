@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react-vite'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import ContentMeta from './index'
 
 const meta: Meta<typeof ContentMeta> = {
@@ -11,6 +11,6 @@ type Story = StoryObj<typeof ContentMeta>
 
 export const BannersStory: Story = {
   render: () => {
-    return <ContentMeta description="description" label="ModalHeader" />
+    return <ContentMeta description='description' label='ModalHeader' />
   },
 }

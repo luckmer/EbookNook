@@ -1,11 +1,15 @@
-import { FormatType } from '@bindings/format'
-import { ProgressType } from '@bindings/progress'
+import type { FormatType } from '@bindings/format'
+import type { ProgressType } from '@bindings/progress'
+import { LOADER_STATE, LOADER_STATUS } from '@interfaces/ui/enums'
 import { getDocumentClient } from '@libs/document'
 import { getPDFClient } from '@libs/pdf'
 import Reader from '@pages/Reader'
 import { actions as bookActions } from '@store/reducers/books'
+import { type IReaderLocation, actions as readerActions } from '@store/reducers/reader'
 import { actions } from '@store/reducers/ui'
-import { bookSelector } from '@store/selectors/books'
+import { bookmarksSelector } from '@store/selectors/bookmarks'
+import { booksSelector } from '@store/selectors/books'
+import { readerSelector } from '@store/selectors/reader'
 import { settingsStyles } from '@store/selectors/settings'
 import { uiSelector } from '@store/selectors/ui'
 import { debounce } from '@utils/debounce'
@@ -15,18 +19,17 @@ import { useLocation } from 'react-router-dom'
 
 const ReaderRoot = () => {
   const [isLoadingStructure, setIsLoadingStructure] = useState(true)
-  const [sectionProgress, setSectionProgress] = useState({ current: 0, total: 0 })
-  const [bookProgress, setBookProgress] = useState({ current: 0, next: 0, total: 0 })
-  const [fraction, setFraction] = useState(0)
-  const [isViewReady, setIsViewReady] = useState(false)
   const [isContentViewReady, setIsContentViewReady] = useState(false)
-
-  const books = useSelector(bookSelector.books)
-  const files = useSelector(bookSelector.files)
+  const [isViewReady, setIsViewReady] = useState(false)
+  const books = useSelector(booksSelector.books)
+  const files = useSelector(booksSelector.files)
   const styles = useSelector(settingsStyles)
-  const selectedChapter = useSelector(bookSelector.selectedChapter)
-  const isLoader = useSelector(uiSelector.isFetchingStructure)
+  const selectedChapter = useSelector(booksSelector.selectedChapter)
+  const isLoader = useSelector(uiSelector.loaderState)
   const hideContent = useSelector(uiSelector.hideHeader)
+  const readerLocation = useSelector(readerSelector.readerLocation)
+  const selectedBookmark = useSelector(bookmarksSelector.selectedBookmark)
+
   const location = useLocation()
 
   const bookState: { id: string; format: FormatType } = useMemo(() => {
@@ -57,28 +60,6 @@ const ReaderRoot = () => {
     dispatch(actions.setHideHeader(false))
   }, [dispatch])
 
-  const handleRelocate = (e: any) => {
-    if (!activeBook) return
-
-    const progress: Partial<Record<ProgressType, string>> = {
-      CFI: e.detail.cfi,
-    }
-
-    setSectionProgress(e.detail.section)
-    setBookProgress(e.detail.location)
-    setFraction(e.detail.fraction)
-
-    dispatch(bookActions.setActiveToc(e.detail.tocItem))
-    dispatch(
-      bookActions.updateBookProgress({
-        percentageProgress: String(e.detail.fraction * 100),
-        format: activeBook.format,
-        id: activeBook.id,
-        progress,
-      }),
-    )
-  }
-
   useEffect(() => {
     if (!file) {
       if (viewRef.current) {
@@ -88,10 +69,8 @@ const ReaderRoot = () => {
       setIsViewReady(false)
       viewRef.current = null
       setIsLoadingStructure(true)
-      setSectionProgress({ current: 0, total: 0 })
-      setBookProgress({ current: 0, next: 0, total: 0 })
+
       setIsContentViewReady(false)
-      setFraction(0)
       return
     }
 
@@ -137,7 +116,32 @@ const ReaderRoot = () => {
     if (activeBook) {
       openBook().catch(console.error)
     }
-  }, [file, activeBook])
+  }, [file, activeBook, isViewReady])
+
+  const saveProgress = useMemo(
+    () =>
+      debounce((location: IReaderLocation, book: typeof activeBook) => {
+        if (!book) return
+
+        const progress: Partial<Record<ProgressType, string>> = {
+          CFI: location.cfi,
+        }
+
+        if (location.tocItem) {
+          dispatch(bookActions.setActiveToc(location.tocItem))
+        }
+
+        dispatch(
+          bookActions.updateBookProgress({
+            percentageProgress: String(location.fraction * 100),
+            format: book.format,
+            id: book.id,
+            progress,
+          }),
+        )
+      }, 300),
+    [dispatch],
+  )
 
   useEffect(() => {
     if (!isContentViewReady) return
@@ -145,12 +149,18 @@ const ReaderRoot = () => {
     const view = viewRef.current
     if (!view) return
 
-    view.addEventListener('relocate', debounce(handleRelocate, 100))
+    view.addEventListener('relocate', (e: { detail: IReaderLocation }) => {
+      dispatch(readerActions.setReaderLocation(e.detail))
+      saveProgress(e.detail, activeBook)
+    })
 
     return () => {
-      view.removeEventListener('relocate', handleRelocate)
+      view.removeEventListener('relocate', (e: { detail: IReaderLocation }) => {
+        dispatch(readerActions.setReaderLocation(e.detail))
+        saveProgress(e.detail, activeBook)
+      })
     }
-  }, [isContentViewReady])
+  }, [isContentViewReady, dispatch, saveProgress, activeBook])
 
   useEffect(() => {
     if (viewRef.current && selectedChapter !== '') {
@@ -168,19 +178,33 @@ const ReaderRoot = () => {
     view.renderer.setStyles?.(styles)
   }, [styles, isLoadingStructure])
 
+  useEffect(() => {
+    if (isLoadingStructure) return
+
+    if (viewRef.current && selectedBookmark.cfi !== null) {
+      viewRef.current.init({ lastLocation: selectedBookmark.cfi })
+      if (!selectedBookmark.hasChapter) {
+        viewRef.current.goToFraction(0)
+      }
+    }
+  }, [selectedBookmark, isLoadingStructure])
+
   return (
     <Reader
       containerRef={containerRef}
       sectionInfo={{
-        current: Math.max(1, sectionProgress.current),
-        total: sectionProgress.total,
+        current: Math.max(1, readerLocation.location.current),
+        total: readerLocation.location.total,
       }}
       pageInfo={{
-        percentage: fraction * 100,
-        current: Math.max(1, bookProgress.current),
-        total: bookProgress.total,
+        percentage: readerLocation.fraction * 100,
+        current: Math.max(1, readerLocation.location.current),
+        total: readerLocation.location.total,
       }}
-      loading={isLoadingStructure || isLoader}
+      loading={
+        isLoadingStructure ||
+        isLoader[LOADER_STATE.IS_FETCHING_STRUCTURE]?.status === LOADER_STATUS.LOADING
+      }
       hideContent={hideContent}
       onHideHeader={handleHideHeader}
       onShowHeader={handleShowHeader}

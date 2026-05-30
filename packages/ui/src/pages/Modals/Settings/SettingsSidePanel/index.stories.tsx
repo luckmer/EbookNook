@@ -1,10 +1,10 @@
-import { Meta, StoryObj } from '@storybook/react-vite'
-import SettingsSidePanel from '.'
 import { OPTIONS } from '@interfaces/settings/enums'
+import type { Meta, StoryObj } from '@storybook/react-vite'
+import SettingsSidePanel from '.'
 
 const meta: Meta<typeof SettingsSidePanel> = {
   component: SettingsSidePanel,
-  title: 'Pages/Settings/SettingsSidePanel',
+  title: 'Pages/Modals/Settings/SettingsSidePanel',
 }
 
 export default meta

@@ -2,7 +2,7 @@ import DefaultButton from '@components/Buttons/DefaultButton'
 import Show from '@components/Show'
 import { Typography } from '@components/Typography'
 import clsx from 'clsx'
-import { FC } from 'react'
+import type { FC } from 'react'
 import { IoIosArrowBack, IoMdClose } from 'react-icons/io'
 
 export interface IProps {
@@ -15,15 +15,15 @@ export interface IProps {
 const ModalHeader: FC<IProps> = ({ label, onClickClose, onClickOpen, open }) => {
   return (
     <div
-      className="flex flex-row gap-12 items-center justify-between border-b border-border-modal p-16"
+      className='flex flex-row gap-12 items-center justify-between border-b border-border-modal p-16'
       data-tauri-drag-region>
-      <div className="flex flex-row gap-12 items-center">
+      <div className='flex flex-row gap-12 items-center'>
         <Show when={typeof onClickOpen !== 'undefined'}>
           <DefaultButton
             onClick={() => {
               onClickOpen?.()
             }}
-            className="  p-4 rounded-4  hover:bg-surface-100 duration-200 ">
+            className='  p-4 rounded-4  hover:bg-surface-100 duration-200 '>
             <IoIosArrowBack
               className={clsx(
                 'w-[18px] h-[18px] transition-all duration-200',
@@ -32,12 +32,12 @@ const ModalHeader: FC<IProps> = ({ label, onClickClose, onClickOpen, open }) => 
             />
           </DefaultButton>
         </Show>
-        <Typography text="body">{label}</Typography>
+        <Typography text='body'>{label}</Typography>
       </div>
       <DefaultButton
         onClick={onClickClose}
-        className="p-4 rounded-4 hover:bg-surface-100 duration-200 ">
-        <IoMdClose className="w-[18px] h-[18px]" />
+        className='p-4 rounded-4 hover:bg-surface-100 duration-200 '>
+        <IoMdClose className='w-[18px] h-[18px]' />
       </DefaultButton>
     </div>
   )

@@ -9,7 +9,7 @@ export class EventEmitter {
     if (!this.listener.has(event)) {
       this.listener.set(event, new Set())
     }
-    this.listener.get(event)!.add(callback)
+    this.listener.get(event)?.add(callback)
   }
 
   off(event: string, callback: (event: CustomEvent) => Promise<void> | void): void {

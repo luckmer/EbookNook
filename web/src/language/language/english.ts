@@ -1,4 +1,4 @@
-import { IDictionary } from '@interfaces/language'
+import type { IDictionary } from '@interfaces/language'
 
 export const english: IDictionary = {
   noResults: 'No results',
@@ -22,6 +22,7 @@ export const english: IDictionary = {
   semiBold: 'Semi bold',
   bold: 'Bold',
   fontSize: 'Font size',
+  name: 'Name',
   fontSizeDescription: 'Adjust text size for better readability',
   fontWeight: 'Font weight',
   fontWeightDescription: 'Control the thickness of text',
@@ -58,4 +59,23 @@ export const english: IDictionary = {
   notesPlaceholder: 'Add your notes here',
   cancel: 'Cancel',
   enterValidDate: 'Please enter a valid date',
+  createBookmark: 'Create bookmark',
+  bookmarkNamePlaceholder: 'Bookmark name',
+  overview: 'Overview',
+  annotations: 'Annotations',
+  contents: 'Contents',
+  pagesLeft: 'Pages left',
+  january: 'January',
+  february: 'February',
+  march: 'March',
+  april: 'April',
+  may: 'May',
+  june: 'June',
+  july: 'July',
+  august: 'August',
+  september: 'September',
+  october: 'October',
+  november: 'November',
+  december: 'December',
+  at: 'at',
 }

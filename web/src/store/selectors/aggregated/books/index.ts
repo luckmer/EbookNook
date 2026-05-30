@@ -1,9 +1,9 @@
-import { IBookFile } from '@interfaces/book/interfaces'
+import type { IBookFile } from '@interfaces/book/interfaces'
 import { createSelector } from '@reduxjs/toolkit'
-import { bookSelector } from '@store/selectors/books'
+import { booksSelector } from '@store/selectors/books'
 import { searchSelector } from '@store/selectors/search'
 
-export const booksState = createSelector([bookSelector.books], (books) =>
+export const booksState = createSelector([booksSelector.books], (books) =>
   Object.values(books)
     .flatMap((booksByFormat) => Object.values(booksByFormat))
     .filter((book) => !!book)
@@ -17,7 +17,7 @@ export const booksState = createSelector([bookSelector.books], (books) =>
       updatedAt: book.updatedAt,
       format: book.format,
       id: book.id,
-    }))
+    })),
 )
 
 export const filteredBooks = createSelector(

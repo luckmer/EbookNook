@@ -1,10 +1,10 @@
-import { BOOK_STATUS } from '@interfaces/book/enums'
-import { Meta, StoryObj } from '@storybook/react-vite'
+import { LOADER_STATE, LOADER_STATUS } from '@interfaces/ui/enums'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import BookOverviewModal from '.'
 
 const meta: Meta<typeof BookOverviewModal> = {
   component: BookOverviewModal,
-  title: 'Pages/BookOverviewModal',
+  title: 'Pages/Modals/BookOverviewModal',
 }
 
 export default meta
@@ -23,7 +23,9 @@ export const Default: Story = {
           title: 'title',
           published: 'published',
           publisher: 'publisher',
-          status: BOOK_STATUS.IDLE,
+          status: {
+            [LOADER_STATE.IS_UPDATING_BOOK]: { status: LOADER_STATUS.LOADING },
+          },
         }}
         onClickClose={() => {}}
         isOpen={true}

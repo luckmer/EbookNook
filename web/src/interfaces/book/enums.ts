@@ -1,8 +1,0 @@
-export enum BOOK_STATUS {
-  UPDATING = 'UPDATING',
-  DELETING = 'DELETING',
-  PENDING = 'PENDING',
-  SUCCESS = 'SUCCESS',
-  ERROR = 'ERROR',
-  IDLE = 'IDLE',
-}

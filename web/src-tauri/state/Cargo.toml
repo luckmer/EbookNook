@@ -7,3 +7,4 @@ edition = "2024"
 database = { path = "../database" }
 formats = { path = "../formats" }
 annotations = { path = "../annotations" }
+bookmarks = { path =  "../bookmarks" }

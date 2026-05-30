@@ -3,7 +3,7 @@ import ImgCover from '@components/ImgCover'
 import Show from '@components/Show'
 import { Typography } from '@components/Typography'
 import { Progress } from 'antd'
-import { FC, memo, useEffect, useState } from 'react'
+import { type FC, memo, useEffect, useState } from 'react'
 import { TfiMenuAlt } from 'react-icons/tfi'
 
 export interface IProps {
@@ -20,26 +20,27 @@ const Book: FC<IProps> = ({ img, progress, title, author, onClick, onClickDetail
 
   useEffect(() => {
     setHasLoadError(false)
-  }, [img])
+  }, [])
 
   return (
     <div
-      className="group flex flex-col p-12 w-full gap-12 rounded-6 cursor-pointer transition-colors duration-300 hover:bg-button-primary-hover/40"
+      className='group flex flex-col p-12 w-full gap-12 rounded-6 cursor-pointer transition-colors duration-300 hover:bg-button-primary-hover/40'
       onClick={(e) => {
         e.preventDefault()
         e.stopPropagation()
         onClick()
       }}>
-      <div className="w-full aspect-2/3 overflow-hidden rounded-6">
+      <div className='w-full aspect-2/3 overflow-hidden rounded-6'>
         <Show
           when={!hasLoadError}
           fallback={
-            <div className="flex w-full h-full transition-transform duration-300 group-hover:scale-105">
+            <div className='flex w-full h-full transition-transform duration-300 group-hover:scale-105'>
               <ImgCover name={title} author={author} />
             </div>
           }>
           <img
-            className="w-full h-full object-fit transition-transform duration-300 group-hover:scale-105"
+            aria-label='img'
+            className='w-full h-full object-fit transition-transform duration-300 group-hover:scale-105'
             src={img}
             onError={(e) => {
               e.stopPropagation()
@@ -48,16 +49,16 @@ const Book: FC<IProps> = ({ img, progress, title, author, onClick, onClickDetail
           />
         </Show>
       </div>
-      <div className="flex flex-col gap-12">
-        <Typography text="small" ellipsis left>
+      <div className='flex flex-col gap-12'>
+        <Typography text='small' ellipsis left>
           {title}
         </Typography>
-        <div className="flex flex-row items-center  justify-between ">
-          <Progress type="circle" percent={parseFloat(parseFloat(progress).toFixed(2))} size={18} />
+        <div className='flex flex-row items-center  justify-between '>
+          <Progress type='circle' percent={parseFloat(parseFloat(progress).toFixed(2))} size={18} />
           <DefaultButton
             onClick={onClickDetails}
-            className="group-hover:opacity-100 opacity-0 duration-300 transition-opacity">
-            <TfiMenuAlt className="text-text-primary min-w-18 min-h-18 max-h-18 max-w-18" />
+            className='group-hover:opacity-100 opacity-0 duration-300 transition-opacity'>
+            <TfiMenuAlt className='text-text-primary min-w-18 min-h-18 max-h-18 max-w-18' />
           </DefaultButton>
         </div>
       </div>

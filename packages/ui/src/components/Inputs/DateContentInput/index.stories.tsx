@@ -1,6 +1,6 @@
-import { Meta, StoryObj } from '@storybook/react-vite'
-import DateContentInput from './index'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Typography } from 'antd'
+import DateContentInput from './index'
 
 const meta: Meta<typeof DateContentInput> = {
   component: DateContentInput,

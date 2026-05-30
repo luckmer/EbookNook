@@ -1,4 +1,4 @@
-import { IDictionary } from '../../interfaces/language'
+import type { IDictionary } from '../../interfaces/language'
 import { LANGUAGE } from '../../interfaces/language/enums'
 import { english } from '../language/english'
 import { polish } from '../language/polish'

@@ -1,7 +1,6 @@
-import * as React from 'react'
 import type { Preview } from '@storybook/react-vite'
+import * as React from 'react'
 import '../common/tailwind/tailwind.css'
-
 ;(globalThis as any).React = React
 
 const preview: Preview = {

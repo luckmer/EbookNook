@@ -1,34 +1,29 @@
-import { FormatType } from '@bindings/format'
+import type { FormatType } from '@bindings/format'
 import Annotator from '@containers/Annotator'
-import Header from '@pages/Header'
+import Header from '@containers/Header'
 import { actions as bookActions } from '@store/reducers/books/index'
-import { actions } from '@store/reducers/search'
-import { actions as uiActions } from '@store/reducers/ui'
-import { bookSelector } from '@store/selectors/books'
-import { searchSelector } from '@store/selectors/search'
-import { uiSelector } from '@store/selectors/ui'
+import { booksSelector } from '@store/selectors/books'
 import '@styles/import.css'
-import { getCurrentWindow } from '@tauri-apps/api/window'
 import { useEffect, useLayoutEffect, useMemo, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Route, Routes, useLocation } from 'react-router-dom'
 import { routes } from './routes'
 
 function App() {
-  const isSettingsOpen = useSelector(uiSelector.openSettingsModal)
-  const isSidebarOpen = useSelector(uiSelector.openChaptersDrawer)
-  const searchValue = useSelector(searchSelector.value)
-  const hideHeader = useSelector(uiSelector.hideHeader)
-  const booksMap = useSelector(bookSelector.books)
-
+  const booksMap = useSelector(booksSelector.books)
   const dispatch = useDispatch()
-
   const location = useLocation()
+
   const isLoaded = useRef(false)
 
   useLayoutEffect(() => {
     dispatch(bookActions.load())
-  }, [])
+  }, [dispatch])
+
+  const bookState: {
+    id: string
+    format: FormatType
+  } = useMemo(() => location?.state, [location])
 
   useEffect(() => {
     if (!location?.state?.id || isLoaded.current) return
@@ -39,71 +34,14 @@ function App() {
     const book = bookShelf[bookState.id]
     if (book) {
       isLoaded.current = true
-      dispatch(bookActions.setOpenBook(book.id))
-      dispatch(bookActions.getBookStructure({ id: book.id, format: book.format }))
+      dispatch(bookActions.setOpenBook({ id: book.id, format: book.format }))
     }
-  }, [booksMap])
-
-  const bookState: {
-    id: string
-    format: FormatType
-  } = useMemo(() => location?.state, [location])
-
-  const book = useMemo(() => {
-    if (!bookState) return
-
-    const bookShelf = booksMap[bookState.format]
-
-    if (!bookShelf) return
-
-    return bookShelf[bookState.id]
-  }, [bookState, booksMap])
+  }, [booksMap, bookState, dispatch, location])
 
   return (
-    <div className="w-full h-full flex flex-col gap-4">
-      <Header
-        bookName={book?.metadata.title}
-        hideHeader={hideHeader}
-        onClickSettings={() => {
-          dispatch(uiActions.setOpenSettingsModal(!isSettingsOpen))
-        }}
-        location={location.pathname}
-        onClickOpenSidebar={() => {
-          dispatch(uiActions.setOpenChaptersDrawer(!isSidebarOpen))
-        }}
-        value={searchValue}
-        onChange={(value) => {
-          dispatch(actions.setValue(value))
-        }}
-        onClickOpenNotebook={() => {
-          dispatch(uiActions.setOpenNotebook(true))
-        }}
-        onClickClose={async () => {
-          try {
-            const appWindow = getCurrentWindow()
-            await appWindow.close()
-          } catch (err) {
-            console.log('failed to close', err)
-          }
-        }}
-        onClickMaximize={async () => {
-          try {
-            const appWindow = getCurrentWindow()
-            await appWindow.toggleMaximize()
-          } catch (err) {
-            console.log('failed to close', err)
-          }
-        }}
-        onClickMinimize={async () => {
-          try {
-            const appWindow = getCurrentWindow()
-            await appWindow.minimize()
-          } catch (err) {
-            console.log('failed to close', err)
-          }
-        }}
-      />
-      <div className="overflow-hidden h-full w-full flex flex-col">
+    <div className='w-full h-full flex flex-col gap-4'>
+      <Header />
+      <div className='overflow-hidden h-full w-full flex flex-col'>
         <Annotator />
         <Routes>
           {routes.map((route) => (

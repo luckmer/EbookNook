@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react-vite'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import UploadButton from './index'
 
 const meta: Meta<typeof UploadButton> = {
@@ -11,6 +11,6 @@ type Story = StoryObj<typeof UploadButton>
 
 export const BannersStory: Story = {
   render: () => {
-    return <UploadButton label="Import books" onClick={() => {}} />
+    return <UploadButton label='Import books' onClick={() => {}} />
   },
 }

@@ -10,6 +10,7 @@ export interface IProps {
 const DefaultButton: React.FC<IProps> = ({ children, onClick, className, disabled }) => {
   return (
     <button
+      type='button'
       disabled={disabled}
       onClick={(e) => {
         e.preventDefault()

@@ -1,6 +1,6 @@
-import { IBindingsEpubRendition, IBindingsEpubSection, IBindingsEpubToc } from '@bindings/epub'
-import { FormatType } from '@bindings/format'
-import { ILanguage, ILanguageMap } from './types'
+import type { IBindingsEpubRendition, IBindingsEpubSection, IBindingsEpubToc } from '@bindings/epub'
+import type { FormatType } from '@bindings/format'
+import type { ILanguage, ILanguageMap } from './types'
 
 export interface IEpubMetadata {
   author: string | string[] | ILanguageMap

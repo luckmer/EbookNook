@@ -1,4 +1,4 @@
-import { FormatType } from '@bindings/format'
+import type { FormatType } from '@bindings/format'
 import { appDataDir, join } from '@tauri-apps/api/path'
 import { exists, mkdir, readDir, readFile, remove, writeFile } from '@tauri-apps/plugin-fs'
 

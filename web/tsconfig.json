@@ -2,11 +2,7 @@
   "compilerOptions": {
     "useDefineForClassFields": true,
     "target": "ES2022",
-    "lib": [
-      "ES2022",
-      "DOM",
-      "DOM.Iterable"
-    ],
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
     "ignoreDeprecations": "5.0",
@@ -26,64 +22,25 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "paths": {
-      "@styles/*": [
-        "./src/styles/*"
-      ],
-      "@interfaces/*": [
-        "./src/interfaces/*"
-      ],
-      "@bindings/*": [
-        "./src-tauri/types/bindings/*"
-      ],
-      "@hooks/*": [
-        "../packages/ui/src/hooks/*"
-      ],
-      "@language/*": [
-        "./src/language/*"
-      ],
-      "@static/*": [
-        "./src/static/*"
-      ],
-      "@utils/*": [
-        "./src/utils/*"
-      ],
-      "@store/*": [
-        "./src/store/*"
-      ],
-      "@libs/*": [
-        "./src/libs/*"
-      ],
-      "@icons/*": [
-        "../packages/ui/common/svg/*"
-      ],
-      "@components/*": [
-        "../packages/ui/src/components/*"
-      ],
-      "@theme/*": [
-        "../packages/ui/common/*"
-      ],
-      "@common/*": [
-        "../packages/ui/common/*"
-      ],
-      "@foliate/*": [
-        "./src/foliate/*"
-      ],
-      "@pages/*": [
-        "../packages/ui/src/pages/*"
-      ],
-      "@containers/*": [
-        "./src/containers/*"
-      ],
-      "@routes/*": [
-        "./src/routes/*"
-      ],
-      "@web-utils/*": [
-        "./src/utils/*"
-      ]
+      "@styles/*": ["./src/styles/*"],
+      "@interfaces/*": ["./src/interfaces/*"],
+      "@bindings/*": ["./src-tauri/types/bindings/*"],
+      "@hooks/*": ["../packages/ui/src/hooks/*"],
+      "@language/*": ["./src/language/*"],
+      "@static/*": ["./src/static/*"],
+      "@utils/*": ["./src/utils/*"],
+      "@store/*": ["./src/store/*"],
+      "@libs/*": ["./src/libs/*"],
+      "@icons/*": ["../packages/ui/common/svg/*"],
+      "@components/*": ["../packages/ui/src/components/*"],
+      "@theme/*": ["../packages/ui/common/*"],
+      "@common/*": ["../packages/ui/common/*"],
+      "@foliate/*": ["./src/foliate/*"],
+      "@pages/*": ["../packages/ui/src/pages/*"],
+      "@containers/*": ["./src/containers/*"],
+      "@routes/*": ["./src/routes/*"],
+      "@web-utils/*": ["./src/utils/*"]
     }
   },
-  "include": [
-    "src",
-    "../packages/**/*"
-  ]
+  "include": ["src", "../packages/**/*"]
 }

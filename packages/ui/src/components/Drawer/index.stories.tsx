@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react-vite'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import DrawerRoot from './index'
 
 const meta: Meta<typeof DrawerRoot> = {
@@ -12,7 +12,7 @@ type Story = StoryObj<typeof DrawerRoot>
 export const BannersStory: Story = {
   render: () => {
     return (
-      <DrawerRoot placement="right" isOpen={true} onClickClose={() => {}}>
+      <DrawerRoot placement='right' isOpen={true} onClickClose={() => {}}>
         <div>Some contents...</div>
       </DrawerRoot>
     )

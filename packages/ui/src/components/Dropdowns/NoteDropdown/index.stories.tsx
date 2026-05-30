@@ -1,5 +1,5 @@
 import { Typography } from '@components/Typography'
-import { Meta, StoryObj } from '@storybook/react-vite'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
 import NoteDropdown from './index'
 
@@ -26,12 +26,12 @@ export const Default: Story = {
           label={value}
           value={value}
           isEditing={editing}
-          placeholder="Write a note..."
+          placeholder='Write a note...'
           onChange={(v) => setValue(v)}
           onClickFocus={() => setEditing(true)}>
           {(isOpen) => (
             <div style={{ padding: 12 }}>
-              <Typography text="body">
+              <Typography text='body'>
                 {isOpen ? 'Dropdown content visible when hovered or editing.' : 'Hover to open'}
               </Typography>
             </div>

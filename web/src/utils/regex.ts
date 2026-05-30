@@ -1,4 +1,4 @@
-export const DATE_REGEX = /^(\d{2})[-\/]?(\d{2})[-\/]?(\d{4})$/ // DAY-MONTH-YEAR
+export const DATE_REGEX = /^(\d{2})[-/]?(\d{2})[-/]?(\d{4})$/ // DAY-MONTH-YEAR
 export const SPACE_REGEX = /\s+/g
 export const COMMA_REGEX = /\s+([,:;])/g
 export const ELLIPSIS_REGEX = /\u2026/g

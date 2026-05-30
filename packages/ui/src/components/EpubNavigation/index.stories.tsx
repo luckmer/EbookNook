@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react-vite'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import EpubNavigation from './index'
 
 const meta: Meta<typeof EpubNavigation> = {

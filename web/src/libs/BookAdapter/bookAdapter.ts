@@ -1,4 +1,4 @@
-import { ILocalBookType } from '@interfaces/book/types'
+import type { ILocalBookType } from '@interfaces/book/types'
 import { BookAdapterCore } from './bookAdapterCore'
 
 export class BookAdapter extends BookAdapterCore {

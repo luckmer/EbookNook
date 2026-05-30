@@ -1,5 +1,5 @@
-import { FormatType } from '@bindings/format'
-import { IBindingsPDFToc } from '@bindings/pdf'
+import type { FormatType } from '@bindings/format'
+import type { IBindingsPDFToc } from '@bindings/pdf'
 
 export interface IPDFMetadata {
   author?: string
