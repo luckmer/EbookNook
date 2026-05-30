@@ -50,8 +50,8 @@ const Bookmark: FC<IProps> = ({
     const d = new Date(+createdAt)
     const h = String(d.getHours()).padStart(2, '0')
     const m = String(d.getMinutes()).padStart(2, '0')
-    return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()} o ${h}:${m}`
-  }, [createdAt])
+    return `${d.getDate()} ${t(months[d.getMonth()].toLocaleLowerCase())} ${d.getFullYear()} ${t('at')} ${h}:${m}`
+  }, [createdAt, t])
 
   return (
     <div
