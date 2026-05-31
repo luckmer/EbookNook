@@ -47,7 +47,7 @@ const BookContentDrawerRoot = () => {
   const activeBookmarks = useMemo(() => {
     if (!cache) return []
 
-    return bookmarksState[cache.id]
+    return bookmarksState[cache.id] ?? []
   }, [bookmarksState, cache])
 
   const notes = useMemo(() => {
