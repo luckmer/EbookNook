@@ -92,5 +92,3 @@ export const store = createSlice({
 export const reducers = store.reducer
 export const actions = store.actions
 export type PayloadTypes = PayloadType<typeof actions>
-
-// trzeba zmienić nazwę z annotations na notes, na froncie tak samo będzie

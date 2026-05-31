@@ -5,6 +5,7 @@ import { persistBookmarks } from './bookmarks/config'
 import { reducers as booksReducers, booksStore } from './books'
 import { reducers as languageReducers, languageStore } from './language'
 import { persistLanguage } from './language/config'
+import { reducers as notesReducers, notesStore } from './notes'
 import { reducers as bookReducers, readerStore } from './reader'
 import { reducers as searchReducers, searchStore } from './search'
 import { reducers as settingsReducers, settingsStore } from './settings'
@@ -15,6 +16,7 @@ const Index = combineReducers({
   [settingsStore]: persistReducer(persistSettings, settingsReducers),
   [languageStore]: persistReducer(persistLanguage, languageReducers),
   [bookmarksStore]: persistReducer(persistBookmarks, bookmarksReducers),
+  [notesStore]: notesReducers,
   [searchStore]: searchReducers,
   [booksStore]: booksReducers,
   [readerStore]: bookReducers,
