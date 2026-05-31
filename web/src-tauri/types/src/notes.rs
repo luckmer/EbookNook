@@ -13,6 +13,8 @@ pub struct IBindingsNote {
     #[serde(rename = "noteId")]
     #[ts(rename = "noteId")]
     pub note_id: String,
+    pub chapter: String,
+    pub title: String,
     pub text: String,
     #[serde(rename = "createdAt")]
     #[ts(rename = "createdAt")]

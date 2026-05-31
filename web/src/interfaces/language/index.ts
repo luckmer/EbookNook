@@ -75,4 +75,6 @@ export type IDictionary = {
   november: string
   december: string
   at: string
+  all: string
+  bookmarks: string
 }

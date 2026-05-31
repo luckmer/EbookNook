@@ -22,6 +22,8 @@ impl NotesService {
             book_id: row.try_get("book_id")?,
             note: row.try_get("note")?,
             page: row.try_get("page")?,
+            chapter:row.try_get("chapter")?,
+            title:row.try_get("title")?,
             created_at: row.try_get("created_at")?,
             updated_at: row.try_get("updated_at")?,
         })
@@ -40,6 +42,8 @@ impl NotesService {
             .bind(note.value)
             .bind(note.note)
             .bind(note.page)
+            .bind(note.chapter)
+            .bind(note.title)
             .bind(note.created_at)
             .bind(note.updated_at)
             .execute(conn)

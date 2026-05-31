@@ -1,10 +1,16 @@
 import type { IBindingsBookmark } from '@bindings/bookmarks'
-import Bookmark from '@components/Bookmark'
+import type { IBindingsNote } from '@bindings/notes'
+import AnnotationCard from '@components/Cards/AnnotationCard'
+import Match from '@components/Match'
 import Show from '@components/Show'
+import Switch from '@components/Switch'
+import { Typography } from '@components/Typography'
+import { ANNOTATION_OPTIONS } from '@interfaces/contentDrawer/enums'
 import { LOADER_STATE, LOADER_STATUS } from '@interfaces/ui/enums'
 import type { LoaderState } from '@interfaces/ui/types'
-import { Empty, Skeleton } from 'antd'
-import { type FC, memo } from 'react'
+import { Empty, Segmented, Skeleton } from 'antd'
+import { type FC, memo, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 export interface IProps {
   onClick: (bookmark: IBindingsBookmark) => void
@@ -12,6 +18,7 @@ export interface IProps {
   onClickEdit: (bookmark: IBindingsBookmark) => void
   scopedLoader: Partial<Record<string, Partial<Record<string, LoaderState>>>>
   bookmarks: Array<IBindingsBookmark>
+  notes: Array<IBindingsNote>
   isLoader: boolean
 }
 
@@ -19,10 +26,18 @@ const AnnotationsLayout: FC<IProps> = ({
   scopedLoader,
   bookmarks,
   isLoader,
+  notes,
   onClick,
   onClickDelete,
   onClickEdit,
 }) => {
+  const [option, setOption] = useState<ANNOTATION_OPTIONS>(ANNOTATION_OPTIONS.ALL)
+  const { t } = useTranslation()
+
+  const hasNoData = useMemo(() => {
+    return notes.length === 0 && bookmarks.length === 0
+  }, [notes, bookmarks])
+
   return (
     <Show
       when={!isLoader}
@@ -31,37 +46,117 @@ const AnnotationsLayout: FC<IProps> = ({
           <Skeleton active />
         </div>
       }>
+      <div className='pb-12 pr-24'>
+        <Segmented
+          block
+          value={option}
+          onChange={setOption}
+          style={{
+            gap: 4,
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+          options={[
+            {
+              label: <Typography>{t('all')}</Typography>,
+              value: ANNOTATION_OPTIONS.ALL,
+            },
+            {
+              label: <Typography>{t('notes')}</Typography>,
+              value: ANNOTATION_OPTIONS.NOTES,
+            },
+            {
+              label: <Typography>{t('bookmarks')}</Typography>,
+              value: ANNOTATION_OPTIONS.BOOKMARKS,
+            },
+          ]}
+        />
+      </div>
       <div className='pr-24 flex flex-col gap-6'>
-        <Show when={bookmarks.length > 0} fallback={<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />}>
-          {bookmarks.map((bookmark) => (
-            <Bookmark
-              isDeletingBookmark={
-                scopedLoader[bookmark.bookId]?.[LOADER_STATE.IS_DELETING_BOOKMARK]?.status ===
-                LOADER_STATUS.LOADING
-              }
-              isUpdatingBookmark={
-                scopedLoader[bookmark.bookId]?.[LOADER_STATE.IS_UPDATING_BOOKMARK]?.status ===
-                LOADER_STATUS.LOADING
-              }
-              onClickDelete={() => {
-                onClickDelete(bookmark.bookId, bookmark.cfi)
-              }}
-              onClickEdit={(label) => {
-                onClickEdit({
-                  ...bookmark,
-                  title: label,
-                })
-              }}
-              onClick={() => {
-                onClick(bookmark)
-              }}
-              key={bookmark.cfi}
-              chapter={bookmark.chapter}
-              title={bookmark.title}
-              createdAt={bookmark.createdAt}
-            />
-          ))}
-        </Show>
+        <Switch>
+          <Match when={option === ANNOTATION_OPTIONS.ALL && hasNoData}>
+            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+          </Match>
+          <Match
+            when={option === ANNOTATION_OPTIONS.BOOKMARKS || option === ANNOTATION_OPTIONS.ALL}>
+            <Show
+              when={bookmarks.length > 0}
+              fallback={
+                option === ANNOTATION_OPTIONS.BOOKMARKS && (
+                  <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+                )
+              }>
+              {bookmarks.map((bookmark) => (
+                <AnnotationCard
+                  isDeleting={
+                    scopedLoader[bookmark.bookId]?.[LOADER_STATE.IS_DELETING_BOOKMARK]?.status ===
+                    LOADER_STATUS.LOADING
+                  }
+                  isUpdating={
+                    scopedLoader[bookmark.bookId]?.[LOADER_STATE.IS_UPDATING_BOOKMARK]?.status ===
+                    LOADER_STATUS.LOADING
+                  }
+                  onClickDelete={() => {
+                    onClickDelete(bookmark.bookId, bookmark.cfi)
+                  }}
+                  onClickEdit={(label) => {
+                    onClickEdit({
+                      ...bookmark,
+                      title: label,
+                    })
+                  }}
+                  onClick={() => {
+                    onClick(bookmark)
+                  }}
+                  key={bookmark.cfi}
+                  chapter={bookmark.chapter}
+                  title={bookmark.title}
+                  createdAt={bookmark.createdAt}
+                />
+              ))}
+            </Show>
+          </Match>
+          <Match when={option === ANNOTATION_OPTIONS.NOTES || option === ANNOTATION_OPTIONS.ALL}>
+            <Show
+              when={notes.length > 0}
+              fallback={
+                option === ANNOTATION_OPTIONS.NOTES && (
+                  <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+                )
+              }>
+              {notes.map((note) => (
+                <AnnotationCard
+                  isDeleting={
+                    scopedLoader[note.bookId]?.[LOADER_STATE.IS_DELETING_NOTE]?.status ===
+                    LOADER_STATUS.LOADING
+                  }
+                  isUpdating={
+                    scopedLoader[note.bookId]?.[LOADER_STATE.IS_UPDATING_NOTE]?.status ===
+                    LOADER_STATUS.LOADING
+                  }
+                  onClickDelete={() => {
+                    // onClickDelete(bookmark.bookId, bookmark.cfi)
+                  }}
+                  onClickEdit={(label) => {
+                    // onClickEdit({
+                    //   ...bookmark,
+                    //   title: label,
+                    // })
+                  }}
+                  onClick={() => {
+                    // onClick(bookmark)
+                  }}
+                  key={note.value}
+                  chapter={note.chapter}
+                  title={note.title}
+                  createdAt={note.createdAt}
+                />
+              ))}
+            </Show>
+          </Match>
+        </Switch>
       </div>
     </Show>
   )

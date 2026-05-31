@@ -78,4 +78,6 @@ export const english: IDictionary = {
   november: 'November',
   december: 'December',
   at: 'at',
+  all: 'All',
+  bookmarks: 'Bookmarks',
 }

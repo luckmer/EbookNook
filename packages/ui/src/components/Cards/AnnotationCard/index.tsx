@@ -4,29 +4,29 @@ import Show from '@components/Show'
 import Spin from '@components/Spin'
 import { Typography } from '@components/Typography'
 import clsx from 'clsx'
-import { type FC, useMemo, useState } from 'react'
+import { type FC, memo, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { MdDelete, MdModeEditOutline } from 'react-icons/md'
 export interface IProps {
   title: string
   chapter: string
   createdAt: string
-  isUpdatingBookmark: boolean
-  isDeletingBookmark: boolean
+  isUpdating: boolean
+  isDeleting: boolean
   onClick: () => void
   onClickDelete: () => void
   onClickEdit: (label: string) => void
 }
 
-const Bookmark: FC<IProps> = ({
+const AnnotationCard: FC<IProps> = ({
   onClick,
   onClickDelete,
   onClickEdit,
   chapter,
   title,
   createdAt,
-  isDeletingBookmark,
-  isUpdatingBookmark,
+  isDeleting,
+  isUpdating,
 }) => {
   const [label, setLabel] = useState('')
   const [isEdit, setIsEdit] = useState(false)
@@ -101,7 +101,7 @@ const Bookmark: FC<IProps> = ({
                   </Typography>
                 </DefaultButton>
                 <DefaultButton
-                  disabled={!label.trim().length || isUpdatingBookmark}
+                  disabled={!label.trim().length || isUpdating}
                   onClick={() => {
                     onClickEdit(label)
                     setIsEdit(false)
@@ -109,7 +109,7 @@ const Bookmark: FC<IProps> = ({
                   }}
                   className='transition-colors hover:bg-button-primary-hover  duration-300 rounded-4 px-6 py-6'>
                   <Typography text='caption' color='blue'>
-                    <Show when={!isUpdatingBookmark} fallback={<Spin size={18} />}>
+                    <Show when={!isUpdating} fallback={<Spin size={18} />}>
                       {t('save')}
                     </Show>
                   </Typography>
@@ -118,20 +118,20 @@ const Bookmark: FC<IProps> = ({
             }>
             <div className='flex gap-2 p-6 justify-end items-center'>
               <DefaultButton
-                disabled={isUpdatingBookmark}
+                disabled={isUpdating}
                 onClick={() => {
                   setIsEdit(true)
                 }}
                 className='transition-colors hover:bg-button-primary-hover hover:text-accent-blue text-accent-blue duration-300 rounded-4 px-6 py-6'>
-                <Show when={!isUpdatingBookmark} fallback={<Spin size={18} />}>
+                <Show when={!isUpdating} fallback={<Spin size={18} />}>
                   <MdModeEditOutline className='w-18 h-18 transition-colors duration-200' />
                 </Show>
               </DefaultButton>
               <DefaultButton
-                disabled={isDeletingBookmark}
+                disabled={isDeleting}
                 onClick={onClickDelete}
                 className='transition-colors hover:bg-button-primary-hover hover:text-shadow-accent-red text-accent-red duration-300 rounded-4 px-6 py-6'>
-                <Show when={!isDeletingBookmark} fallback={<Spin size={18} />}>
+                <Show when={!isDeleting} fallback={<Spin size={18} />}>
                   <MdDelete className='w-18 h-18 transition-colors duration-200' />
                 </Show>
               </DefaultButton>
@@ -143,4 +143,4 @@ const Bookmark: FC<IProps> = ({
   )
 }
 
-export default Bookmark
+export default memo(AnnotationCard)

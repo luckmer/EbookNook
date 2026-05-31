@@ -79,4 +79,6 @@ export const polish: IDictionary = {
   november: 'Listopad',
   december: 'Grudzień',
   at: 'o',
+  all: 'Wszystkie',
+  bookmarks: 'Zakładki',
 }

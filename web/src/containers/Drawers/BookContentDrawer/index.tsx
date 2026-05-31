@@ -73,6 +73,7 @@ const BookContentDrawerRoot = () => {
       loaderState={loaderState}
       scopedLoader={scopedLoader}
       isOpen={isOpen}
+      notes={[]}
       onClickBack={() => {
         dispatch(uiActions.setOpenChaptersDrawer(false))
         dispatch(bookActions.setSelectedChapter(''))
