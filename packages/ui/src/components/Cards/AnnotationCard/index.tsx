@@ -63,16 +63,14 @@ const AnnotationCard: FC<IProps> = ({
             placeholder={t('enterLabelName')}
             value={label}
             onChange={setLabel}>
-            <Typography text='caption'>
-              <Typography text='caption' ellipsis={ellipsis}>
-                <Show when={typeof background !== 'undefined'} fallback={title}>
-                  <span
-                    className='text-white rounded-6 px-6 py-4 leading-loose'
-                    style={{ backgroundColor: `${background}60` }}>
-                    {title}
-                  </span>
-                </Show>
-              </Typography>
+            <Typography text='caption' ellipsis={ellipsis}>
+              <Show when={typeof background !== 'undefined'} fallback={title}>
+                <span
+                  className='text-white rounded-6 px-6 py-4 leading-loose'
+                  style={{ backgroundColor: `${background}60` }}>
+                  {title}
+                </span>
+              </Show>
             </Typography>
           </ContentInput>
           <Show when={!isEdit}>
