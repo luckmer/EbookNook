@@ -5,8 +5,8 @@ use std::str::FromStr;
 use tauri::{AppHandle, Manager};
 
 use crate::{
-    ANNOTATIONS_TABLE, BOOKMARKS_TABLE, EPUB_BOOKS_TABLE, EPUB_SECTIONS_TABLE, EPUB_TOC_TABLE,
-    MOBI_BOOKS_TABLE, MOBI_SECTIONS_TABLE, MOBI_TOC_TABLE, PDF_BOOKS_TABLE, PDF_SECTIONS_TABLE,
+    BOOKMARKS_TABLE, EPUB_BOOKS_TABLE, EPUB_SECTIONS_TABLE, EPUB_TOC_TABLE, MOBI_BOOKS_TABLE,
+    MOBI_SECTIONS_TABLE, MOBI_TOC_TABLE, NOTES_TABLE, PDF_BOOKS_TABLE, PDF_SECTIONS_TABLE,
     PDF_TOC_TABLE,
 };
 
@@ -68,7 +68,7 @@ impl DatabaseManager {
 
         sqlx::query(BOOKMARKS_TABLE).execute(&self.pool).await?;
 
-        sqlx::query(ANNOTATIONS_TABLE).execute(&self.pool).await?;
+        sqlx::query(NOTES_TABLE).execute(&self.pool).await?;
         Ok(())
     }
 
