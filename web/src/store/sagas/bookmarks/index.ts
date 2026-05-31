@@ -72,8 +72,8 @@ export function* deleteBookmark(action: PayloadAction<PayloadTypes['deleteBookma
       yield* put(actions.setSelectedBookmark(defaultSelectedBookmark))
     }
   } catch (err) {
-    console.log('Failed to delete note', err)
-    notify('Failed to delete note', 'error')
+    console.log('Failed to delete bookmark', err)
+    notify('Failed to delete bookmark', 'error')
   }
 
   yield* put(
@@ -95,11 +95,11 @@ export function* updateBookmark(action: PayloadAction<PayloadTypes['updateBookma
   )
 
   try {
-    yield* call(invoke, 'update_note', { payload: action.payload })
+    yield* call(invoke, 'update_bookmark_by_book_id', { payload: action.payload })
     yield* put(actions.setUpdateBookmark(action.payload))
   } catch (err) {
-    console.log('Failed to update note', err)
-    notify('Failed to update note', 'error')
+    console.log('Failed to update bookmark', err)
+    notify('Failed to update bookmark', 'error')
   }
 
   yield* put(
