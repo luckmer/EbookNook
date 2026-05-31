@@ -134,6 +134,8 @@ const AnnotationsLayout: FC<IProps> = ({
               }>
               {notes.map((note) => (
                 <AnnotationCard
+                  ellipsis={false}
+                  background={note.color}
                   isDeleting={
                     scopedLoader[note.noteId]?.[LOADER_STATE.IS_DELETING_NOTE]?.status ===
                     LOADER_STATUS.LOADING
@@ -155,8 +157,8 @@ const AnnotationsLayout: FC<IProps> = ({
                     onClickNote(note)
                   }}
                   key={note.value}
-                  chapter={note.chapter}
-                  title={note.title}
+                  chapter={note.title}
+                  title={note.text.length > 150 ? `${note.text.slice(0, 150)}...` : note.text}
                   createdAt={note.createdAt}
                 />
               ))}

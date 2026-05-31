@@ -89,4 +89,5 @@ export const polish: IDictionary = {
   enterNoteName: 'Podaj nazwę notatki',
   saveNote: 'Zapisz notatkę',
   selectedText: 'Zaznaczony tekst',
+  enterLabelName: 'Podaj nazwę etykiety',
 }

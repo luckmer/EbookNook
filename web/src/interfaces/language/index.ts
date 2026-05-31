@@ -85,4 +85,5 @@ export type IDictionary = {
   noteName: string
   enterNoteName: string
   saveNote: string
+  enterLabelName: string
 }

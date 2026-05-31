@@ -87,5 +87,6 @@ export const english: IDictionary = {
   highlightColor: 'Highlight Color',
   noteName: 'Note Name',
   enterNoteName: 'Enter note name',
+  enterLabelName: 'Enter label name',
   saveNote: 'Save Note',
 }
