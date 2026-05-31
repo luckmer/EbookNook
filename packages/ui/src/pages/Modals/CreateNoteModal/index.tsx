@@ -4,16 +4,18 @@ import Modal from '@components/Modals/Modal'
 import ModalHeader from '@components/Modals/ModalHeader'
 import { Typography } from '@components/Typography'
 import { useWindowSize } from '@hooks/useWindowSize'
+import { colors } from '@package-utils/static'
+import { getDate, getTime } from '@package-utils/utils'
 import clsx from 'clsx'
 import { type FC, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { IoMdTime } from 'react-icons/io'
+import { IoMdColorPalette, IoMdTime } from 'react-icons/io'
 import { IoTextOutline } from 'react-icons/io5'
 import { MdMenuBook } from 'react-icons/md'
 
 export interface IProps {
   onClickClose: () => void
-  onClickSaveNote: (note: string) => void
+  onClickSaveNote: (note: string, color: string) => void
   isOpen: boolean
   selectedText: string
   book: string
@@ -29,6 +31,8 @@ const CreateNoteModal: FC<IProps> = ({
   createdAt,
 }) => {
   const [noteName, setNoteName] = useState('')
+  const [selectedColor, setSelectedColor] = useState('#4DA3FF')
+
   const { width } = useWindowSize()
   const isMobile = useMemo(() => width <= 700, [width])
   const { t } = useTranslation()
@@ -40,32 +44,13 @@ const CreateNoteModal: FC<IProps> = ({
   }, [isOpen])
 
   const date = useMemo(() => {
-    const months = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December',
-    ]
-    const d = new Date(+createdAt)
-    return `${d.getDate()} ${t(months[d.getMonth()].toLocaleLowerCase())} ${d.getFullYear()}`
+    const { day, month, year } = getDate(createdAt)
+    return `${day} ${t(month)} ${year}`
   }, [createdAt, t])
 
   const time = useMemo(() => {
-    const d = new Date(+createdAt)
-    const h = String(d.getHours()).padStart(2, '0')
-    const m = String(d.getMinutes()).padStart(2, '0')
-
-    const isAM = +h < 12
-
-    return `${h}:${m} ${isAM ? 'AM' : 'PM'}`
+    const { hours, minutes, isAM } = getTime(createdAt)
+    return `${hours}:${minutes} ${isAM ? 'AM' : 'PM'}`
   }, [createdAt])
 
   return (
@@ -88,7 +73,7 @@ const CreateNoteModal: FC<IProps> = ({
           <div className='flex flex-col gap-12'>
             <div className='flex flex-col gap-12 p-12 bg-base rounded-6 border-border-subtle border'>
               <Typography text='caption' color='muted'>
-                Selected Text
+                {t('selectedText')}
               </Typography>
               <Typography text='caption' color='secondary'>
                 {selectedText}
@@ -98,7 +83,7 @@ const CreateNoteModal: FC<IProps> = ({
               <div className='flex flex-row gap-6 items-center'>
                 <MdMenuBook className='text-text-muted' />
                 <Typography text='caption' color='muted'>
-                  Book
+                  {t('book')}
                 </Typography>
               </div>
               <Typography text='caption' color='secondary'>
@@ -110,18 +95,18 @@ const CreateNoteModal: FC<IProps> = ({
                 <div className='flex flex-row gap-6 items-center'>
                   <IoTextOutline className='text-text-muted' />
                   <Typography text='caption' color='muted'>
-                    Words
+                    {t('words')}
                   </Typography>
                 </div>
                 <Typography text='caption' color='secondary'>
-                  {selectedText.length} words
+                  {selectedText.length} {t('words').toLocaleLowerCase()}
                 </Typography>
               </div>
               <div className='flex flex-col gap-12 p-12 bg-base rounded-6 w-full border-border-subtle border'>
                 <div className='flex flex-row gap-6 items-center'>
                   <IoMdTime className='text-text-muted' />
                   <Typography text='caption' color='muted'>
-                    Created
+                    {t('created')}
                   </Typography>
                 </div>
                 <div className='flex flex-col gap-4'>
@@ -135,19 +120,45 @@ const CreateNoteModal: FC<IProps> = ({
               </div>
             </div>
             <div className='flex flex-col gap-12 p-12 bg-base rounded-6 border-border-subtle border'>
-              <Typography text='caption' color='muted'>
-                Note name
-              </Typography>
+              <div className='flex flex-row gap-6 items-center'>
+                <IoMdColorPalette className='text-text-muted' />
+                <Typography text='caption' color='muted'>
+                  {t('highlightColor')}
+                </Typography>
+              </div>
+              <div className='flex flex-wrap gap-6 items-center  '>
+                {colors.map((color) => {
+                  return (
+                    <div
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        if (selectedColor === color) {
+                          setSelectedColor('#4DA3FF')
+                        } else {
+                          setSelectedColor(color)
+                        }
+                      }}
+                      key={color}
+                      className={clsx(
+                        'w-[24px] h-[24px] rounded-full cursor-pointer',
+                        'border-2',
+                        selectedColor === color ? 'border-text-primary' : 'border-transparent',
+                      )}
+                      style={{ backgroundColor: color }}
+                    />
+                  )
+                })}
+              </div>
             </div>
             <div className='flex flex-col gap-12 p-12 bg-base rounded-6 border-border-subtle border'>
               <Typography text='caption' color='muted'>
-                Note name
+                {t('noteName')}
               </Typography>
               <DefaultInput
                 className='h-full w-full py-12 rounded-4 px-12 font-ubuntu border border-border-subtle bg-deep'
                 onChange={setNoteName}
                 value={noteName}
-                placeholder='Enter note name'
+                placeholder={t('enterNoteName')}
               />
             </div>
           </div>
@@ -161,10 +172,10 @@ const CreateNoteModal: FC<IProps> = ({
           <DefaultButton
             disabled={!noteName.trim().toLocaleLowerCase().length}
             onClick={() => {
-              onClickSaveNote(noteName)
+              onClickSaveNote(noteName, selectedColor)
             }}
             className='px-24 py-12 w-full bg-button-secondary-active hover:bg-button-primary-hover rounded-4 duration-150 h-full'>
-            <Typography text='caption'>Save note</Typography>
+            <Typography text='caption'>{t('saveNote')}</Typography>
           </DefaultButton>
         </div>
       </div>

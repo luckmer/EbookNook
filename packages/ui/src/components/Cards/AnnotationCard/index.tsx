@@ -3,6 +3,7 @@ import ContentInput from '@components/Inputs/ContentInput'
 import Show from '@components/Show'
 import Spin from '@components/Spin'
 import { Typography } from '@components/Typography'
+import { getDate, getTime } from '@package-utils/utils'
 import clsx from 'clsx'
 import { type FC, memo, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -33,24 +34,9 @@ const AnnotationCard: FC<IProps> = ({
   const { t } = useTranslation()
 
   const date = useMemo(() => {
-    const months = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December',
-    ]
-    const d = new Date(+createdAt)
-    const h = String(d.getHours()).padStart(2, '0')
-    const m = String(d.getMinutes()).padStart(2, '0')
-    return `${d.getDate()} ${t(months[d.getMonth()].toLocaleLowerCase())} ${d.getFullYear()} ${t('at')} ${h}:${m}`
+    const { day, month, year } = getDate(createdAt)
+    const { hours, minutes } = getTime(createdAt)
+    return `${day} ${t(month)} ${year} ${t('at')} ${hours}:${minutes}`
   }, [createdAt, t])
 
   return (

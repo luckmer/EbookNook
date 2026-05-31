@@ -81,4 +81,12 @@ export const polish: IDictionary = {
   at: 'o',
   all: 'Wszystkie',
   bookmarks: 'Zakładki',
+  book: 'Książka',
+  words: 'Słowa',
+  created: 'Utworzono',
+  highlightColor: 'Kolor zaznaczenia',
+  noteName: 'Nazwa notatki',
+  enterNoteName: 'Podaj nazwę notatki',
+  saveNote: 'Zapisz notatkę',
+  selectedText: 'Zaznaczony tekst',
 }

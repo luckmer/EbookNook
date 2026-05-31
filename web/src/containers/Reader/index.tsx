@@ -10,8 +10,9 @@ import Reader from '@pages/Reader'
 import { actions as bookActions } from '@store/reducers/books'
 import { type IReaderLocation, actions as readerActions } from '@store/reducers/reader'
 import { actions } from '@store/reducers/ui'
-import { bookmarksSelector } from '@store/selectors/bookmarks'
+import { getSelectedAnnotation } from '@store/selectors/aggregated/annotations'
 import { booksSelector } from '@store/selectors/books'
+import { notesSelector } from '@store/selectors/notes'
 import { readerSelector } from '@store/selectors/reader'
 import { settingsStyles } from '@store/selectors/settings'
 import { uiSelector } from '@store/selectors/ui'
@@ -26,6 +27,8 @@ const ReaderRoot = () => {
   const [isLoadingStructure, setIsLoadingStructure] = useState(true)
   const [isContentViewReady, setIsContentViewReady] = useState(false)
   const [isViewReady, setIsViewReady] = useState(false)
+  const [currentPageIndex, setCurrentPageIndex] = useState(-1)
+
   const books = useSelector(booksSelector.books)
   const files = useSelector(booksSelector.files)
   const styles = useSelector(settingsStyles)
@@ -33,29 +36,43 @@ const ReaderRoot = () => {
   const isLoader = useSelector(uiSelector.loaderState)
   const hideContent = useSelector(uiSelector.hideHeader)
   const readerLocation = useSelector(readerSelector.readerLocation)
-  const selectedBookmark = useSelector(bookmarksSelector.selectedBookmark)
+  const selectedAnnotation = useSelector(getSelectedAnnotation)
+  const notesState = useSelector(notesSelector.notes)
+
   const location = useLocation()
   const emitter = getEventEmitter()
-
-  const bookState: { id: string; format: FormatType } = useMemo(() => {
-    return {
-      id: location?.state?.id || '',
-      format: location?.state?.format || '',
-    }
-  }, [location])
-  const file = useMemo(() => files[bookState.id], [bookState, files])
-
   const dispatch = useDispatch()
+
   const containerRef = useRef<HTMLDivElement | null>(null)
   const viewRef = useRef<any | null>(null)
 
+  const bookState: { id: string; format: FormatType } = useMemo(
+    () => ({
+      id: location?.state?.id || '',
+      format: location?.state?.format || '',
+    }),
+    [location],
+  )
+
+  const file = useMemo(() => files[bookState.id], [bookState, files])
+
   const activeBook = useMemo(() => {
     const bookShelf = books[bookState.format]
-
     if (!bookShelf) return
-
     return bookShelf[bookState.id]
   }, [bookState, books])
+
+  const notes = useMemo(() => {
+    if (!activeBook || currentPageIndex === -1) return { currentNotes: [], prevNotes: [] }
+
+    const notesList = notesState[activeBook.id]
+    if (!notesList) return { currentNotes: [], prevNotes: [] }
+
+    return {
+      currentNotes: notesList[currentPageIndex] ?? [],
+      prevNotes: notesList[currentPageIndex - 1] ?? [],
+    }
+  }, [notesState, currentPageIndex, activeBook])
 
   const handleHideHeader = useCallback(() => {
     dispatch(actions.setHideHeader(true))
@@ -101,14 +118,13 @@ const ReaderRoot = () => {
     if (!doc) return
 
     const view = viewRef.current
+    setCurrentPageIndex(index + 1)
 
     getFoliateDocEvents(doc, {
       mouseUp: () => {
         const selection = doc.getSelection()
-
         const range = selection.getRangeAt(0)
         const cfi = view.getCFI(index, range)
-
         if (!cfi) return
 
         const note: IBindingsNote = {
@@ -118,6 +134,7 @@ const ReaderRoot = () => {
           note: '',
           noteId: '',
           createdAt: '',
+          color: '',
           updatedAt: '',
           value: cfi,
           page: Number(index + 1).toString(),
@@ -132,17 +149,13 @@ const ReaderRoot = () => {
         })
       },
       mouseDown: () => emitter.dispatch('restartAnnotator'),
-      resize: () => {
-        emitter.dispatch('restartAnnotator')
-      },
+      resize: () => emitter.dispatch('restartAnnotator'),
     })
   }
 
   const drawAnnotation = (e: any) => {
     const { draw, annotation } = e.detail
-
-    console.log(e.detail)
-    draw(Overlayer.highlight, { color: annotation.color ?? '#ffff00' })
+    draw(Overlayer.highlight, { color: annotation.color ?? '#4DA3FF' })
   }
 
   getFoliateEvents(viewRef.current, isContentViewReady, { relocate, load, drawAnnotation })
@@ -156,7 +169,6 @@ const ReaderRoot = () => {
       setIsViewReady(false)
       viewRef.current = null
       setIsLoadingStructure(true)
-
       setIsContentViewReady(false)
       return
     }
@@ -178,6 +190,7 @@ const ReaderRoot = () => {
 
       viewRef.current = view
       setIsContentViewReady(true)
+
       const client = getDocumentClient()
       const isPDF = await client.isPDF(file)
 
@@ -190,7 +203,6 @@ const ReaderRoot = () => {
       }
 
       const lastLocation = activeBook?.progress?.CFI
-
       if (lastLocation) {
         await view.init({ lastLocation })
       } else {
@@ -215,20 +227,28 @@ const ReaderRoot = () => {
     if (isLoadingStructure) return
     const view = viewRef.current
     if (!view) return
-
     view.renderer.setStyles?.(styles)
   }, [styles, isLoadingStructure])
 
   useEffect(() => {
     if (isLoadingStructure) return
-
-    if (viewRef.current && selectedBookmark.cfi !== null) {
-      viewRef.current.init({ lastLocation: selectedBookmark.cfi })
-      if (!selectedBookmark.hasChapter) {
-        viewRef.current.goToFraction(0)
-      }
+    if (viewRef.current && selectedAnnotation.cfi !== null) {
+      viewRef.current.init({ lastLocation: selectedAnnotation.cfi })
     }
-  }, [selectedBookmark, isLoadingStructure])
+  }, [selectedAnnotation, isLoadingStructure])
+
+  useEffect(() => {
+    const view = viewRef.current
+    if (!view || isLoadingStructure) return
+
+    notes.prevNotes.forEach((note) => {
+      view.deleteAnnotation({ value: note.value })
+    })
+
+    notes.currentNotes.forEach((note) => {
+      view.addAnnotation({ value: note.value, color: note.color })
+    })
+  }, [isLoadingStructure, notes])
 
   return (
     <Reader

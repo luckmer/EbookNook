@@ -77,4 +77,12 @@ export type IDictionary = {
   at: string
   all: string
   bookmarks: string
+  selectedText: string
+  book: string
+  words: string
+  created: string
+  highlightColor: string
+  noteName: string
+  enterNoteName: string
+  saveNote: string
 }

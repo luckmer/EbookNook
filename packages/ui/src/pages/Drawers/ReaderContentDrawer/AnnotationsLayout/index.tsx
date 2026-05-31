@@ -14,8 +14,11 @@ import { useTranslation } from 'react-i18next'
 
 export interface IProps {
   onClick: (bookmark: IBindingsBookmark) => void
+  onClickNote: (note: IBindingsNote) => void
   onClickDelete: (id: string, cfi: string) => void
+  onClickDeleteNote: (id: string, noteId: string, page: string) => void
   onClickEdit: (bookmark: IBindingsBookmark) => void
+  onClickEditNote: (note: IBindingsNote) => void
   scopedLoader: Partial<Record<string, Partial<Record<string, LoaderState>>>>
   bookmarks: Array<IBindingsBookmark>
   notes: Array<IBindingsNote>
@@ -29,6 +32,9 @@ const AnnotationsLayout: FC<IProps> = ({
   notes,
   onClick,
   onClickDelete,
+  onClickDeleteNote,
+  onClickEditNote,
+  onClickNote,
   onClickEdit,
 }) => {
   const [option, setOption] = useState<ANNOTATION_OPTIONS>(ANNOTATION_OPTIONS.ALL)
@@ -129,24 +135,24 @@ const AnnotationsLayout: FC<IProps> = ({
               {notes.map((note) => (
                 <AnnotationCard
                   isDeleting={
-                    scopedLoader[note.bookId]?.[LOADER_STATE.IS_DELETING_NOTE]?.status ===
+                    scopedLoader[note.noteId]?.[LOADER_STATE.IS_DELETING_NOTE]?.status ===
                     LOADER_STATUS.LOADING
                   }
                   isUpdating={
-                    scopedLoader[note.bookId]?.[LOADER_STATE.IS_UPDATING_NOTE]?.status ===
+                    scopedLoader[note.noteId]?.[LOADER_STATE.IS_UPDATING_NOTE]?.status ===
                     LOADER_STATUS.LOADING
                   }
                   onClickDelete={() => {
-                    // onClickDelete(bookmark.bookId, bookmark.cfi)
+                    onClickDeleteNote(note.bookId, note.noteId, note.page)
                   }}
                   onClickEdit={(label) => {
-                    // onClickEdit({
-                    //   ...bookmark,
-                    //   title: label,
-                    // })
+                    onClickEditNote({
+                      ...note,
+                      title: label,
+                    })
                   }}
                   onClick={() => {
-                    // onClick(bookmark)
+                    onClickNote(note)
                   }}
                   key={note.value}
                   chapter={note.chapter}

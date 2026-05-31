@@ -36,8 +36,11 @@ export interface IProps {
   onClick: (href: string) => void
   onClickClose: () => void
   onClickBack: () => void
+  onClickNote: (note: IBindingsNote) => void
   onClickBookmark: (bookmark: IBindingsBookmark) => void
   onClickDelete: (id: string, cfi: string) => void
+  onClickDeleteNote: (id: string, noteId: string, page: string) => void
+  onClickEditNote: (note: IBindingsNote) => void
   onClickEdit: (bookmark: IBindingsBookmark) => void
   isOpen: boolean
   toc: ITocItem[]
@@ -54,6 +57,9 @@ const ReaderContentDrawer: FC<IProps> = ({
   onClickBack,
   onClickBookmark,
   onClickDelete,
+  onClickNote,
+  onClickDeleteNote,
+  onClickEditNote,
   onClickEdit,
   onClick,
   book,
@@ -152,7 +158,10 @@ const ReaderContentDrawer: FC<IProps> = ({
                 notes={notes}
                 bookmarks={bookmarks}
                 onClick={onClickBookmark}
+                onClickNote={onClickNote}
                 onClickDelete={onClickDelete}
+                onClickEditNote={onClickEditNote}
+                onClickDeleteNote={onClickDeleteNote}
                 onClickEdit={onClickEdit}
               />
             </Match>

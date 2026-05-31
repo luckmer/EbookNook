@@ -2,6 +2,7 @@ import type { FormatType } from '@bindings/format'
 import ReaderContentDrawer from '@pages/Drawers/ReaderContentDrawer'
 import { actions as bookmarkActions } from '@store/reducers/bookmarks'
 import { actions as bookActions } from '@store/reducers/books'
+import { actions as noteActions } from '@store/reducers/notes'
 import { actions as uiActions } from '@store/reducers/ui'
 import { bookmarksSelector } from '@store/selectors/bookmarks'
 import { booksSelector } from '@store/selectors/books'
@@ -10,6 +11,7 @@ import { uiSelector } from '@store/selectors/ui'
 import { useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation, useNavigate } from 'react-router-dom'
+
 export interface ICache {
   id: string
   format: FormatType
@@ -119,6 +121,22 @@ const BookContentDrawerRoot = () => {
             cfi,
           }),
         )
+      }}
+      onClickNote={(note) => {
+        dispatch(uiActions.setOpenChaptersDrawer(false))
+        dispatch(uiActions.setHideHeader(true))
+        dispatch(
+          noteActions.setSelectedNote({
+            cfi: note.value,
+            selectedAt: Date.now().toString(),
+          }),
+        )
+      }}
+      onClickEditNote={(note) => {
+        dispatch(noteActions.updateNote(note))
+      }}
+      onClickDeleteNote={(id, noteId, page) => {
+        dispatch(noteActions.deleteNote({ id, noteId, page }))
       }}
     />
   )

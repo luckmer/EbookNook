@@ -49,7 +49,7 @@ const CreateNoteModalRoot = () => {
       onClickClose={() => {
         dispatch(uiActions.setOpenCreateNoteModal(false))
       }}
-      onClickSaveNote={(title) => {
+      onClickSaveNote={(title, color) => {
         if (!activeBook) {
           return
         }
@@ -63,6 +63,7 @@ const CreateNoteModalRoot = () => {
           text: pendingNote.text,
           bookId: activeBook.id,
           chapter: 'Note',
+          color,
           note: '',
           title,
         }

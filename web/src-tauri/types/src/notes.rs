@@ -9,6 +9,7 @@ pub struct IBindingsNote {
     #[ts(rename = "bookId")]
     pub book_id: String,
     pub note: String,
+    pub color: String,
     pub page: String,
     #[serde(rename = "noteId")]
     #[ts(rename = "noteId")]

@@ -39,6 +39,7 @@
       "@pages/*": ["../packages/ui/src/pages/*"],
       "@containers/*": ["./src/containers/*"],
       "@routes/*": ["./src/routes/*"],
+      "@package-utils/*": ["../packages/ui/src/utils/*"],
       "@web-utils/*": ["./src/utils/*"]
     }
   },

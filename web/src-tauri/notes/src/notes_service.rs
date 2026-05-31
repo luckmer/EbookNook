@@ -23,6 +23,7 @@ impl NotesService {
             note: row.try_get("note")?,
             page: row.try_get("page")?,
             chapter:row.try_get("chapter")?,
+            color:row.try_get("color")?,
             title:row.try_get("title")?,
             created_at: row.try_get("created_at")?,
             updated_at: row.try_get("updated_at")?,
@@ -44,6 +45,7 @@ impl NotesService {
             .bind(note.page)
             .bind(note.chapter)
             .bind(note.title)
+            .bind(note.color)
             .bind(note.text)
             .bind(note.created_at)
             .bind(note.updated_at)
@@ -108,9 +110,7 @@ impl NotesService {
         let now = chrono::Utc::now().timestamp();
 
         let res = sqlx::query(UPDATE_NOTE)
-            .bind(note.page)
-            .bind(note.value)
-            .bind(note.text)
+            .bind(note.title)
             .bind(now)
             .bind(note.book_id)
             .bind(note.note_id)

@@ -80,4 +80,12 @@ export const english: IDictionary = {
   at: 'at',
   all: 'All',
   bookmarks: 'Bookmarks',
+  selectedText: 'Selected text',
+  book: 'Book',
+  words: 'Words',
+  created: 'Created',
+  highlightColor: 'Highlight Color',
+  noteName: 'Note Name',
+  enterNoteName: 'Enter note name',
+  saveNote: 'Save Note',
 }

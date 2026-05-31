@@ -2,6 +2,7 @@ import { LOADER_STATE, LOADER_STATUS } from '@interfaces/ui/enums'
 import type { PayloadAction } from '@reduxjs/toolkit'
 import { actions as bookmarkActions } from '@store/reducers/bookmarks'
 import { actions, type PayloadTypes } from '@store/reducers/books'
+import { actions as noteActions } from '@store/reducers/notes'
 import { actions as readerActions } from '@store/reducers/reader'
 import { actions as uiActions } from '@store/reducers/ui'
 import { all, call, put, takeLatest } from 'typed-redux-saga'
@@ -10,7 +11,7 @@ import { getBookStructure, setOpenBook } from '../books'
 import { getNotesByBookId } from '../notes'
 
 export function* resetBookState() {
-  yield* all([put(bookmarkActions.reset()), put(readerActions.reset())])
+  yield* all([put(bookmarkActions.reset()), put(readerActions.reset()), put(noteActions.reset())])
 }
 
 export function* loadAnnotationState(action: PayloadAction<PayloadTypes['setOpenBook']>) {

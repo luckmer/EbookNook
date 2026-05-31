@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS notes_table (
     page                TEXT NOT NULL, 
     chapter             TEXT NOT NULL,
     title               TEXT NOT NULL, 
+    color               TEXT NOT NULL,
     text                TEXT NOT NULL,
     created_at          TEXT NOT NULL,
     updated_at          TEXT NOT NULL,
@@ -21,18 +22,18 @@ pub const DELETE_NOTE: &str = r#"
 
 pub const UPDATE_NOTE: &str = r#"
     UPDATE notes_table
-    SET page= ?, value = ?, text = ?, updated_at = ?
+    SET title = ?, updated_at = ?
     WHERE book_id = ? AND note_id = ?
 "#;
 
 pub const SELECT_NOTE: &str = r#"
-    SELECT book_id, note_id, value, note, page, chapter, title, text, created_at, updated_at
+    SELECT book_id, note_id, value, note, page, chapter, title, color, text, created_at, updated_at
     FROM notes_table
     WHERE book_id = ?1
     ORDER BY created_at DESC
 "#;
 
 pub const INSERT_NOTE: &str = r#"
-    INSERT INTO notes_table (book_id, note_id, value, note, page, chapter, title, text, created_at, updated_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
+    INSERT INTO notes_table (book_id, note_id, value, note, page, chapter, title, color, text, created_at, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
 "#;

@@ -69,10 +69,74 @@ export function* addNote(action: PayloadAction<PayloadTypes['addNote']>) {
   )
 }
 
+export function* deleteNote(action: PayloadAction<PayloadTypes['deleteNote']>) {
+  yield* put(
+    uiActions.setScopedLoaderState({
+      scope: action.payload.noteId,
+      loader: LOADER_STATE.IS_DELETING_NOTE,
+      state: { status: LOADER_STATUS.LOADING },
+    }),
+  )
+
+  try {
+    yield* call(invoke<IBindingsNote>, 'delete_note', {
+      id: action.payload.id,
+      noteId: action.payload.noteId,
+    })
+
+    yield* put(actions.setDeleteNote(action.payload))
+  } catch (err) {
+    console.log('Failed to save note', err)
+    notify('Failed to save note', 'error')
+  }
+
+  yield* put(
+    uiActions.setScopedLoaderState({
+      scope: action.payload.noteId,
+      loader: LOADER_STATE.IS_DELETING_NOTE,
+      state: { status: LOADER_STATUS.IDLE },
+    }),
+  )
+}
+
+export function* updateNote(action: PayloadAction<PayloadTypes['updateNote']>) {
+  yield* put(
+    uiActions.setScopedLoaderState({
+      scope: action.payload.noteId,
+      loader: LOADER_STATE.IS_UPDATING_NOTE,
+      state: { status: LOADER_STATUS.LOADING },
+    }),
+  )
+
+  try {
+    yield* call(invoke<IBindingsNote>, 'update_note', { note: action.payload })
+    yield* put(actions.setUpdateNote(action.payload))
+  } catch (err) {
+    console.log('Failed to save note', err)
+    notify('Failed to save note', 'error')
+  }
+
+  yield* put(
+    uiActions.setScopedLoaderState({
+      scope: action.payload.noteId,
+      loader: LOADER_STATE.IS_UPDATING_NOTE,
+      state: { status: LOADER_STATUS.IDLE },
+    }),
+  )
+}
+
 export function* addNoteSaga() {
   yield* takeEvery(actions.addNote, addNote)
 }
 
+export function* deleteNoteSaga() {
+  yield* takeEvery(actions.deleteNote, deleteNote)
+}
+
+export function* updateNoteSaga() {
+  yield* takeEvery(actions.updateNote, updateNote)
+}
+
 export default function* rootSaga() {
-  yield all([addNoteSaga()])
+  yield all([addNoteSaga(), deleteNoteSaga(), updateNoteSaga()])
 }

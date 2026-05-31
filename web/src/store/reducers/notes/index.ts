@@ -7,8 +7,14 @@ export const notesStore = 'notesStore'
 export type pageNumber = string
 export type bookId = string
 
+export interface ISelectedNote {
+  cfi: string | null
+  selectedAt: string
+}
+
 export interface INotesState {
   notes: Partial<Record<bookId, Record<pageNumber, Array<IBindingsNote>>>>
+  selectedNote: ISelectedNote
   pendingNote: IBindingsNote
 }
 
@@ -17,6 +23,7 @@ export const defaultNote: IBindingsNote = {
   chapter: '',
   title: '',
   note: '',
+  color: '',
   noteId: '',
   createdAt: '',
   updatedAt: '',
@@ -25,8 +32,14 @@ export const defaultNote: IBindingsNote = {
   text: '',
 }
 
+export const defaultSelectedNote = {
+  cfi: null,
+  selectedAt: Date.now().toString(),
+}
+
 export const defaultState: INotesState = {
   pendingNote: defaultNote,
+  selectedNote: defaultSelectedNote,
   notes: {},
 }
 
@@ -35,6 +48,10 @@ export const store = createSlice({
   initialState: defaultState,
   reducers: {
     load(state) {
+      return state
+    },
+    reset(state) {
+      state.selectedNote = defaultSelectedNote
       return state
     },
     setPendingNote(state, action: PayloadAction<IBindingsNote>) {
@@ -51,6 +68,44 @@ export const store = createSlice({
     addNote(state, _: PayloadAction<IBindingsNote>) {
       return state
     },
+    deleteNote(state, _: PayloadAction<{ id: string; noteId: string; page: string }>) {
+      return state
+    },
+    updateNote(state, _: PayloadAction<IBindingsNote>) {
+      return state
+    },
+
+    setDeleteNote(state, action: PayloadAction<{ id: string; noteId: string; page: string }>) {
+      const noteShelf = state.notes[action.payload.id]
+
+      if (!noteShelf) {
+        return state
+      }
+
+      noteShelf[action.payload.page] = noteShelf[action.payload.page].filter(
+        (note) => note.noteId !== action.payload.noteId,
+      )
+
+      return state
+    },
+
+    setUpdateNote(state, action: PayloadAction<IBindingsNote>) {
+      const { bookId, page, noteId } = action.payload
+      const pageNotes = state.notes[bookId]?.[page]
+
+      if (!pageNotes) return state
+
+      const idx = pageNotes.findIndex((n) => n.noteId === noteId)
+      if (idx !== -1) pageNotes[idx] = action.payload
+
+      return state
+    },
+
+    setSelectedNote(state, action: PayloadAction<ISelectedNote>) {
+      state.selectedNote = action.payload
+      return state
+    },
+
     setAddNote(state, action: PayloadAction<IBindingsNote>) {
       const notesShelf = state.notes[action.payload.bookId]
 
