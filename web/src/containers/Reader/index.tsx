@@ -25,6 +25,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useLocation } from 'react-router-dom'
 
 const ReaderRoot = () => {
+  const [notesCache, setNotesCache] = useState<IBindingsNote[]>([])
   const [isLoadingStructure, setIsLoadingStructure] = useState(true)
   const [isContentViewReady, setIsContentViewReady] = useState(false)
   const [isViewReady, setIsViewReady] = useState(false)
@@ -64,15 +65,12 @@ const ReaderRoot = () => {
   }, [bookState, books])
 
   const notes = useMemo(() => {
-    if (!activeBook || currentPageIndex === -1) return { currentNotes: [], prevNotes: [] }
+    if (!activeBook || currentPageIndex === -1) return []
 
     const notesList = notesState[activeBook.id]
-    if (!notesList) return { currentNotes: [], prevNotes: [] }
+    if (!notesList) return []
 
-    return {
-      currentNotes: notesList[currentPageIndex] ?? [],
-      prevNotes: notesList[currentPageIndex - 1] ?? [],
-    }
+    return notesList[currentPageIndex] ?? []
   }, [notesState, currentPageIndex, activeBook])
 
   const handleHideHeader = useCallback(() => {
@@ -240,16 +238,27 @@ const ReaderRoot = () => {
 
   useEffect(() => {
     const view = viewRef.current
-    if (!view || isLoadingStructure) return
+    if (!view || isLoadingStructure) {
+      return
+    }
 
-    notes.prevNotes.forEach((note) => {
-      view.deleteAnnotation({ value: note.value })
+    const cachedCFI = new Set(notesCache.map((n) => n.value))
+    const currentCFI = new Set(notes.map((n) => n.value))
+
+    notesCache.forEach((note) => {
+      if (!currentCFI.has(note.value)) {
+        view.deleteAnnotation({ value: note.value })
+      }
     })
 
-    notes.currentNotes.forEach((note) => {
-      view.addAnnotation({ value: note.value, color: note.color })
+    notes.forEach((note) => {
+      if (!cachedCFI.has(note.value)) {
+        view.addAnnotation({ value: note.value, color: note.color })
+      }
     })
-  }, [isLoadingStructure, notes])
+
+    setNotesCache(notes)
+  }, [isLoadingStructure, notes, notesCache])
 
   useEffect(() => {
     if (location.pathname !== NAVIGATION.READER) {
