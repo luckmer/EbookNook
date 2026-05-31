@@ -2,6 +2,7 @@ import type { FormatType } from '@bindings/format'
 import type { IBindingsNote } from '@bindings/notes'
 import type { ProgressType } from '@bindings/progress'
 import { Overlayer } from '@foliate/overlayer.js'
+import { NAVIGATION } from '@interfaces/routes/enums'
 import { LOADER_STATE, LOADER_STATUS } from '@interfaces/ui/enums'
 import { getDocumentClient } from '@libs/document'
 import { getEventEmitter } from '@libs/eventEmitter'
@@ -249,6 +250,12 @@ const ReaderRoot = () => {
       view.addAnnotation({ value: note.value, color: note.color })
     })
   }, [isLoadingStructure, notes])
+
+  useEffect(() => {
+    if (location.pathname !== NAVIGATION.READER) {
+      emitter.dispatch('restartAnnotator')
+    }
+  }, [location, emitter])
 
   return (
     <Reader

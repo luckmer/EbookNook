@@ -139,7 +139,7 @@ const AnnotatorRoot = () => {
     <Show when={showAnnotator}>
       <Annotator
         onClickCopy={() => {
-          console.log(selectedText)
+          navigator.clipboard.writeText(selectedText)
           setPosition(DEFAULT_ANNOTATION_STATE)
           setShowAnnotator(false)
           removeSelection()
