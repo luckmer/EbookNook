@@ -44,6 +44,7 @@ impl NotesService {
             .bind(note.page)
             .bind(note.chapter)
             .bind(note.title)
+            .bind(note.text)
             .bind(note.created_at)
             .bind(note.updated_at)
             .execute(conn)
@@ -55,6 +56,7 @@ impl NotesService {
 
         Ok(())
     }
+
 
     pub async fn get_notes_by_book_id(
         &self,

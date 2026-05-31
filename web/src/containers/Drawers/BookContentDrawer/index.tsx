@@ -5,6 +5,7 @@ import { actions as bookActions } from '@store/reducers/books'
 import { actions as uiActions } from '@store/reducers/ui'
 import { bookmarksSelector } from '@store/selectors/bookmarks'
 import { booksSelector } from '@store/selectors/books'
+import { notesSelector } from '@store/selectors/notes'
 import { uiSelector } from '@store/selectors/ui'
 import { useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -22,6 +23,7 @@ const BookContentDrawerRoot = () => {
   const books = useSelector(booksSelector.books)
   const activeToc = useSelector(booksSelector.activeToc)
   const bookmarksState = useSelector(bookmarksSelector.bookmarks)
+  const notesState = useSelector(notesSelector.notes)
 
   const navigate = useNavigate()
 
@@ -45,6 +47,15 @@ const BookContentDrawerRoot = () => {
 
     return bookmarksState[cache.id]
   }, [bookmarksState, cache])
+
+  const notes = useMemo(() => {
+    if (!cache) return []
+
+    const shelf = notesState[cache.id]
+    if (!shelf) return []
+
+    return Object.values(shelf).filter(Boolean).flat()
+  }, [notesState, cache])
 
   useEffect(() => {
     if (!bookState) return
@@ -73,7 +84,7 @@ const BookContentDrawerRoot = () => {
       loaderState={loaderState}
       scopedLoader={scopedLoader}
       isOpen={isOpen}
-      notes={[]}
+      notes={notes}
       onClickBack={() => {
         dispatch(uiActions.setOpenChaptersDrawer(false))
         dispatch(bookActions.setSelectedChapter(''))

@@ -1,4 +1,5 @@
 import type { FormatType } from '@bindings/format'
+import type { IBindingsNote } from '@bindings/notes'
 import type { ProgressType } from '@bindings/progress'
 import { Overlayer } from '@foliate/overlayer.js'
 import { LOADER_STATE, LOADER_STATUS } from '@interfaces/ui/enums'
@@ -101,30 +102,32 @@ const ReaderRoot = () => {
 
     const view = viewRef.current
 
-    // loadAnnotations()
     getFoliateDocEvents(doc, {
       mouseUp: () => {
         const selection = doc.getSelection()
 
-        // const range = selection.getRangeAt(0)
-        // const cfi = view.getCFI(index, range)
+        const range = selection.getRangeAt(0)
+        const cfi = view.getCFI(index, range)
 
-        // if (!cfi) return
-        // const annotation = {
-        //   value: cfi,
-        //   color: '#fff',
-        //   note: 'optional note, idk what it does',
-        //   page: index + 1,
-        //   text: selection.toString(),
-        //   createdAt: Date.now().toString(),
-        //   updatedAt: Date.now().toString(),
-        // }
+        if (!cfi) return
 
-        // view.addAnnotation(annotation, false)
+        const note: IBindingsNote = {
+          bookId: '',
+          chapter: '',
+          title: '',
+          note: '',
+          noteId: '',
+          createdAt: '',
+          updatedAt: '',
+          value: cfi,
+          page: Number(index + 1).toString(),
+          text: selection.toString(),
+        }
 
         emitter.dispatch('annotationClick', {
-          selected: selection,
           iframe: doc.defaultView?.frameElement,
+          selected: selection,
+          note,
           doc,
         })
       },

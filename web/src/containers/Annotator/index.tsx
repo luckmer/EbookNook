@@ -1,6 +1,10 @@
+import type { IBindingsNote } from '@bindings/notes'
 import Show from '@components/Show'
 import { getEventEmitter } from '@libs/eventEmitter'
 import Annotator from '@pages/Annotator'
+import { actions as noteActions } from '@store/reducers/notes'
+import { actions as uiActions } from '@store/reducers/ui'
+import { notify } from '@utils/notification'
 import {
   DEFAULT_ANNOTATION_STATE,
   GAP,
@@ -11,7 +15,6 @@ import {
 } from '@utils/static'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { useLocation } from 'react-router-dom'
 
 interface IPosition {
   x: number
@@ -21,19 +24,18 @@ interface IPosition {
 
 interface IDetail {
   selected: Selection
+  note: IBindingsNote
   doc: Document
   iframe: HTMLIFrameElement
 }
 
 const AnnotatorRoot = () => {
-  const [doc, setDoc] = useState<Document | null>(null)
   const [position, setPosition] = useState<IPosition>(DEFAULT_ANNOTATION_STATE)
+  const [note, setNote] = useState<IBindingsNote | null>(null)
   const [showAnnotator, setShowAnnotator] = useState(false)
+  const [doc, setDoc] = useState<Document | null>(null)
   const [selectedText, setSelectedText] = useState('')
   const dispatch = useDispatch()
-  const location = useLocation()
-
-  // const bookId = useMemo(() => location?.state?.id, [location])
 
   const removeSelection = useCallback(() => {
     if (doc) {
@@ -92,8 +94,9 @@ const AnnotatorRoot = () => {
       )
 
       setPosition({ x: popupX, y: popupY, triangleX })
-      setSelectedText(text)
       setShowAnnotator(true)
+      setSelectedText(text)
+      setNote(detail.note)
     }
 
     emitter.on('annotationClick', handleAnnotationClick)
@@ -101,6 +104,7 @@ const AnnotatorRoot = () => {
       removeSelection()
       setPosition(DEFAULT_ANNOTATION_STATE)
       setShowAnnotator(false)
+      setNote(null)
       setSelectedText('')
     })
 
@@ -135,18 +139,23 @@ const AnnotatorRoot = () => {
     <Show when={showAnnotator}>
       <Annotator
         onClickCopy={() => {
-          //  dispatch(uiActions.setOpenNotebook(true))
-          // dispatch(
-          //   annotationActions.setAnnotation({
-          //     id: bookId,
-          //     annotation: { label: selectedText, description: selectedText, id: v7() },
-          //   }),
-          // )
+          console.log(selectedText)
           setPosition(DEFAULT_ANNOTATION_STATE)
           setShowAnnotator(false)
           removeSelection()
         }}
-        onClickAddNote={() => {}}
+        onClickAddNote={() => {
+          if (!note) {
+            notify('Missing note', 'info')
+            return
+          }
+
+          dispatch(noteActions.setPendingNote(note))
+          dispatch(uiActions.setOpenCreateNoteModal(true))
+          setPosition(DEFAULT_ANNOTATION_STATE)
+          setShowAnnotator(false)
+          removeSelection()
+        }}
         modalPosition={modalPosition}
         pointPosition={pointPosition}
       />

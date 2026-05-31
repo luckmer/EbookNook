@@ -35,7 +35,6 @@ export function* addBookmarkById(action: PayloadAction<PayloadTypes['addBookmark
 
   try {
     yield* call(invoke<IBindingsBookmark>, 'add_bookmark_by_book_id', { payload: action.payload })
-
     yield* put(actions.setAddBookmark(action.payload))
   } catch (err) {
     console.log('Failed to save bookmark', err)

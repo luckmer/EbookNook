@@ -26,7 +26,6 @@ export class AppServiceCore {
 
   async getLibraryDir(bookId: string): Promise<string> {
     const dataDir = await this.getAppDataDir()
-    console.log(dataDir)
     const booksDir = await join(dataDir, this.appName, bookId)
 
     if (!(await exists(booksDir))) {
