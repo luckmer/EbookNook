@@ -1,4 +1,5 @@
 import type { IBindingsBookmark } from '@bindings/bookmarks'
+import type { IBindingsNote } from '@bindings/notes'
 import DefaultButton from '@components/Buttons/DefaultButton'
 import Drawer from '@components/Drawer'
 import Match from '@components/Match'
@@ -35,14 +36,18 @@ export interface IProps {
   onClick: (href: string) => void
   onClickClose: () => void
   onClickBack: () => void
+  onClickNote: (note: IBindingsNote) => void
   onClickBookmark: (bookmark: IBindingsBookmark) => void
   onClickDelete: (id: string, cfi: string) => void
+  onClickDeleteNote: (id: string, noteId: string, page: string) => void
+  onClickEditNote: (note: IBindingsNote) => void
   onClickEdit: (bookmark: IBindingsBookmark) => void
   isOpen: boolean
   toc: ITocItem[]
   loaderState: Partial<Record<LOADER_STATE, LoaderState>>
   scopedLoader: Partial<Record<string, Partial<Record<LOADER_STATE, LoaderState>>>>
   bookmarks: Array<IBindingsBookmark>
+  notes: Array<IBindingsNote>
   activeToc: ITocItem
   book: IBook
 }
@@ -52,11 +57,15 @@ const ReaderContentDrawer: FC<IProps> = ({
   onClickBack,
   onClickBookmark,
   onClickDelete,
+  onClickNote,
+  onClickDeleteNote,
+  onClickEditNote,
   onClickEdit,
   onClick,
   book,
   toc,
   loaderState,
+  notes,
   activeToc,
   bookmarks,
   scopedLoader,
@@ -146,9 +155,13 @@ const ReaderContentDrawer: FC<IProps> = ({
                   loaderState[LOADER_STATE.IS_LOADING_ANNOTATIONS]?.status === LOADER_STATUS.LOADING
                 }
                 scopedLoader={scopedLoader}
+                notes={notes}
                 bookmarks={bookmarks}
                 onClick={onClickBookmark}
+                onClickNote={onClickNote}
                 onClickDelete={onClickDelete}
+                onClickEditNote={onClickEditNote}
+                onClickDeleteNote={onClickDeleteNote}
                 onClickEdit={onClickEdit}
               />
             </Match>

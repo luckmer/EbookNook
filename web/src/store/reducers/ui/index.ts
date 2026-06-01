@@ -18,6 +18,7 @@ export interface IUiState {
   openSettingsModal: boolean
   openBookOverviewModal: IOpenBookOverviewModal
   openCreateBookmarkModal: boolean
+  openCreateNoteModal: boolean
   hideHeader: boolean
 }
 
@@ -32,6 +33,7 @@ const defaultState: IUiState = {
   loaderState: {},
   scopedLoaderState: {},
   openChaptersDrawer: false,
+  openCreateNoteModal: false,
   openCreateBookmarkModal: false,
   openSettingsModal: false,
   hideHeader: false,
@@ -72,6 +74,10 @@ export const store = createSlice({
     },
     setOpenBookOverviewModal(state, action: PayloadAction<IOpenBookOverviewModal>) {
       state.openBookOverviewModal = action.payload
+      return state
+    },
+    setOpenCreateNoteModal(state, action: PayloadAction<boolean>) {
+      state.openCreateNoteModal = action.payload
       return state
     },
     setHideHeader(state, action: PayloadAction<boolean>) {

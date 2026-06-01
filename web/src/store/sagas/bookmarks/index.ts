@@ -8,7 +8,7 @@ import { invoke } from '@tauri-apps/api/core'
 import { notify } from '@utils/notification'
 import { all, call, put, select, takeEvery } from 'typed-redux-saga'
 
-export function* loadBookmarksById(id: string) {
+export function* loadBookmarksByBookId(id: string) {
   try {
     const bookmarks = yield* select(bookmarksSelector.bookmarks)
 
@@ -35,7 +35,6 @@ export function* addBookmarkById(action: PayloadAction<PayloadTypes['addBookmark
 
   try {
     yield* call(invoke<IBindingsBookmark>, 'add_bookmark_by_book_id', { payload: action.payload })
-
     yield* put(actions.setAddBookmark(action.payload))
   } catch (err) {
     console.log('Failed to save bookmark', err)

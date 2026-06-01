@@ -30,7 +30,7 @@
       "@libs/*": ["../../web/src/libs/*"],
       "@pages/*": ["./src/pages/*"],
       "@theme/*": ["./common/*"],
-      "@utils/*": ["./src/utils/*"],
+      "@package-utils/*": ["./src/utils/*"],
       "@foliate/*": ["../../web/src/foliate/*"],
       "@language/*": ["../../web/src/language/*"],
       "@web-utils/*": ["../../web/src/utils/*"]

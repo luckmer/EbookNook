@@ -33,7 +33,7 @@ const CreateBookmarkModal: FC<IProps> = ({ onClickClose, onClickCreateBookmark, 
       isOpen={isOpen}
       centered
       isFullscreen={isMobile}
-      width={isMobile ? '100%' : 450}
+      width={isMobile ? '100%' : 500}
       height={isMobile ? '100%' : undefined}
       closable={false}>
       <div

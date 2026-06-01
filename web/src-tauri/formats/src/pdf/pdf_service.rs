@@ -5,7 +5,6 @@ use database::{
     INSERT_PDF_BOOK_TOC, SELECT_PDF_BOOK_SECTION_BY_ID, SELECT_PDF_BOOK_TOC_BY_ID,
     SELECT_PROGRESS_FROM_PDF, UPDATE_PDF_BOOK_PERCENTAGE_PROGRESS, UPDATE_PDF_BOOK_PROGRESS,
 };
-use sqlx::types::chrono;
 use types::{
     FormatType, IBindingsBookContent, IBindingsPDFBook, IBindingsPDFBookStructure,
     IBindingsPDFMetadata, IBindingsPDFSection, IBindingsPDFToc, ProgressType,
@@ -134,7 +133,6 @@ impl PDFService {
             existing_map.insert(key_str, serde_json::Value::String(value));
         }
 
-        let now = chrono::Utc::now().timestamp();
         sqlx::query(UPDATE_PDF_BOOK_PROGRESS)
             .bind(serde_json::to_string(&existing)?)
             .bind(&id)
@@ -151,8 +149,6 @@ impl PDFService {
         percentage_progress: String,
     ) -> Result<(), Box<dyn std::error::Error>> {
         let conn = db.get_pool();
-
-        let now = chrono::Utc::now().timestamp();
 
         sqlx::query(UPDATE_PDF_BOOK_PERCENTAGE_PROGRESS)
             .bind(percentage_progress)

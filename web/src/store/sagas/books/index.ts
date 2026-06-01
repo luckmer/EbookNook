@@ -260,7 +260,6 @@ export default function* RootSaga() {
   yield all([
     ImportBookSaga(),
     loadStateSaga(),
-    // getBookStructureSaga(),
     updateBookMetadataSaga(),
     updateBookProgressSaga(),
     deleteBookSagas(),

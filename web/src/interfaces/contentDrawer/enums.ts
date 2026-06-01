@@ -3,3 +3,9 @@ export enum OPTIONS {
   CONTENTS = 'CONTENTS',
   ANNOTATIONS = 'ANNOTATIONS',
 }
+
+export enum ANNOTATION_OPTIONS {
+  BOOKMARKS = 'BOOKMARKS',
+  NOTES = 'NOTES',
+  ALL = 'ALL',
+}

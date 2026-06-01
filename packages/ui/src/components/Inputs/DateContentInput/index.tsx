@@ -1,6 +1,6 @@
 import Show from '@components/Show'
 import { Typography } from '@components/Typography'
-import { formatDate } from '@web-utils/index'
+import { formatDate } from '@package-utils/utils'
 import clsx from 'clsx'
 import { type FC, memo } from 'react'
 import { useTranslation } from 'react-i18next'

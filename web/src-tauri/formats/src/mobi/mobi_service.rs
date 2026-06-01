@@ -5,7 +5,6 @@ use database::{
     INSERT_MOBI_BOOK_TOC, SELECT_MOBI_BOOK_SECTION_BY_ID, SELECT_MOBI_BOOK_TOC_BY_ID,
     SELECT_PGORESS_FROM_MOBI, UPDATE_MOBI_BOOK_PERCENTAGE_PROGRESS, UPDATE_MOBI_BOOK_PROGRESS,
 };
-use sqlx::types::chrono;
 use types::{
     FormatType, IBindingsBookContent, IBindingsMobiBook, IBindingsMobiBookStructure,
     IBindingsMobiMetadata, IBindingsMobiSection, IBindingsMobiToc, ProgressType,
@@ -134,7 +133,6 @@ impl MobiService {
             existing_map.insert(key_str, serde_json::Value::String(value));
         }
 
-        let now = chrono::Utc::now().timestamp();
         sqlx::query(UPDATE_MOBI_BOOK_PROGRESS)
             .bind(serde_json::to_string(&existing)?)
             .bind(id)
@@ -191,8 +189,6 @@ impl MobiService {
         percentage_progress: String,
     ) -> Result<(), Box<dyn std::error::Error>> {
         let conn = db.get_pool();
-
-        let now = chrono::Utc::now().timestamp();
 
         sqlx::query(UPDATE_MOBI_BOOK_PERCENTAGE_PROGRESS)
             .bind(percentage_progress)
