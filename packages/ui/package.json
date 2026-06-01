@@ -4,18 +4,19 @@
   "description": "",
   "main": "vitest.config.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "typecheck": "tsc --noEmit",
     "format": "biome format --write",
     "lint": "biome check .",
+    "test": "vitest",
     "check": "biome check . --write"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@chromatic-com/storybook": "^5.2.1",
     "@storybook/addon-a11y": "10.0.2",
     "@storybook/addon-docs": "10.0.2",
     "@storybook/addon-vitest": "10.0.2",

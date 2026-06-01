@@ -12,6 +12,7 @@
     "typecheck": "tsc --noEmit",
     "tauri": "tauri",
     "format": "biome format . --write",
+    "test": "vitest",
     "lint": "biome check .",
     "check": "biome check . --write"
   },
