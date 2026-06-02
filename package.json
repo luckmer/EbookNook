@@ -16,7 +16,6 @@
     "web-lint": "cd web && pnpm lint",
     "packages-lint": "cd packages/ui && pnpm lint",
     "lint": "pnpm web-lint && pnpm packages-lint",
-    "test": "vitest",
     "web-format": "cd web && pnpm format",
     "packages-format": "cd packages/ui && pnpm format",
     "format": "pnpm web-format && pnpm packages-format",
@@ -46,9 +45,9 @@
     "@types/react": "19.1.8",
     "@vitejs/plugin-react": "5.1.0",
     "cpx": "^1.5.0",
+    "jsdom": "29.1.1",
     "vite": "7.0.4",
-    "vitest": "4.0.6",
-    "jsdom": "29.1.1"
+    "vitest": "4.1.8"
   },
   "engines": {
     "pnpm": ">=10.14.0",
