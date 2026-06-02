@@ -8,6 +8,7 @@ export default defineConfig({
     alias: {
       '@foliate': path.resolve(__dirname, './src/foliate'),
       "@utils": path.resolve(__dirname, "./src/utils"),
+      "@interfaces": path.resolve(__dirname, "./src/interfaces"),
     },
   },
   test: {
