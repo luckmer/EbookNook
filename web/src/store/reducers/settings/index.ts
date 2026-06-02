@@ -3,7 +3,7 @@ import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
 
 export const settingsStore = 'settingsStore'
 
-const defaultState: ISettingsState = {
+export const defaultState: ISettingsState = {
   paragraphMargin: 0,
   defaultFontSize: 16,
   fontWeight: 400,
