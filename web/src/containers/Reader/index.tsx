@@ -258,6 +258,10 @@ const ReaderRoot = () => {
     })
 
     setNotesCache(notes)
+
+    return () => {
+      setNotesCache([])
+    }
   }, [isLoadingStructure, notes, notesCache])
 
   useEffect(() => {
