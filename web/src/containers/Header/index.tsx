@@ -45,7 +45,6 @@ const HeaderRoot = () => {
     return bookmarks.some((b) => isActiveCFI(b.cfi, readerLocation.cfi))
   }, [readerLocation.cfi, bookmarks])
 
-  console.log(bookmarks, readerLocation.cfi)
   return (
     <Header
       isBookmarkActive={isBookmarkActive}
