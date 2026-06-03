@@ -7,7 +7,7 @@ export interface ISearchState {
   value: string
 }
 
-const defaultState: ISearchState = {
+export const defaultState: ISearchState = {
   value: '',
 }
 

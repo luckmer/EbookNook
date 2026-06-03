@@ -12,7 +12,7 @@ export interface ISelectedBookmark {
 
 export interface IBookmarksState {
   selectedBookmark: ISelectedBookmark
-  bookmarks: Record<string, IBindingsBookmark[]>
+  bookmarks: Partial<Record<string, IBindingsBookmark[]>>
 }
 
 export const defaultSelectedBookmark = {
@@ -21,7 +21,7 @@ export const defaultSelectedBookmark = {
   selectedAt: Date.now().toString(),
 }
 
-const defaultState: IBookmarksState = {
+export const defaultState: IBookmarksState = {
   selectedBookmark: defaultSelectedBookmark,
   bookmarks: {},
 }
@@ -50,14 +50,15 @@ export const store = createSlice({
     updateBookmark(state, _: PayloadAction<IBindingsBookmark>) {
       return state
     },
+
     setAddBookmark(state, action: PayloadAction<IBindingsBookmark>) {
-      if (!state.bookmarks[action.payload.bookId]) {
-        state.bookmarks[action.payload.bookId] = []
+      const { bookId } = action.payload
+
+      if (!state.bookmarks[bookId]) {
+        state.bookmarks[bookId] = []
       }
 
-      state.bookmarks[action.payload.bookId].push(action.payload)
-
-      return state
+      state.bookmarks[bookId].push(action.payload)
     },
     setUpdateBookmark(state, action: PayloadAction<IBindingsBookmark>) {
       const bookmarks = state.bookmarks[action.payload.bookId]

@@ -28,7 +28,7 @@ const defaultOpenBookOverviewModalState: IOpenBookOverviewModal = {
   bookId: '',
 }
 
-const defaultState: IUiState = {
+export const defaultState: IUiState = {
   openBookOverviewModal: defaultOpenBookOverviewModalState,
   loaderState: {},
   scopedLoaderState: {},
