@@ -21,7 +21,7 @@ export const defaultActiveToc = {
   index: -1,
 }
 
-const defaultState: IBookState = {
+export const defaultState: IBookState = {
   selectedChapter: '',
   activeToc: defaultActiveToc,
   files: {},
@@ -176,6 +176,7 @@ export const store = createSlice({
       state.books = action.payload
       return state
     },
+
     setDeleteBook(state, _: PayloadAction<{ id: string; format: FormatType }>) {
       return state
     },
