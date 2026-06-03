@@ -21,7 +21,7 @@ export const defaultSelectedBookmark = {
   selectedAt: Date.now().toString(),
 }
 
-const defaultState: IBookmarksState = {
+export const defaultState: IBookmarksState = {
   selectedBookmark: defaultSelectedBookmark,
   bookmarks: {},
 }
@@ -32,10 +32,10 @@ export const store = createSlice({
   reducers: {
     load(state) {
       return state
-    },
+    }, //
     reset(state) {
       state.selectedBookmark = defaultState.selectedBookmark
-    },
+    }, //
     addBookmarkById(state, _: PayloadAction<IBindingsBookmark>) {
       return state
     },
@@ -73,7 +73,7 @@ export const store = createSlice({
       bookmarks[index] = action.payload
 
       return state
-    },
+    }, //
     setDeleteBookmark(state, action: PayloadAction<{ id: string; cfi: string }>) {
       const { id, cfi } = action.payload
 
@@ -82,10 +82,10 @@ export const store = createSlice({
       state.bookmarks[id] = state.bookmarks[id].filter((b) => b.cfi !== cfi)
 
       return state
-    },
+    }, //
     setSelectedBookmark(state, action: PayloadAction<ISelectedBookmark>) {
       state.selectedBookmark = action.payload
-    },
+    }, //
   },
 })
 

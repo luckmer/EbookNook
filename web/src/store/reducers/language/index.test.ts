@@ -10,7 +10,7 @@ describe('languageStore', () => {
         language: LANGUAGE.ENGLISH,
       }
 
-      expect(reducers(content, actions.setLanguage(LANGUAGE.ENGLISH))).toBe(content)
+      expect(reducers(defaultState, actions.setLanguage(LANGUAGE.ENGLISH))).toStrictEqual(content)
     })
 
     test('Should set Polish', () => {
@@ -19,7 +19,7 @@ describe('languageStore', () => {
         language: LANGUAGE.POLISH,
       }
 
-      expect(reducers(content, actions.setLanguage(LANGUAGE.POLISH))).toBe(content)
+      expect(reducers(defaultState, actions.setLanguage(LANGUAGE.POLISH))).toStrictEqual(content)
     })
   })
 })

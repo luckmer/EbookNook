@@ -26,11 +26,13 @@ describe('uiStore', () => {
         },
       }
 
-      expect(reducers(content, actions.setLoaderState(loaderStateContent))).toBe(content)
+      expect(reducers(defaultState, actions.setLoaderState(loaderStateContent))).toStrictEqual(
+        content,
+      )
     })
 
-    test('Should set multiple loader state', () => {
-      const loaderStateContent: { loader: LOADER_STATE; state: LoaderState } = {
+    test('should set multiple loader states', () => {
+      const isAddingBook: { loader: LOADER_STATE; state: LoaderState } = {
         loader: LOADER_STATE.IS_ADDING_BOOK,
         state: {
           status: LOADER_STATUS.IDLE,
@@ -44,15 +46,16 @@ describe('uiStore', () => {
         },
       }
 
-      const content = {
+      const stateAfterFirst = reducers(defaultState, actions.setLoaderState(isAddingBook))
+      const stateAfterSecond = reducers(stateAfterFirst, actions.setLoaderState(isAddingNote))
+
+      expect(stateAfterSecond).toStrictEqual({
         ...defaultState,
         loaderState: {
-          [loaderStateContent.loader]: loaderStateContent.state,
+          [isAddingBook.loader]: isAddingBook.state,
           [isAddingNote.loader]: isAddingNote.state,
         },
-      }
-
-      expect(reducers(content, actions.setLoaderState(loaderStateContent))).toBe(content)
+      })
     })
 
     test('should dynamically update loader state', () => {
@@ -70,7 +73,7 @@ describe('uiStore', () => {
         },
       }
 
-      expect(reducers(content, actions.setLoaderState(addingBookIdle))).toEqual(content)
+      expect(reducers(defaultState, actions.setLoaderState(addingBookIdle))).toStrictEqual(content)
 
       const addingBookLoader: { loader: LOADER_STATE; state: LoaderState } = {
         loader: LOADER_STATE.IS_ADDING_NOTE,
@@ -86,7 +89,9 @@ describe('uiStore', () => {
         },
       }
 
-      expect(reducers(content, actions.setLoaderState(addingBookLoader))).toEqual(contentAfter)
+      expect(reducers(defaultState, actions.setLoaderState(addingBookLoader))).toStrictEqual(
+        contentAfter,
+      )
     })
   })
 
@@ -109,7 +114,9 @@ describe('uiStore', () => {
         },
       }
 
-      expect(reducers(content, actions.setScopedLoaderState(addingBookIdle))).toEqual(content)
+      expect(reducers(defaultState, actions.setScopedLoaderState(addingBookIdle))).toStrictEqual(
+        content,
+      )
     })
 
     test('should add a new loader under an existing scope without removing other loaders', () => {
@@ -163,13 +170,13 @@ describe('uiStore', () => {
     test('should open chapters drawer', () => {
       const content = { ...defaultState, openChaptersDrawer: true }
 
-      expect(reducers(content, actions.setOpenChaptersDrawer(true))).toBe(content)
+      expect(reducers(defaultState, actions.setOpenChaptersDrawer(true))).toStrictEqual(content)
     })
 
     test('Should hide chapters drawer', () => {
       const content = { ...defaultState, openChaptersDrawer: false }
 
-      expect(reducers(content, actions.setOpenChaptersDrawer(false))).toBe(content)
+      expect(reducers(defaultState, actions.setOpenChaptersDrawer(false))).toStrictEqual(content)
     })
   })
 
@@ -177,13 +184,13 @@ describe('uiStore', () => {
     test('should open settings modal', () => {
       const content = { ...defaultState, openSettingsModal: true }
 
-      expect(reducers(content, actions.setOpenSettingsModal(true))).toBe(content)
+      expect(reducers(defaultState, actions.setOpenSettingsModal(true))).toStrictEqual(content)
     })
 
     test('Should hide settings modal', () => {
       const content = { ...defaultState, openSettingsModal: false }
 
-      expect(reducers(content, actions.setOpenSettingsModal(false))).toBe(content)
+      expect(reducers(defaultState, actions.setOpenSettingsModal(false))).toStrictEqual(content)
     })
   })
 
@@ -197,7 +204,7 @@ describe('uiStore', () => {
 
       const content = { ...defaultState, openBookOverviewModal: data }
 
-      expect(reducers(content, actions.setOpenBookOverviewModal(data))).toBe(content)
+      expect(reducers(defaultState, actions.setOpenBookOverviewModal(data))).toStrictEqual(content)
     })
 
     test('Should hide book overview modal', () => {
@@ -209,7 +216,7 @@ describe('uiStore', () => {
 
       const content = { ...defaultState, openBookOverviewModal: data }
 
-      expect(reducers(content, actions.setOpenBookOverviewModal(data))).toBe(content)
+      expect(reducers(defaultState, actions.setOpenBookOverviewModal(data))).toStrictEqual(content)
     })
   })
 
@@ -217,13 +224,13 @@ describe('uiStore', () => {
     test('should open create note modal', () => {
       const content = { ...defaultState, openCreateNoteModal: true }
 
-      expect(reducers(content, actions.setOpenCreateNoteModal(true))).toBe(content)
+      expect(reducers(defaultState, actions.setOpenCreateNoteModal(true))).toStrictEqual(content)
     })
 
     test('Should hide create note modal', () => {
       const content = { ...defaultState, openCreateNoteModal: false }
 
-      expect(reducers(content, actions.setOpenCreateNoteModal(false))).toBe(content)
+      expect(reducers(defaultState, actions.setOpenCreateNoteModal(false))).toStrictEqual(content)
     })
   })
 
@@ -231,13 +238,13 @@ describe('uiStore', () => {
     test('Should hide header', () => {
       const hidden = { ...defaultState, hideHeader: true }
 
-      expect(reducers(hidden, actions.setHideHeader(true))).toBe(hidden)
+      expect(reducers(hidden, actions.setHideHeader(true))).toStrictEqual(hidden)
     })
 
     test('Should show header', () => {
       const hidden = { ...defaultState, hideHeader: false }
 
-      expect(reducers(hidden, actions.setHideHeader(false))).toBe(hidden)
+      expect(reducers(hidden, actions.setHideHeader(false))).toStrictEqual(hidden)
     })
   })
 
@@ -245,13 +252,17 @@ describe('uiStore', () => {
     test('should open create bookmark modal', () => {
       const content = { ...defaultState, openCreateBookmarkModal: true }
 
-      expect(reducers(content, actions.setOpenCreateBookmarkModal(true))).toBe(content)
+      expect(reducers(defaultState, actions.setOpenCreateBookmarkModal(true))).toStrictEqual(
+        content,
+      )
     })
 
     test('Should hide create bookmark modal', () => {
       const content = { ...defaultState, openCreateBookmarkModal: false }
 
-      expect(reducers(content, actions.setOpenCreateBookmarkModal(false))).toBe(content)
+      expect(reducers(defaultState, actions.setOpenCreateBookmarkModal(false))).toStrictEqual(
+        content,
+      )
     })
   })
 })

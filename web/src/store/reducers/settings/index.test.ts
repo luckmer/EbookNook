@@ -15,7 +15,7 @@ describe('settingsStore', () => {
         defaultFontSize: 16,
       }
 
-      expect(reducers(content, actions.setDefaultFontSize(16))).toBe(content)
+      expect(reducers(defaultState, actions.setDefaultFontSize(16))).toStrictEqual(content)
     })
 
     test('should increase font size by 1', () => {
@@ -24,7 +24,7 @@ describe('settingsStore', () => {
         defaultFontSize: 17,
       }
 
-      expect(reducers(content, actions.setDefaultFontSize(17))).toBe(content)
+      expect(reducers(defaultState, actions.setDefaultFontSize(17))).toStrictEqual(content)
     })
 
     test('should decrease font size by 1', () => {
@@ -33,7 +33,7 @@ describe('settingsStore', () => {
         defaultFontSize: 15,
       }
 
-      expect(reducers(content, actions.setDefaultFontSize(15))).toBe(content)
+      expect(reducers(defaultState, actions.setDefaultFontSize(15))).toStrictEqual(content)
     })
   })
 
@@ -44,7 +44,7 @@ describe('settingsStore', () => {
         fontWeight: 400,
       }
 
-      expect(reducers(content, actions.setFontWeight(400))).toBe(content)
+      expect(reducers(defaultState, actions.setFontWeight(400))).toStrictEqual(content)
     })
 
     test('should increase font weight by 100', () => {
@@ -53,7 +53,7 @@ describe('settingsStore', () => {
         fontWeight: 500,
       }
 
-      expect(reducers(content, actions.setFontWeight(500))).toBe(content)
+      expect(reducers(defaultState, actions.setFontWeight(500))).toStrictEqual(content)
     })
 
     test('should decrease font size by 100', () => {
@@ -62,7 +62,7 @@ describe('settingsStore', () => {
         fontWeight: 300,
       }
 
-      expect(reducers(content, actions.setFontWeight(300))).toBe(content)
+      expect(reducers(defaultState, actions.setFontWeight(300))).toStrictEqual(content)
     })
   })
 
@@ -73,7 +73,7 @@ describe('settingsStore', () => {
         letterSpacing: 0,
       }
 
-      expect(reducers(content, actions.setLetterSpacing(0))).toBe(content)
+      expect(reducers(defaultState, actions.setLetterSpacing(0))).toStrictEqual(content)
     })
 
     test('should increase letter spacing by 1', () => {
@@ -82,7 +82,7 @@ describe('settingsStore', () => {
         letterSpacing: 1,
       }
 
-      expect(reducers(content, actions.setLetterSpacing(1))).toBe(content)
+      expect(reducers(defaultState, actions.setLetterSpacing(1))).toStrictEqual(content)
     })
 
     test('should decrease letter spacing by 1', () => {
@@ -91,7 +91,7 @@ describe('settingsStore', () => {
         letterSpacing: 0,
       }
 
-      expect(reducers(content, actions.setLetterSpacing(0))).toBe(content)
+      expect(reducers(defaultState, actions.setLetterSpacing(0))).toStrictEqual(content)
     })
   })
 
@@ -102,7 +102,7 @@ describe('settingsStore', () => {
         textIndent: 0,
       }
 
-      expect(reducers(content, actions.setTextIndent(0))).toBe(content)
+      expect(reducers(defaultState, actions.setTextIndent(0))).toStrictEqual(content)
     })
 
     test('should increase text Indent by 1', () => {
@@ -111,7 +111,7 @@ describe('settingsStore', () => {
         textIndent: 1,
       }
 
-      expect(reducers(content, actions.setTextIndent(1))).toBe(content)
+      expect(reducers(defaultState, actions.setTextIndent(1))).toStrictEqual(content)
     })
 
     test('should decrease text Indent by 1', () => {
@@ -120,7 +120,7 @@ describe('settingsStore', () => {
         textIndent: 0,
       }
 
-      expect(reducers(content, actions.setTextIndent(0))).toBe(content)
+      expect(reducers(defaultState, actions.setTextIndent(0))).toStrictEqual(content)
     })
   })
 
@@ -131,7 +131,7 @@ describe('settingsStore', () => {
         lineHeight: 1.5,
       }
 
-      expect(reducers(content, actions.setLineHeight(1.5))).toBe(content)
+      expect(reducers(defaultState, actions.setLineHeight(1.5))).toStrictEqual(content)
     })
 
     test('should increase line height by 1', () => {
@@ -140,7 +140,7 @@ describe('settingsStore', () => {
         lineHeight: 2.5,
       }
 
-      expect(reducers(content, actions.setLineHeight(2.5))).toBe(content)
+      expect(reducers(defaultState, actions.setLineHeight(2.5))).toStrictEqual(content)
     })
 
     test('should decrease line height by 1', () => {
@@ -149,7 +149,7 @@ describe('settingsStore', () => {
         lineHeight: 1.5,
       }
 
-      expect(reducers(content, actions.setLineHeight(1.5))).toBe(content)
+      expect(reducers(defaultState, actions.setLineHeight(1.5))).toStrictEqual(content)
     })
   })
 
@@ -161,7 +161,7 @@ describe('settingsStore', () => {
         fontWeight: 700,
       }
 
-      expect(reducers(content, actions.setResetFontSettings())).toEqual({
+      expect(reducers(defaultState, actions.setResetFontSettings())).toStrictEqual({
         ...content,
         defaultFontSize: 16,
         fontWeight: 400,
@@ -176,7 +176,7 @@ describe('settingsStore', () => {
         paragraphMargin: 0,
       }
 
-      expect(reducers(content, actions.setParagraphMargin(0))).toBe(content)
+      expect(reducers(defaultState, actions.setParagraphMargin(0))).toStrictEqual(content)
     })
 
     test('should increase paragraph margin', () => {
@@ -185,7 +185,7 @@ describe('settingsStore', () => {
         paragraphMargin: 2.5,
       }
 
-      expect(reducers(content, actions.setParagraphMargin(2.5))).toBe(content)
+      expect(reducers(defaultState, actions.setParagraphMargin(2.5))).toStrictEqual(content)
     })
 
     test('should decrease paragraph margin', () => {
@@ -194,7 +194,7 @@ describe('settingsStore', () => {
         paragraphMargin: 1.5,
       }
 
-      expect(reducers(content, actions.setParagraphMargin(1.5))).toBe(content)
+      expect(reducers(defaultState, actions.setParagraphMargin(1.5))).toStrictEqual(content)
     })
   })
 
@@ -209,7 +209,7 @@ describe('settingsStore', () => {
         lineHeight: 2,
       }
 
-      expect(reducers(content, actions.setResetLayoutSettings())).toEqual({
+      expect(reducers(defaultState, actions.setResetLayoutSettings())).toEqual({
         ...content,
         wordSpacing: 0,
         letterSpacing: 0,

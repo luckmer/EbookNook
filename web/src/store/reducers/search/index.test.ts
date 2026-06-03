@@ -15,7 +15,7 @@ describe('searchStore', () => {
         value: 'Lorem ipsum',
       }
 
-      expect(reducers(content, actions.setValue('Lorem ipsum'))).toBe(content)
+      expect(reducers(defaultState, actions.setValue('Lorem ipsum'))).toStrictEqual(content)
     })
 
     test('should reset value', () => {
@@ -24,7 +24,7 @@ describe('searchStore', () => {
         value: '',
       }
 
-      expect(reducers(content, actions.setValue(''))).toBe(content)
+      expect(reducers(defaultState, actions.setValue(''))).toStrictEqual(content)
     })
 
     test('should handle whitespace-only value', () => {
