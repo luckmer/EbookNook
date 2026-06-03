@@ -2,6 +2,22 @@ import type { IBindingsBookmark } from '@bindings/bookmarks'
 import { describe, expect, test } from 'vitest'
 import { actions, defaultState, type ISelectedBookmark, reducers } from '.'
 
+const baseBookmark: IBindingsBookmark = {
+  bookId: '123',
+  cfi: 'epubcfi(/6/12!/4/2/2[tagalog],/2[rw-title-block_43539-077535482],/42[rw-p_43542-151052214]/1:283)',
+  chapter: 'Chapter 1',
+  createdAt: Date.now().toString(),
+  updatedAt: Date.now().toString(),
+  format: 'EPUB',
+  title: 'Book title',
+}
+
+const selectedBookmark: ISelectedBookmark = {
+  cfi: 'epubcfi(/6/12!/4/2/2[tagalog],/2[rw-title-block_43539-077535482],/42[rw-p_43542-151052214]/1:283)',
+  selectedAt: '1780510075459',
+  hasChapter: true,
+}
+
 describe('bookmarksStore', () => {
   describe('load', () => {
     test('Load initial state', () => {
@@ -15,16 +31,6 @@ describe('bookmarksStore', () => {
     })
 
     test('does not clear bookmarks on reset', () => {
-      const baseBookmark: IBindingsBookmark = {
-        bookId: '123',
-        cfi: 'epubcfi(/6/12!/4/2/2[tagalog],/2[rw-title-block_43539-077535482],/42[rw-p_43542-151052214]/1:283)',
-        chapter: 'Chapter 1',
-        createdAt: Date.now().toString(),
-        updatedAt: Date.now().toString(),
-        format: 'EPUB',
-        title: 'Book title',
-      }
-
       const stateWithBookmarks = reducers(defaultState, actions.setAddBookmark(baseBookmark))
       const result = reducers(stateWithBookmarks, actions.reset())
 
@@ -33,12 +39,6 @@ describe('bookmarksStore', () => {
     })
 
     test('Reset initial state with bookmarks', () => {
-      const selectedBookmark: ISelectedBookmark = {
-        cfi: 'epubcfi(/6/12!/4/2/2[tagalog],/2[rw-title-block_43539-077535482],/42[rw-p_43542-151052214]/1:283)',
-        selectedAt: '1780510075459',
-        hasChapter: true,
-      }
-
       const stateWithBookmark = reducers(
         defaultState,
         actions.setSelectedBookmark(selectedBookmark),
@@ -51,32 +51,15 @@ describe('bookmarksStore', () => {
 
   describe('setSelectedBookmark', () => {
     test('Set custom bookmark', () => {
-      const selectedBookmark: ISelectedBookmark = {
-        cfi: 'epubcfi(/6/12!/4/2/2[tagalog],/2[rw-title-block_43539-077535482],/42[rw-p_43542-151052214]/1:283)',
-        selectedAt: '1780510075459',
-        hasChapter: true,
-      }
-
       const stateWithBookmark = reducers(
         defaultState,
         actions.setSelectedBookmark(selectedBookmark),
       )
-
       expect(stateWithBookmark).toEqual({ ...defaultState, selectedBookmark })
     })
   })
 
   describe('setDeleteBookmark', () => {
-    const baseBookmark: IBindingsBookmark = {
-      bookId: '123',
-      cfi: 'epubcfi(/6/12!/4/2/2[tagalog],/2[rw-title-block_43539-077535482],/42[rw-p_43542-151052214]/1:283)',
-      chapter: 'Chapter 1',
-      createdAt: Date.now().toString(),
-      updatedAt: Date.now().toString(),
-      format: 'EPUB',
-      title: 'Book title',
-    }
-
     const bookmarkB: IBindingsBookmark = {
       ...baseBookmark,
       cfi: 'epubcfi(/6/8!/4/2/4)',
@@ -167,16 +150,6 @@ describe('bookmarksStore', () => {
   })
 
   describe('setUpdateBookmark', () => {
-    const baseBookmark: IBindingsBookmark = {
-      bookId: '123',
-      cfi: 'epubcfi(/6/12!/4/2/2[tagalog],/2[rw-title-block_43539-077535482],/42[rw-p_43542-151052214]/1:283)',
-      chapter: 'Chapter 1',
-      createdAt: Date.now().toString(),
-      updatedAt: Date.now().toString(),
-      format: 'EPUB',
-      title: 'Book title',
-    }
-
     const stateWithBookmarks = {
       ...defaultState,
       bookmarks: { '123': [baseBookmark] },
@@ -209,16 +182,6 @@ describe('bookmarksStore', () => {
   })
 
   describe('setAddBookmark', () => {
-    const baseBookmark: IBindingsBookmark = {
-      bookId: '123',
-      cfi: 'epubcfi(/6/12!/4/2/2[tagalog],/2[rw-title-block_43539-077535482],/42[rw-p_43542-151052214]/1:283)',
-      chapter: 'Chapter 1',
-      createdAt: Date.now().toString(),
-      updatedAt: Date.now().toString(),
-      format: 'EPUB',
-      title: 'Book title',
-    }
-
     test('adds bookmark to an existing book', () => {
       const stateWithBookmarks = {
         ...defaultState,
@@ -240,32 +203,12 @@ describe('bookmarksStore', () => {
 
   describe('updateBookmark', () => {
     test('dispatches without modifying state', () => {
-      const baseBookmark: IBindingsBookmark = {
-        bookId: '123',
-        cfi: 'epubcfi(/6/12!/4/2/2[tagalog],/2[rw-title-block_43539-077535482],/42[rw-p_43542-151052214]/1:283)',
-        chapter: 'Chapter 1',
-        createdAt: Date.now().toString(),
-        updatedAt: Date.now().toString(),
-        format: 'EPUB',
-        title: 'Book title',
-      }
-
       expect(reducers(undefined, actions.updateBookmark(baseBookmark))).toEqual(defaultState)
     })
   })
 
   describe('deleteBookmark', () => {
     test('dispatches without modifying state', () => {
-      const baseBookmark: IBindingsBookmark = {
-        bookId: '123',
-        cfi: 'epubcfi(/6/12!/4/2/2[tagalog],/2[rw-title-block_43539-077535482],/42[rw-p_43542-151052214]/1:283)',
-        chapter: 'Chapter 1',
-        createdAt: Date.now().toString(),
-        updatedAt: Date.now().toString(),
-        format: 'EPUB',
-        title: 'Book title',
-      }
-
       expect(
         reducers(undefined, actions.deleteBookmark({ id: '123', cfi: baseBookmark.cfi })),
       ).toEqual(defaultState)
@@ -274,32 +217,12 @@ describe('bookmarksStore', () => {
 
   describe('addBookmarkById', () => {
     test('dispatches without modifying state', () => {
-      const baseBookmark: IBindingsBookmark = {
-        bookId: '123',
-        cfi: 'epubcfi(/6/12!/4/2/2[tagalog],/2[rw-title-block_43539-077535482],/42[rw-p_43542-151052214]/1:283)',
-        chapter: 'Chapter 1',
-        createdAt: Date.now().toString(),
-        updatedAt: Date.now().toString(),
-        format: 'EPUB',
-        title: 'Book title',
-      }
-
       expect(reducers(undefined, actions.addBookmarkById(baseBookmark))).toEqual(defaultState)
     })
   })
 
   describe('setBookmarks', () => {
     test('sets bookmarks for a given book id', () => {
-      const baseBookmark: IBindingsBookmark = {
-        bookId: '123',
-        cfi: 'epubcfi(/6/12!/4/2/2[tagalog],/2[rw-title-block_43539-077535482],/42[rw-p_43542-151052214]/1:283)',
-        chapter: 'Chapter 1',
-        createdAt: Date.now().toString(),
-        updatedAt: Date.now().toString(),
-        format: 'EPUB',
-        title: 'Book title',
-      }
-
       const bookmarkB: IBindingsBookmark = {
         ...baseBookmark,
         cfi: 'epubcfi(/6/8!/4/2/4)',
@@ -328,16 +251,6 @@ describe('bookmarksStore', () => {
     })
 
     test('overwrites existing bookmarks for a given book id', () => {
-      const baseBookmark: IBindingsBookmark = {
-        bookId: '123',
-        cfi: 'epubcfi(/6/12!/4/2/2[tagalog],/2[rw-title-block_43539-077535482],/42[rw-p_43542-151052214]/1:283)',
-        chapter: 'Chapter 1',
-        createdAt: Date.now().toString(),
-        updatedAt: Date.now().toString(),
-        format: 'EPUB',
-        title: 'Book title',
-      }
-
       const stateWithBookmarks = {
         ...defaultState,
         bookmarks: { '123': [baseBookmark] },
