@@ -25,8 +25,9 @@ export default defineConfig({
           'src/store/selectors/**',
           'src/interfaces/**',
           "src/language/**",
-          "src/utils/static/**",
-          "src/store/reducers/**/config.ts"
+          "src/utils/static.ts",
+          "src/utils/regex.ts",
+          "src/store/reducers/**/config.ts",
 
         ],
       thresholds: {

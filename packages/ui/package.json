@@ -10,6 +10,7 @@
     "format": "biome format --write",
     "lint": "biome check .",
     "test": "vitest",
+    "coverage": "vitest run --coverage",
     "check": "biome check . --write"
   },
   "keywords": [],
