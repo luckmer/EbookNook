@@ -28,7 +28,10 @@ export default defineConfig({
           "src/utils/static.ts",
           "src/utils/regex.ts",
           "src/store/reducers/**/config.ts",
-
+          "src/store/reducers/index.ts",
+          "src/store/sagas/index.ts",
+          "src/store/helper/index.ts",
+          "src/store/store.ts"
         ],
       thresholds: {
         lines: 100,
