@@ -147,6 +147,8 @@ describe(booksStore, () => {
     test('sets active book', () => {
       const result = reducers(defaultState, actions.setActiveBook(book))
 
+      expect(result.files[book.id]).not.toBeUndefined()
+      expect(result.files[book.id]).not.toBeNull()
       expect(result.files[book.id]).toEqual(book.book)
     })
 
@@ -155,6 +157,8 @@ describe(booksStore, () => {
       const updatedBook = { ...book, book: { ...book.book, title: 'Updated title' } }
       const result = reducers(stateWithBook, actions.setActiveBook(updatedBook))
 
+      expect(result.files[book.id]).not.toBeUndefined()
+      expect(result.files[book.id]).not.toBeNull()
       expect(result.files[book.id]).toEqual(updatedBook.book)
     })
 
@@ -163,7 +167,12 @@ describe(booksStore, () => {
       const stateWithBook = reducers(defaultState, actions.setActiveBook(book))
       const result = reducers(stateWithBook, actions.setActiveBook(secondBook))
 
+      expect(result.files[book.id]).not.toBeUndefined()
+      expect(result.files[book.id]).not.toBeNull()
       expect(result.files[book.id]).toEqual(book.book)
+
+      expect(result.files[secondBook.id]).not.toBeUndefined()
+      expect(result.files[secondBook.id]).not.toBeNull()
       expect(result.files[secondBook.id]).toEqual(secondBook.book)
     })
   })
@@ -172,6 +181,8 @@ describe(booksStore, () => {
     test('Sets selected chapter', () => {
       const result = reducers(defaultState, actions.setSelectedChapter(book.id))
 
+      expect(result.selectedChapter).not.toBeUndefined()
+      expect(result.selectedChapter).not.toBeNull()
       expect(result.selectedChapter).toEqual(book.id)
     })
 
@@ -179,6 +190,8 @@ describe(booksStore, () => {
       const stateWithChapter = reducers(defaultState, actions.setSelectedChapter(book.id))
       const result = reducers(stateWithChapter, actions.setSelectedChapter('new-chapter-id'))
 
+      expect(result.selectedChapter).not.toBeUndefined()
+      expect(result.selectedChapter).not.toBeNull()
       expect(result.selectedChapter).toEqual('new-chapter-id')
     })
   })
@@ -186,6 +199,8 @@ describe(booksStore, () => {
   describe('setActiveToc', () => {
     test('Sets active toc', () => {
       const result = reducers(defaultState, actions.setActiveToc(toc))
+      expect(result.activeToc).not.toBeUndefined()
+      expect(result.activeToc).not.toBeNull()
       expect(result.activeToc).toEqual(toc)
     })
 
@@ -194,6 +209,8 @@ describe(booksStore, () => {
       const updatedToc = { ...toc, label: 'Updated label' }
 
       const result = reducers(stateWithToc, actions.setActiveToc(updatedToc))
+      expect(result.activeToc).not.toBeUndefined()
+      expect(result.activeToc).not.toBeNull()
       expect(result.activeToc).toEqual(updatedToc)
     })
   })
@@ -205,6 +222,8 @@ describe(booksStore, () => {
         actions.setBook({ id: bindingsBook.id, book: bindingsBook }),
       )
 
+      expect(result.books.EPUB![bindingsBook.id]).not.toBeUndefined()
+      expect(result.books.EPUB![bindingsBook.id]).not.toBeNull()
       expect(result.books.EPUB![bindingsBook.id]).toEqual(bindingsBook)
     })
 
@@ -228,6 +247,8 @@ describe(booksStore, () => {
         actions.setBook({ id: bindingsBook.id, book: updatedBook }),
       )
 
+      expect(result.books.EPUB![bindingsBook.id]).not.toBeUndefined()
+      expect(result.books.EPUB![bindingsBook.id]).not.toBeNull()
       expect(result.books.EPUB![bindingsBook.id]).toEqual(updatedBook)
     })
 
@@ -242,7 +263,12 @@ describe(booksStore, () => {
         actions.setBook({ id: secondBook.id, book: secondBook }),
       )
 
+      expect(result.books.EPUB![bindingsBook.id]).not.toBeUndefined()
+      expect(result.books.EPUB![bindingsBook.id]).not.toBeNull()
       expect(result.books.EPUB![bindingsBook.id]).toEqual(bindingsBook)
+
+      expect(result.books.EPUB![secondBook.id]).not.toBeUndefined()
+      expect(result.books.EPUB![secondBook.id]).not.toBeNull()
       expect(result.books.EPUB![secondBook.id]).toEqual(secondBook)
     })
 
@@ -267,6 +293,8 @@ describe(booksStore, () => {
       )
       const result = reducers(state, actions.setBookStructure({ id: bindingsBook.id, structure }))
 
+      expect(result.books.EPUB![bindingsBook.id]).not.toBeUndefined()
+      expect(result.books.EPUB![bindingsBook.id]).not.toBeNull()
       expect(result.books.EPUB![bindingsBook.id]).toEqual({
         ...bindingsBook,
         sections: structure.sections,
@@ -344,6 +372,8 @@ describe(booksStore, () => {
         actions.setBookStructure({ id: mobiBook.id, structure: mobiStructure }),
       )
 
+      expect(result.books.MOBI![mobiBook.id]).not.toBeUndefined()
+      expect(result.books.MOBI![mobiBook.id]).not.toBeNull()
       expect(result.books.MOBI![mobiBook.id]).toEqual({
         ...mobiBook,
         sections: mobiStructure.sections,
@@ -386,6 +416,8 @@ describe(booksStore, () => {
         actions.setBookStructure({ id: pdfBook.id, structure: pdfStructure }),
       )
 
+      expect(result.books.PDF![pdfBook.id]).not.toBeUndefined()
+      expect(result.books.PDF![pdfBook.id]).not.toBeNull()
       expect(result.books.PDF![pdfBook.id]).toEqual({
         ...pdfBook,
         sections: pdfStructure.sections,
@@ -455,6 +487,9 @@ describe(booksStore, () => {
       )
 
       const book = result.books.EPUB!['123']!
+      expect(book).not.toBeUndefined()
+      expect(book).not.toBeNull()
+
       expect(book.metadata).toMatchObject(updatedMetadata)
     })
 
@@ -527,7 +562,11 @@ describe(booksStore, () => {
         }),
       )
 
-      expect(result.books.MOBI![mobiBook.id]!.metadata).toMatchObject(updatedMetadata)
+      const metadata = result.books.MOBI![mobiBook.id]!.metadata
+
+      expect(metadata).not.toBeUndefined()
+      expect(metadata).not.toBeNull()
+      expect(metadata).toMatchObject(updatedMetadata)
     })
 
     test('updates PDF book metadata', () => {
@@ -569,7 +608,12 @@ describe(booksStore, () => {
         }),
       )
 
-      expect(result.books.PDF![pdfBook.id]!.metadata).toMatchObject(updatedMetadata)
+      const metadata = result.books.PDF![pdfBook.id]!.metadata
+
+      expect(metadata).not.toBeUndefined()
+      expect(metadata).not.toBeNull()
+
+      expect(metadata).toMatchObject(updatedMetadata)
     })
 
     test('keeps existing values for non updated fields', () => {
@@ -635,8 +679,18 @@ describe(booksStore, () => {
         }),
       )
 
-      expect(result.books.EPUB!['123']!.percentageProgress).toEqual('50')
-      expect(result.books.EPUB!['123']!.progress.CFI!).toEqual('epubcfi(/6/8!/4/2/4)')
+      const percentageProgress = result.books.EPUB!['123']!.percentageProgress
+
+      expect(percentageProgress).not.toBeUndefined()
+      expect(percentageProgress).not.toBeNull()
+
+      const epubCFI = result.books.EPUB!['123']!.progress.CFI!
+
+      expect(epubCFI).not.toBeUndefined()
+      expect(epubCFI).not.toBeNull()
+
+      expect(percentageProgress).toEqual('50')
+      expect(epubCFI).toEqual('epubcfi(/6/8!/4/2/4)')
     })
 
     test('ignores unknown book id', () => {
@@ -717,6 +771,9 @@ describe(booksStore, () => {
       const result = reducers(stateWithBooks, actions.deleteBook({ id: '123', format: 'EPUB' }))
 
       expect(result.books.EPUB!['123']).toBeUndefined()
+
+      expect(result.books.EPUB!['456']).not.toBeUndefined()
+      expect(result.books.EPUB!['456']).not.toBeNull()
       expect(result.books.EPUB!['456']).toEqual(secondBook)
     })
 
@@ -731,6 +788,8 @@ describe(booksStore, () => {
       const file = new File([], 'epub', { type: 'application/epub+zip' })
       const result = reducers(defaultState, actions.setFile({ id: '123', file }))
 
+      expect(result.files['123']).not.toBeUndefined()
+      expect(result.files['123']).not.toBeNull()
       expect(result.files['123']).toEqual(file)
     })
   })

@@ -159,7 +159,12 @@ describe('bookmarksStore', () => {
       const updatedBookmark = { ...baseBookmark, chapter: 'Chapter 2' }
       const result = reducers(stateWithBookmarks, actions.setUpdateBookmark(updatedBookmark))
 
-      expect(result.bookmarks['123'][0]).toEqual(updatedBookmark)
+      const data = result.bookmarks['123']![0]
+
+      expect(data).not.toBeUndefined()
+      expect(data).not.toBeNull()
+
+      expect(result.bookmarks['123']![0]).toEqual(updatedBookmark)
     })
 
     test('ignores unknown book id', () => {
