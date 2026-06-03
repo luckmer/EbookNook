@@ -37,6 +37,37 @@ describe('settingsStore', () => {
     })
   })
 
+  describe('setWordSpacing', () => {
+    test('should set default word spacing', () => {
+      const content = {
+        ...defaultState,
+        wordSpacing: 0,
+      }
+
+      const state = reducers(defaultState, actions.setWordSpacing(1))
+      expect(reducers(state, actions.setWordSpacing(0))).toStrictEqual(content)
+    })
+
+    test('should increase word spacing by 1', () => {
+      const content = {
+        ...defaultState,
+        wordSpacing: 1,
+      }
+
+      expect(reducers(defaultState, actions.setWordSpacing(1))).toStrictEqual(content)
+    })
+
+    test('should decrease word spacing by 1', () => {
+      const content = {
+        ...defaultState,
+        wordSpacing: 0,
+      }
+
+      const state = reducers(defaultState, actions.setWordSpacing(1))
+      expect(reducers(state, actions.setWordSpacing(0))).toStrictEqual(content)
+    })
+  })
+
   describe('setFontWeight', () => {
     test('should set default font weight', () => {
       const content = {
