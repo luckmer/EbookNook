@@ -26,11 +26,17 @@ pub const UPDATE_NOTE: &str = r#"
     WHERE book_id = ? AND note_id = ?
 "#;
 
-pub const SELECT_NOTE: &str = r#"
+pub const SELECT_NOTE_BY_BOOK_ID: &str = r#"
     SELECT book_id, note_id, value, note, page, chapter, title, color, text, created_at, updated_at
     FROM notes_table
     WHERE book_id = ?1
     ORDER BY created_at DESC
+"#;
+
+pub const SELECT_NOTE_BY_ID: &str = r#"
+    SELECT book_id, note_id, value, note, page, chapter, title, color, text, created_at, updated_at
+    FROM notes_table
+    WHERE book_id = ?1 AND note_id = ?2
 "#;
 
 pub const INSERT_NOTE: &str = r#"

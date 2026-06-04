@@ -52,10 +52,7 @@ async fn notes_expect_unique_note() -> Result<(), Box<dyn std::error::Error>> {
     service.add_note(&db, note.clone()).await?;
     let result = service.add_note(&db, note).await;
 
-    assert!(
-        result.is_err(),
-        "Expected a unique constraint error on duplicate insert"
-    );
+    assert!(result.is_err(), "Note exist");
 
     let notes = service.get_notes_by_book_id(&db, "123".to_string()).await?;
     assert_eq!(notes.len(), 1, "Expected exactly 1 note to be returned");
