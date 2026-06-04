@@ -40,13 +40,10 @@ impl NotesService {
     ) -> Result<(), Box<dyn std::error::Error>> {
         let conn = db.get_pool();
 
-        let note_exist = self
-            .note_exist(db, &note.book_id, &note.note_id)
-            .await
-            .is_ok();
+        let note_exist = self.note_exist(db, &note.book_id, &note.note_id).await?;
 
         if note_exist {
-            return Err("note exist".into());
+            return Err("Note exist".into());
         }
 
         let res = sqlx::query(INSERT_NOTE)
@@ -93,25 +90,6 @@ impl NotesService {
         Ok(notes)
     }
 
-    pub async fn get_note_by_id(
-        &self,
-        db: &DatabaseManager,
-        id: &String,
-        note_id: &String,
-    ) -> Result<IBindingsNote, Box<dyn std::error::Error>> {
-        let conn = db.get_pool();
-
-        let raw_note = sqlx::query(SELECT_NOTE_BY_ID)
-            .bind(id)
-            .bind(note_id)
-            .fetch_one(conn)
-            .await?;
-
-        let note = self.parse_note(raw_note)?;
-
-        Ok(note)
-    }
-
     pub async fn note_exist(
         &self,
         db: &DatabaseManager,
@@ -130,6 +108,31 @@ impl NotesService {
         Ok(note_exist)
     }
 
+    pub async fn get_note_by_id(
+        &self,
+        db: &DatabaseManager,
+        id: &String,
+        note_id: &String,
+    ) -> Result<IBindingsNote, Box<dyn std::error::Error>> {
+        let conn = db.get_pool();
+
+        let note_exist = self.note_exist(db, id, note_id).await?;
+
+        if !note_exist {
+            return Err("Note not found".into());
+        }
+
+        let raw_note = sqlx::query(SELECT_NOTE_BY_ID)
+            .bind(id)
+            .bind(note_id)
+            .fetch_one(conn)
+            .await?;
+
+        let note = self.parse_note(raw_note)?;
+
+        Ok(note)
+    }
+
     pub async fn delete_note(
         &self,
         db: &DatabaseManager,
@@ -138,7 +141,7 @@ impl NotesService {
     ) -> Result<(), Box<dyn std::error::Error>> {
         let conn = db.get_pool();
 
-        let note_exist = self.note_exist(db, &id, &note_id).await.is_ok();
+        let note_exist = self.note_exist(db, &id, &note_id).await?;
 
         if !note_exist {
             return Err("Note not found".into());
@@ -164,20 +167,15 @@ impl NotesService {
     ) -> Result<(), Box<dyn std::error::Error>> {
         let conn = db.get_pool();
 
-        let note_exist = self
-            .note_exist(db, &note.book_id, &note.note_id)
-            .await
-            .is_ok();
+        let note_exist = self.note_exist(db, &note.book_id, &note.note_id).await?;
 
         if !note_exist {
             return Err("Note not found".into());
         }
 
-        let now = chrono::Utc::now().timestamp();
-
         let res = sqlx::query(UPDATE_NOTE)
             .bind(note.title)
-            .bind(now)
+            .bind(note.updated_at)
             .bind(note.book_id)
             .bind(note.note_id)
             .execute(conn)
