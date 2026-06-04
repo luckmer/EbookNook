@@ -22,9 +22,9 @@ impl NotesService {
             book_id: row.try_get("book_id")?,
             note: row.try_get("note")?,
             page: row.try_get("page")?,
-            chapter:row.try_get("chapter")?,
-            color:row.try_get("color")?,
-            title:row.try_get("title")?,
+            chapter: row.try_get("chapter")?,
+            color: row.try_get("color")?,
+            title: row.try_get("title")?,
             created_at: row.try_get("created_at")?,
             updated_at: row.try_get("updated_at")?,
         })
@@ -58,7 +58,6 @@ impl NotesService {
 
         Ok(())
     }
-
 
     pub async fn get_notes_by_book_id(
         &self,
