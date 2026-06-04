@@ -2,7 +2,6 @@ use database::{
     DELETE_NOTE, DatabaseManager, INSERT_NOTE, SELECT_NOTE_BY_BOOK_ID, SELECT_NOTE_BY_ID,
     UPDATE_NOTE,
 };
-use sqlx::types::chrono;
 use types::IBindingsNote;
 
 pub struct NotesService {}
