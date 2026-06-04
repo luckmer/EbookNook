@@ -15,23 +15,8 @@ pub struct DatabaseManager {
 }
 
 impl DatabaseManager {
-    pub async fn new(app_handle: &AppHandle) -> Result<Self, Box<dyn std::error::Error>> {
-        let base_dir = app_handle.path().app_data_dir()?;
-
-        let db_dir = base_dir.join("eBookNook").join("database");
-
-        if !db_dir.exists() {
-            fs::create_dir_all(&db_dir)?;
-        }
-
-        let db_path = db_dir.join("database.sqlite");
-
-        let db_url = format!(
-            "sqlite:{}",
-            db_path.to_str().ok_or("Invalid path encoding")?
-        );
-
-        let options = SqliteConnectOptions::from_str(&db_url)?
+    pub async fn new_from_url(db_url: &str) -> Result<Self, Box<dyn std::error::Error>> {
+        let options = SqliteConnectOptions::from_str(db_url)?
             .create_if_missing(true)
             .foreign_keys(true)
             .journal_mode(SqliteJournalMode::Wal)
@@ -47,6 +32,23 @@ impl DatabaseManager {
         database.run_migrations().await?;
 
         Ok(database)
+    }
+
+    pub async fn new(app_handle: &AppHandle) -> Result<Self, Box<dyn std::error::Error>> {
+        let base_dir = app_handle.path().app_data_dir()?;
+        let db_dir = base_dir.join("eBookNook").join("database");
+
+        if !db_dir.exists() {
+            fs::create_dir_all(&db_dir)?;
+        }
+
+        let db_path = db_dir.join("database.sqlite");
+        let db_url = format!(
+            "sqlite:{}",
+            db_path.to_str().ok_or("Invalid path encoding")?
+        );
+
+        Self::new_from_url(&db_url).await
     }
 
     async fn run_migrations(&self) -> Result<(), Box<dyn std::error::Error>> {
