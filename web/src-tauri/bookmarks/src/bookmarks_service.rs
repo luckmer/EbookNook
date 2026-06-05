@@ -1,5 +1,6 @@
 use database::{
-    DELETE_BOOKMARK, DatabaseManager, INSERT_BOOKMARK, SELECT_BOOKMARKS, UPDATE_BOOKMARK,
+    DELETE_BOOKMARK, DatabaseManager, INSERT_BOOKMARK, SELECT_BOOKMARK_BY_BOOK_CFI_ID,
+    SELECT_BOOKMARKS, UPDATE_BOOKMARK,
 };
 use sqlx::types::chrono;
 use std::error::Error;
@@ -36,12 +37,31 @@ impl BookmarksService {
         })
     }
 
+    pub async fn bookmark_exist(
+        &self,
+        db: &DatabaseManager,
+        book_id: &String,
+        cfi: &String,
+    ) -> Result<bool, Box<dyn std::error::Error>> {
+        let conn = db.get_pool();
+
+        let bookmark_exist = sqlx::query(SELECT_BOOKMARK_BY_BOOK_CFI_ID)
+            .bind(book_id)
+            .bind(cfi)
+            .fetch_one(conn)
+            .await
+            .is_ok();
+
+        Ok(bookmark_exist)
+    }
+
     pub async fn get_bookmarks_by_book_id(
         &self,
         db: &DatabaseManager,
         id: String,
     ) -> Result<Vec<IBindingsBookmark>, Box<dyn Error>> {
         let conn = db.get_pool();
+
         let raw_bookmarks = sqlx::query(SELECT_BOOKMARKS)
             .bind(id)
             .fetch_all(conn)
@@ -63,6 +83,7 @@ impl BookmarksService {
         payload: IBindingsBookmark,
     ) -> Result<(), Box<dyn Error>> {
         let conn = db.get_pool();
+
         let format = serde_json::to_string(&payload.format)?;
         sqlx::query(INSERT_BOOKMARK)
             .bind(payload.book_id)
@@ -86,6 +107,14 @@ impl BookmarksService {
         let conn = db.get_pool();
         let updated_at = chrono::Utc::now().to_rfc3339();
 
+        let bookmark_exist = self
+            .bookmark_exist(db, &payload.book_id, &payload.cfi)
+            .await?;
+
+        if !bookmark_exist {
+            return Err("Bookmark not found".into());
+        }
+
         let result = sqlx::query(UPDATE_BOOKMARK)
             .bind(payload.title)
             .bind(updated_at)
@@ -101,6 +130,31 @@ impl BookmarksService {
         Ok(())
     }
 
+    pub async fn get_bookmark_by_id(
+        &self,
+        db: &DatabaseManager,
+        id: &String,
+        cfi: &String,
+    ) -> Result<IBindingsBookmark, Box<dyn std::error::Error>> {
+        let conn = db.get_pool();
+
+        let note_exist = self.bookmark_exist(db, id, cfi).await?;
+
+        if !note_exist {
+            return Err("bookmark not found".into());
+        }
+
+        let raw_bookmark = sqlx::query(SELECT_BOOKMARK_BY_BOOK_CFI_ID)
+            .bind(id)
+            .bind(cfi)
+            .fetch_one(conn)
+            .await?;
+
+        let note = self.parse_bookmark(raw_bookmark)?;
+
+        Ok(note)
+    }
+
     pub async fn delete_bookmark_by_book_id(
         &self,
         db: &DatabaseManager,
@@ -108,6 +162,13 @@ impl BookmarksService {
         cfi: String,
     ) -> Result<(), Box<dyn Error>> {
         let conn = db.get_pool();
+
+        let bookmark_exist = self.bookmark_exist(db, &id, &cfi).await?;
+
+        if !bookmark_exist {
+            return Err("Bookmark not found".into());
+        }
+
         let result = sqlx::query(DELETE_BOOKMARK)
             .bind(id)
             .bind(cfi)

@@ -18,6 +18,12 @@ pub const SELECT_BOOKMARKS: &str = r#"
     ORDER BY created_at DESC
 "#;
 
+pub const SELECT_BOOKMARK_BY_BOOK_CFI_ID: &str = r#"
+    SELECT book_id, cfi, format, chapter, title, updated_at, created_at
+    FROM bookmarks_table
+    WHERE book_id = ? AND cfi = ?
+"#;
+
 pub const DELETE_BOOKMARK: &str = r#"
     DELETE FROM bookmarks_table
     WHERE book_id = ?1 AND cfi = ?2
