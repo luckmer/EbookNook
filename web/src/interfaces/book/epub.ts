@@ -1,4 +1,3 @@
-// import type { IBindingsEpubRendition, IBindingsEpubSection, IBindingsEpubToc } from '@bindings/epub'
 import type { FormatType } from '@bindings/format'
 import type { ILanguage, ILanguageMap } from './types'
 
