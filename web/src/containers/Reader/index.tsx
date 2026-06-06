@@ -59,9 +59,9 @@ const ReaderRoot = () => {
   const file = useMemo(() => files[bookState.id], [bookState, files])
 
   const activeBook = useMemo(() => {
-    const bookShelf = books[bookState.format]
-    if (!bookShelf) return
-    return bookShelf[bookState.id]
+    const book = books[bookState.id]
+    if (!book) return
+    return book
   }, [bookState, books])
 
   const notes = useMemo(() => {
@@ -97,7 +97,6 @@ const ReaderRoot = () => {
         dispatch(
           bookActions.updateBookProgress({
             percentageProgress: String(location.fraction * 100),
-            format: book.format,
             id: book.id,
             progress,
           }),

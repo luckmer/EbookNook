@@ -40,7 +40,10 @@ Default.args = {
       })),
     },
   ],
-  activeToc: {} as any,
+  activeToc: {
+    label: '1. Introduction',
+    href: 'epub30-overview.xhtml#sec-intro',
+  },
   isLoader: false,
   onClick: () => {},
 }

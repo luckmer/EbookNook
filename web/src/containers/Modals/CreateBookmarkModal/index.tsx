@@ -1,5 +1,4 @@
 import type { IBindingsBookmark } from '@bindings/bookmarks'
-import type { FormatType } from '@bindings/format'
 import CreateBookmarkModal from '@pages/Modals/CreateBookmarkModal'
 import { actions as bookmarkActions } from '@store/reducers/bookmarks'
 import { actions } from '@store/reducers/ui'
@@ -11,7 +10,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useLocation } from 'react-router-dom'
 export interface ICache {
   id: string
-  format: FormatType
 }
 
 const CreateBookmarkModalRoot = () => {
@@ -26,7 +24,7 @@ const CreateBookmarkModalRoot = () => {
 
   useEffect(() => {
     if (!bookState) return
-    if (bookState.id !== cache?.id || bookState.format !== cache?.format) {
+    if (bookState.id !== cache?.id) {
       setCache(bookState)
     }
   }, [bookState, cache])
@@ -34,11 +32,11 @@ const CreateBookmarkModalRoot = () => {
   const activeBook = useMemo(() => {
     if (!cache) return
 
-    const bookShelf = books[cache.format]
+    const book = books[cache.id]
 
-    if (!bookShelf) return
+    if (!book) return
 
-    return bookShelf[cache.id]
+    return book
   }, [cache, books])
 
   return (

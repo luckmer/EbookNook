@@ -28,10 +28,9 @@ function App() {
   useEffect(() => {
     if (!location?.state?.id || isLoaded.current) return
 
-    const bookShelf = booksMap[bookState.format]
-    if (!bookShelf) return
+    const book = booksMap[bookState.id]
+    if (!book) return
 
-    const book = bookShelf[bookState.id]
     if (book) {
       isLoaded.current = true
       dispatch(bookActions.setOpenBook({ id: book.id, format: book.format }))

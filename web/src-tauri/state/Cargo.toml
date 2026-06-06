@@ -5,6 +5,6 @@ edition = "2024"
 
 [dependencies]
 database = { path = "../database" }
-formats = { path = "../formats" }
 notes = { path = "../notes" }
 bookmarks = { path = "../bookmarks" }
+library = {path ="../library"}

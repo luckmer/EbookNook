@@ -1,14 +1,7 @@
-import type { IBindingsEpubToc } from '@bindings/epub'
-import type { FormatType } from '@bindings/format'
-import type {
-  IEpubBookStructure,
-  IEpubBookType,
-  IMobiBookStructure,
-  IMobiBookType,
-  IPDFBookStructure,
-  IPDFBookType,
-} from '@interfaces/book/interfaces'
-import type { IBookType } from '@interfaces/book/types'
+import type { IBindingsBook, IBindingsBookStructure } from '@bindings/book'
+import type { IBindingsMetadata } from '@bindings/metadata'
+import type { IBindingsSection } from '@bindings/sections'
+import type { IBindingsToc, IBindingsTocStructure } from '@bindings/toc'
 import { describe, expect, test } from 'vitest'
 import { actions, booksStore, defaultState, reducers } from '.'
 
@@ -20,48 +13,61 @@ const book: {
   book: new File([], 'epub', { type: 'application/epub+zip' }),
 }
 
-const toc: IBindingsEpubToc = {
-  label: 'Chapter 1',
-  href: 'chapter-1',
-  subitems: [
+const subitems: Array<IBindingsTocStructure> = [
+  {
+    label: 'Section 1',
+    href: 'section-1',
+    subitems: [],
+  },
+]
+
+const toc: IBindingsToc = {
+  id: '123',
+  toc: [
     {
-      label: 'Chapter 1.1',
-      href: 'chapter-1-1',
+      label: 'Chapter 1',
+      href: 'chapter-1',
+      subitems: subitems,
     },
   ],
 }
 
-const structure: IEpubBookStructure = {
-  format: 'EPUB',
+const sections: IBindingsSection = {
+  id: '123',
   sections: [
     {
       id: 'chapter-1',
-      cfi: 'epubcfi(/6/8!/4/2/4)',
-      size: 1,
+      size: '2',
     },
     {
       id: 'chapter-1',
-      cfi: 'epubcfi(/6/8!/4/2/4)',
-      size: 1,
+      size: '2',
     },
   ],
-  toc: [toc, toc, toc],
 }
 
-const bindingsBook: IEpubBookType = {
+const structure: IBindingsBookStructure = {
+  id: '123',
+  sections,
+  toc,
+}
+
+const bindingsBook: IBindingsBook = {
   id: '123',
   format: 'EPUB',
   createdAt: '1780510075459',
   updatedAt: '1780510075459',
   percentageProgress: '0',
   progress: {},
-  sections: [],
-  rendition: {},
+  sections,
+  toc,
   metadata: {
     title: 'Book title',
     author: 'Book author',
     cover: '',
     language: 'en',
+    format: 'EPUB',
+    id: '123',
   },
 }
 describe(booksStore, () => {
@@ -109,19 +115,16 @@ describe(booksStore, () => {
 
   describe('updateBookMetadata', () => {
     test('dispatches without modifying state', () => {
-      expect(
-        reducers(
-          undefined,
-          actions.updateBookMetadata({
-            id: 'book_1',
-            format: 'EPUB',
-            metadata: {
-              title: 'title',
-              author: 'author',
-            },
-          }),
-        ),
-      ).toEqual(defaultState)
+      const data: IBindingsMetadata = {
+        id: 'book_1',
+        format: 'EPUB',
+        cover: '',
+        language: 'en',
+        title: 'title',
+        author: 'author',
+      }
+
+      expect(reducers(undefined, actions.updateBookMetadata(data))).toEqual(defaultState)
     })
   })
 
@@ -132,7 +135,6 @@ describe(booksStore, () => {
           undefined,
           actions.updateBookProgress({
             id: 'book_1',
-            format: 'EPUB',
             percentageProgress: '10%',
             progress: {
               CFI: 'epubcfi(/6/12!/4/2/2[tagalog],/2[rw-title-block_43539-077535482],/42[rw-p_43542-151052214]/1:283)',
@@ -198,15 +200,25 @@ describe(booksStore, () => {
 
   describe('setActiveToc', () => {
     test('Sets active toc', () => {
-      const result = reducers(defaultState, actions.setActiveToc(toc))
+      const activeToc = {
+        label: 'label',
+        href: 'chapter-1',
+      }
+
+      const result = reducers(defaultState, actions.setActiveToc(activeToc))
       expect(result.activeToc).not.toBeUndefined()
       expect(result.activeToc).not.toBeNull()
-      expect(result.activeToc).toEqual(toc)
+      expect(result.activeToc).toEqual(activeToc)
     })
 
     test('overwrites existing active toc', () => {
-      const stateWithToc = reducers(defaultState, actions.setActiveToc(toc))
-      const updatedToc = { ...toc, label: 'Updated label' }
+      const activeToc = {
+        label: 'label',
+        href: 'chapter-1',
+      }
+
+      const stateWithToc = reducers(defaultState, actions.setActiveToc(activeToc))
+      const updatedToc = { label: 'Updated label', href: 'chapter-1', id: 1 }
 
       const result = reducers(stateWithToc, actions.setActiveToc(updatedToc))
       expect(result.activeToc).not.toBeUndefined()
@@ -222,9 +234,9 @@ describe(booksStore, () => {
         actions.setBook({ id: bindingsBook.id, book: bindingsBook }),
       )
 
-      expect(result.books.EPUB![bindingsBook.id]).not.toBeUndefined()
-      expect(result.books.EPUB![bindingsBook.id]).not.toBeNull()
-      expect(result.books.EPUB![bindingsBook.id]).toEqual(bindingsBook)
+      expect(result.books![bindingsBook.id]).not.toBeUndefined()
+      expect(result.books![bindingsBook.id]).not.toBeNull()
+      expect(result.books![bindingsBook.id]).toEqual(bindingsBook)
     })
 
     test('creates format entry when it does not exist', () => {
@@ -233,7 +245,7 @@ describe(booksStore, () => {
         actions.setBook({ id: bindingsBook.id, book: bindingsBook }),
       )
 
-      expect(result.books.EPUB).toBeDefined()
+      expect(result.books[bindingsBook.id]).toBeDefined()
     })
 
     test('overwrites existing book', () => {
@@ -247,9 +259,9 @@ describe(booksStore, () => {
         actions.setBook({ id: bindingsBook.id, book: updatedBook }),
       )
 
-      expect(result.books.EPUB![bindingsBook.id]).not.toBeUndefined()
-      expect(result.books.EPUB![bindingsBook.id]).not.toBeNull()
-      expect(result.books.EPUB![bindingsBook.id]).toEqual(updatedBook)
+      expect(result.books![bindingsBook.id]).not.toBeUndefined()
+      expect(result.books![bindingsBook.id]).not.toBeNull()
+      expect(result.books![bindingsBook.id]).toEqual(updatedBook)
     })
 
     test('sets multiple books independently', () => {
@@ -263,13 +275,13 @@ describe(booksStore, () => {
         actions.setBook({ id: secondBook.id, book: secondBook }),
       )
 
-      expect(result.books.EPUB![bindingsBook.id]).not.toBeUndefined()
-      expect(result.books.EPUB![bindingsBook.id]).not.toBeNull()
-      expect(result.books.EPUB![bindingsBook.id]).toEqual(bindingsBook)
+      expect(result.books![bindingsBook.id]).not.toBeUndefined()
+      expect(result.books![bindingsBook.id]).not.toBeNull()
+      expect(result.books![bindingsBook.id]).toEqual(bindingsBook)
 
-      expect(result.books.EPUB![secondBook.id]).not.toBeUndefined()
-      expect(result.books.EPUB![secondBook.id]).not.toBeNull()
-      expect(result.books.EPUB![secondBook.id]).toEqual(secondBook)
+      expect(result.books![secondBook.id]).not.toBeUndefined()
+      expect(result.books![secondBook.id]).not.toBeNull()
+      expect(result.books![secondBook.id]).toEqual(secondBook)
     })
 
     test('ignores missing id when shelf exists', () => {
@@ -277,10 +289,13 @@ describe(booksStore, () => {
         defaultState,
         actions.setBook({ id: bindingsBook.id, book: bindingsBook }),
       )
-      const result = reducers(
-        stateWithBook,
-        actions.setBookStructure({ id: 'non-existent', structure }),
-      )
+
+      const randomStructure = {
+        ...structure,
+        id: '999',
+      }
+
+      const result = reducers(stateWithBook, actions.setBookStructure(randomStructure))
       expect(result).toEqual(stateWithBook)
     })
   })
@@ -291,170 +306,45 @@ describe(booksStore, () => {
         defaultState,
         actions.setBook({ id: bindingsBook.id, book: bindingsBook }),
       )
-      const result = reducers(state, actions.setBookStructure({ id: bindingsBook.id, structure }))
+      const result = reducers(state, actions.setBookStructure(structure))
 
-      expect(result.books.EPUB![bindingsBook.id]).not.toBeUndefined()
-      expect(result.books.EPUB![bindingsBook.id]).not.toBeNull()
-      expect(result.books.EPUB![bindingsBook.id]).toEqual({
+      expect(result.books![bindingsBook.id]).not.toBeUndefined()
+      expect(result.books![bindingsBook.id]).not.toBeNull()
+      expect(result.books![bindingsBook.id]).toEqual({
         ...bindingsBook,
         sections: structure.sections,
         toc: structure.toc,
       })
     })
 
-    test('ignores unknown MOBI book id', () => {
-      const result = reducers(
-        defaultState,
-        actions.setBookStructure({
-          id: 'non-existent',
-          structure: { format: 'MOBI', sections: [], toc: [] },
-        }),
-      )
-      expect(result).toEqual(defaultState)
-    })
-
-    test('ignores unknown PDF book id', () => {
-      const result = reducers(
-        defaultState,
-        actions.setBookStructure({
-          id: 'non-existent',
-          structure: { format: 'PDF', sections: [], toc: [] },
-        }),
-      )
-      expect(result).toEqual(defaultState)
-    })
-
     test('ignores unknown book id', () => {
       const result = reducers(
         defaultState,
-        actions.setBookStructure({ id: 'non-existent', structure }),
+        actions.setBookStructure({
+          ...structure,
+          id: 'non-existent',
+        }),
       )
-
       expect(result).toEqual(defaultState)
-    })
-
-    test('Sets MOBI structure', () => {
-      const mobiBook: IMobiBookType = {
-        id: '456',
-        format: 'MOBI',
-        createdAt: '1780510075459',
-        updatedAt: '1780510075459',
-        percentageProgress: '0',
-        progress: {},
-        sections: [],
-        metadata: {
-          title: 'Book title',
-          author: 'Book author',
-          cover: '',
-          language: 'en',
-        },
-      }
-
-      const state = reducers(defaultState, actions.setBook({ id: mobiBook.id, book: mobiBook }))
-
-      const mobiStructure: IMobiBookStructure = {
-        format: 'MOBI',
-        sections: [
-          {
-            id: 2,
-            size: 1,
-          },
-          {
-            id: 2,
-            size: 1,
-          },
-        ],
-        toc: [toc, toc, toc],
-      }
-
-      const result = reducers(
-        state,
-        actions.setBookStructure({ id: mobiBook.id, structure: mobiStructure }),
-      )
-
-      expect(result.books.MOBI![mobiBook.id]).not.toBeUndefined()
-      expect(result.books.MOBI![mobiBook.id]).not.toBeNull()
-      expect(result.books.MOBI![mobiBook.id]).toEqual({
-        ...mobiBook,
-        sections: mobiStructure.sections,
-        toc: mobiStructure.toc,
-      })
-    })
-
-    test('Sets PDF structure', () => {
-      const pdfBook: IPDFBookType = {
-        id: '789',
-        format: 'PDF',
-        createdAt: '1780510075459',
-        updatedAt: '1780510075459',
-        percentageProgress: '0',
-        progress: {},
-        sections: [],
-        metadata: {
-          title: 'Book title',
-          author: 'Book author',
-          cover: '',
-          language: 'en',
-        },
-      }
-
-      const state = reducers(defaultState, actions.setBook({ id: pdfBook.id, book: pdfBook }))
-
-      const pdfStructure: IPDFBookStructure = {
-        format: 'PDF',
-        sections: [
-          {
-            id: 2,
-            size: 1,
-          },
-        ],
-        toc: [toc, toc, toc],
-      }
-
-      const result = reducers(
-        state,
-        actions.setBookStructure({ id: pdfBook.id, structure: pdfStructure }),
-      )
-
-      expect(result.books.PDF![pdfBook.id]).not.toBeUndefined()
-      expect(result.books.PDF![pdfBook.id]).not.toBeNull()
-      expect(result.books.PDF![pdfBook.id]).toEqual({
-        ...pdfBook,
-        sections: pdfStructure.sections,
-        toc: pdfStructure.toc,
-      })
     })
   })
 
   describe('setBooks', () => {
     test('sets books', () => {
-      const state: Partial<Record<FormatType, Partial<Record<string, IBookType>>>> = {
-        EPUB: {
-          '123': {
-            ...bindingsBook,
-            sections: [],
-            toc: [],
-          },
-        },
+      const state: Record<string, IBindingsBook> = {
+        [bindingsBook.id]: bindingsBook,
       }
 
       const result = reducers(defaultState, actions.setBooks(state))
       expect(result.books).toEqual(state)
     })
 
-    test('overwrites existing books', () => {
-      const initialState = { EPUB: { '123': { ...bindingsBook } } }
-      const stateWithBooks = reducers(defaultState, actions.setBooks(initialState))
-      const updatedState = { EPUB: { '123': { ...bindingsBook, percentageProgress: '50' } } }
-      const result = reducers(stateWithBooks, actions.setBooks(updatedState))
-
-      expect(result.books).toEqual(updatedState)
-    })
-
     test('sets empty books', () => {
       const stateWithBooks = reducers(
         defaultState,
-        actions.setBooks({ EPUB: { '123': bindingsBook } }),
+        actions.setBooks({
+          [bindingsBook.id]: bindingsBook,
+        }),
       )
       const result = reducers(stateWithBooks, actions.setBooks({}))
 
@@ -466,197 +356,158 @@ describe(booksStore, () => {
     test('updates book metadata', () => {
       const stateWithBook = reducers(
         defaultState,
-        actions.setBooks({ EPUB: { '123': { ...bindingsBook, sections: [], toc: [] } } }),
+        actions.setBooks({ [bindingsBook.id]: bindingsBook }),
       )
 
-      const updatedMetadata = {
+      const updatedMetadata: IBindingsMetadata = {
+        language: bindingsBook.metadata.language,
         author: 'Updated author',
         description: 'Updated description',
         published: 'Updated published',
         publisher: 'Updated publisher',
         title: 'Updated title',
+        cover: '',
+        format: 'EPUB',
+        id: bindingsBook.id,
       }
 
       const result = reducers(
         stateWithBook,
         actions.setUpdateBookMetadata({
-          id: '123',
-          format: 'EPUB',
-          metadata: { format: 'EPUB', metadata: updatedMetadata },
+          id: bindingsBook.id,
+          metadata: updatedMetadata,
         }),
       )
 
-      const book = result.books.EPUB!['123']!
+      const book = result.books![bindingsBook.id]!
       expect(book).not.toBeUndefined()
       expect(book).not.toBeNull()
-
       expect(book.metadata).toMatchObject(updatedMetadata)
     })
 
     test('ignores unknown book id', () => {
       const stateWithBook = reducers(
         defaultState,
-        actions.setBooks({ EPUB: { '123': { ...bindingsBook, sections: [], toc: [] } } }),
+        actions.setBooks({ [bindingsBook.id]: bindingsBook }),
       )
 
       const result = reducers(
         stateWithBook,
         actions.setUpdateBookMetadata({
           id: 'non-existent',
-          format: 'EPUB',
-          metadata: { format: 'EPUB', metadata: { title: 'Updated title' } },
+          metadata: {
+            id: bindingsBook.id,
+            title: 'updated title',
+            author: bindingsBook.metadata.author,
+            description: bindingsBook.metadata.description,
+            published: bindingsBook.metadata.published,
+            publisher: bindingsBook.metadata.publisher,
+            cover: bindingsBook.metadata.cover,
+            format: bindingsBook.metadata.format,
+            language: bindingsBook.metadata.language,
+          },
         }),
       )
 
       expect(result).toEqual(stateWithBook)
     })
 
-    test('ignores unknown format', () => {
+    test('ignores unknown book id in empty state', () => {
       const result = reducers(
         defaultState,
         actions.setUpdateBookMetadata({
-          id: '123',
-          format: 'EPUB',
-          metadata: { format: 'EPUB', metadata: { title: 'Updated title' } },
+          id: 'non-existent',
+          metadata: {
+            id: bindingsBook.id,
+            title: 'updated title',
+            author: bindingsBook.metadata.author,
+            description: bindingsBook.metadata.description,
+            published: bindingsBook.metadata.published,
+            publisher: bindingsBook.metadata.publisher,
+            cover: bindingsBook.metadata.cover,
+            format: bindingsBook.metadata.format,
+            language: bindingsBook.metadata.language,
+          },
         }),
       )
       expect(result).toEqual(defaultState)
     })
 
-    test('updates MOBI book metadata', () => {
-      const mobiBook: IMobiBookType = {
-        id: '456',
-        format: 'MOBI',
-        createdAt: '1780510075459',
-        updatedAt: '1780510075459',
-        percentageProgress: '0',
-        progress: {},
-        sections: [],
-        metadata: {
-          title: 'Book title',
-          author: 'Book author',
-          cover: '',
-          language: 'en',
-        },
-      }
-
-      const stateWithBook = reducers(
-        defaultState,
-        actions.setBooks({ MOBI: { [mobiBook.id]: { ...mobiBook, sections: [], toc: [] } } }),
-      )
-
-      const updatedMetadata = {
-        author: 'Updated author',
-        description: 'Updated description',
-        published: 'Updated published',
-        publisher: 'Updated publisher',
-        title: 'Updated title',
-      }
-
-      const result = reducers(
-        stateWithBook,
-        actions.setUpdateBookMetadata({
-          id: mobiBook.id,
-          format: 'MOBI',
-          metadata: { format: 'MOBI', metadata: updatedMetadata },
-        }),
-      )
-
-      const metadata = result.books.MOBI![mobiBook.id]!.metadata
-
-      expect(metadata).not.toBeUndefined()
-      expect(metadata).not.toBeNull()
-      expect(metadata).toMatchObject(updatedMetadata)
-    })
-
-    test('updates PDF book metadata', () => {
-      const pdfBook: IPDFBookType = {
-        id: '789',
-        format: 'PDF',
-        createdAt: '1780510075459',
-        updatedAt: '1780510075459',
-        percentageProgress: '0',
-        progress: {},
-        sections: [],
-        metadata: {
-          title: 'Book title',
-          author: 'Book author',
-          cover: '',
-          language: 'en',
-        },
-      }
-
-      const stateWithBook = reducers(
-        defaultState,
-        actions.setBooks({ PDF: { [pdfBook.id]: { ...pdfBook, sections: [], toc: [] } } }),
-      )
-
-      const updatedMetadata = {
-        author: 'Updated author',
-        description: 'Updated description',
-        published: 'Updated published',
-        publisher: 'Updated publisher',
-        title: 'Updated title',
-      }
-
-      const result = reducers(
-        stateWithBook,
-        actions.setUpdateBookMetadata({
-          id: pdfBook.id,
-          format: 'PDF',
-          metadata: { format: 'PDF', metadata: updatedMetadata },
-        }),
-      )
-
-      const metadata = result.books.PDF![pdfBook.id]!.metadata
-
-      expect(metadata).not.toBeUndefined()
-      expect(metadata).not.toBeNull()
-
-      expect(metadata).toMatchObject(updatedMetadata)
-    })
-
     test('keeps existing values for non updated fields', () => {
       const stateWithBook = reducers(
         defaultState,
-        actions.setBooks({ EPUB: { '123': { ...bindingsBook, sections: [], toc: [] } } }),
+        actions.setBooks({ [bindingsBook.id]: bindingsBook }),
       )
 
       const result = reducers(
         stateWithBook,
         actions.setUpdateBookMetadata({
-          id: '123',
-          format: 'EPUB',
-          metadata: { format: 'EPUB', metadata: { title: 'Only title updated' } },
+          id: bindingsBook.id,
+          metadata: {
+            id: bindingsBook.id,
+            title: 'Only title updated',
+            author: bindingsBook.metadata.author,
+            description: bindingsBook.metadata.description,
+            published: bindingsBook.metadata.published,
+            publisher: bindingsBook.metadata.publisher,
+            cover: bindingsBook.metadata.cover,
+            format: bindingsBook.metadata.format,
+            language: bindingsBook.metadata.language,
+          },
         }),
       )
 
-      const book = result.books.EPUB!['123']!
+      const book = result.books![bindingsBook.id]!
       expect(book.metadata.title).toEqual('Only title updated')
       expect(book.metadata.author).toEqual(bindingsBook.metadata.author)
-      expect(book.metadata.description).toEqual(bindingsBook.metadata.description)
-      expect(book.metadata.published).toEqual(bindingsBook.metadata.published)
-      expect(book.metadata.publisher).toEqual(bindingsBook.metadata.publisher)
     })
 
     test('keeps existing title when title is not provided', () => {
       const stateWithBook = reducers(
         defaultState,
-        actions.setBooks({ EPUB: { '123': { ...bindingsBook, sections: [], toc: [] } } }),
+        actions.setBooks({ [bindingsBook.id]: bindingsBook }),
       )
 
       const result = reducers(
         stateWithBook,
         actions.setUpdateBookMetadata({
-          id: '123',
-          format: 'EPUB',
-          metadata: { format: 'EPUB', metadata: { author: 'Only author updated' } },
+          id: bindingsBook.id,
+          metadata: {
+            id: bindingsBook.id,
+            title: bindingsBook.metadata.title,
+            author: 'Only author updated',
+            description: bindingsBook.metadata.description,
+            published: bindingsBook.metadata.published,
+            publisher: bindingsBook.metadata.publisher,
+            cover: bindingsBook.metadata.cover,
+            format: bindingsBook.metadata.format,
+            language: bindingsBook.metadata.language,
+          },
         }),
       )
 
-      const book = result.books.EPUB!['123']!
+      const book = result.books![bindingsBook.id]!
       expect(book.metadata.title).toEqual(bindingsBook.metadata.title)
       expect(book.metadata.author).toEqual('Only author updated')
+    })
+
+    test('Expect empty metadata', () => {
+      const stateWithBook = reducers(
+        defaultState,
+        actions.setBooks({ [bindingsBook.id]: bindingsBook }),
+      )
+
+      const result = reducers(
+        stateWithBook,
+        actions.setUpdateBookMetadata({
+          id: bindingsBook.id,
+          metadata: {},
+        }),
+      )
+
+      const book = result.books![bindingsBook.id]!
+      expect(book.metadata.description).toEqual(bindingsBook.metadata.description)
+      expect(book.metadata.title).toEqual(bindingsBook.metadata.title)
     })
   })
 
@@ -664,46 +515,33 @@ describe(booksStore, () => {
     test('Updates book progress', () => {
       const stateWithBook = reducers(
         defaultState,
-        actions.setBooks({ EPUB: { '123': { ...bindingsBook, sections: [], toc: [] } } }),
+        actions.setBooks({ [bindingsBook.id]: bindingsBook }),
       )
 
       const result = reducers(
         stateWithBook,
         actions.setUpdateBookProgress({
-          id: '123',
-          format: 'EPUB',
-          progress: {
-            CFI: 'epubcfi(/6/8!/4/2/4)',
-          },
+          id: bindingsBook.id,
+          progress: { CFI: 'epubcfi(/6/8!/4/2/4)' },
           percentageProgress: '50',
         }),
       )
 
-      const percentageProgress = result.books.EPUB!['123']!.percentageProgress
-
-      expect(percentageProgress).not.toBeUndefined()
-      expect(percentageProgress).not.toBeNull()
-
-      const epubCFI = result.books.EPUB!['123']!.progress.CFI!
-
-      expect(epubCFI).not.toBeUndefined()
-      expect(epubCFI).not.toBeNull()
-
-      expect(percentageProgress).toEqual('50')
-      expect(epubCFI).toEqual('epubcfi(/6/8!/4/2/4)')
+      const book = result.books![bindingsBook.id]!
+      expect(book.percentageProgress).toEqual('50')
+      expect(book.progress.CFI).toEqual('epubcfi(/6/8!/4/2/4)')
     })
 
     test('ignores unknown book id', () => {
       const stateWithBook = reducers(
         defaultState,
-        actions.setBooks({ EPUB: { '123': { ...bindingsBook, sections: [], toc: [] } } }),
+        actions.setBooks({ [bindingsBook.id]: bindingsBook }),
       )
 
       const result = reducers(
         stateWithBook,
         actions.setUpdateBookProgress({
           id: 'non-existent',
-          format: 'EPUB',
           progress: { CFI: 'epubcfi(/6/8!/4/2/4)' },
           percentageProgress: '50',
         }),
@@ -712,12 +550,11 @@ describe(booksStore, () => {
       expect(result).toEqual(stateWithBook)
     })
 
-    test('ignores unknown format', () => {
+    test('ignores unknown book id in empty state', () => {
       const result = reducers(
         defaultState,
         actions.setUpdateBookProgress({
-          id: '123',
-          format: 'EPUB',
+          id: 'non-existent',
           progress: { CFI: 'epubcfi(/6/8!/4/2/4)' },
           percentageProgress: '50',
         }),
@@ -728,27 +565,22 @@ describe(booksStore, () => {
 
   describe('deleteBook', () => {
     test('deletes book', () => {
-      const state: Partial<Record<FormatType, Partial<Record<string, IBookType>>>> = {
-        EPUB: {
-          '123': {
-            ...bindingsBook,
-            sections: [],
-            toc: [],
-          },
-        },
-      }
+      const stateWithBook = reducers(
+        defaultState,
+        actions.setBooks({ [bindingsBook.id]: bindingsBook }),
+      )
 
-      const result = reducers(defaultState, actions.setBooks(state))
-      expect(result.books).toEqual(state)
-
-      const stateAfterDelete = reducers(result, actions.deleteBook({ id: '123', format: 'EPUB' }))
-      expect(stateAfterDelete.books).toEqual({})
+      const result = reducers(
+        stateWithBook,
+        actions.deleteBook({ id: bindingsBook.id, format: 'EPUB' }),
+      )
+      expect(result.books![bindingsBook.id]).toBeUndefined()
     })
 
     test('ignores unknown book id', () => {
       const stateWithBook = reducers(
         defaultState,
-        actions.setBooks({ EPUB: { '123': { ...bindingsBook, sections: [], toc: [] } } }),
+        actions.setBooks({ [bindingsBook.id]: bindingsBook }),
       )
 
       const result = reducers(
@@ -759,26 +591,27 @@ describe(booksStore, () => {
       expect(result).toEqual(stateWithBook)
     })
 
-    test('deletes one book while keeping others in the same format', () => {
+    test('deletes one book while keeping others', () => {
       const secondBook = { ...bindingsBook, id: '456' }
       const stateWithBooks = reducers(
         defaultState,
-        actions.setBooks({
-          EPUB: { '123': bindingsBook, '456': secondBook },
-        }),
+        actions.setBooks({ [bindingsBook.id]: bindingsBook, [secondBook.id]: secondBook }),
       )
 
-      const result = reducers(stateWithBooks, actions.deleteBook({ id: '123', format: 'EPUB' }))
+      const result = reducers(
+        stateWithBooks,
+        actions.deleteBook({ id: bindingsBook.id, format: 'EPUB' }),
+      )
 
-      expect(result.books.EPUB!['123']).toBeUndefined()
-
-      expect(result.books.EPUB!['456']).not.toBeUndefined()
-      expect(result.books.EPUB!['456']).not.toBeNull()
-      expect(result.books.EPUB!['456']).toEqual(secondBook)
+      expect(result.books![bindingsBook.id]).toBeUndefined()
+      expect(result.books![secondBook.id]).toEqual(secondBook)
     })
 
-    test('ignores unknown format', () => {
-      const result = reducers(defaultState, actions.deleteBook({ id: '123', format: 'EPUB' }))
+    test('ignores unknown book id in empty state', () => {
+      const result = reducers(
+        defaultState,
+        actions.deleteBook({ id: 'non-existent', format: 'EPUB' }),
+      )
       expect(result).toEqual(defaultState)
     })
   })

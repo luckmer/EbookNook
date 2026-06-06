@@ -2,7 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 use bookmarks::init_bookmarks_service;
 use database::init_database;
-use formats::init_format_service;
+use library::init_core_library_service;
 use notes::init_notes_service;
 use state::AppState;
 use tauri::PhysicalSize;
@@ -19,7 +19,7 @@ fn main() {
                 let db_manager = init_database(handle).await;
 
                 let state = AppState {
-                    format_service: init_format_service(),
+                    library_core: init_core_library_service(),
                     bookmarks_service: init_bookmarks_service(),
                     notes_service: init_notes_service(),
                     db: db_manager,
@@ -48,13 +48,12 @@ fn main() {
             api::bookmarks::add_bookmark_by_book_id,
             api::bookmarks::update_bookmark_by_book_id,
             api::bookmarks::delete_bookmark_by_book_id,
-            api::books::get_book_structure_by_id,
-            api::books::get_books,
-            api::books::add_book,
-            api::books::set_book_progress,
-            api::books::delete_book,
-            api::books::update_book_metadata,
-            api::books::set_book_percentage_progress,
+            api::library::get_books,
+            api::library::get_book_structure,
+            api::library::add_book,
+            api::library::delete_book,
+            api::library::update_book_progress,
+            api::library::update_book_metadata
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -1,17 +1,17 @@
 pub mod book;
 pub mod bookmarks;
-pub mod epub;
 pub mod format;
-pub mod mobi;
+pub mod metadata;
 pub mod notes;
-pub mod pdf;
 pub mod progress;
+pub mod sections;
+pub mod toc;
 
 pub use book::*;
 pub use bookmarks::*;
-pub use epub::*;
 pub use format::*;
-pub use mobi::*;
+pub use metadata::*;
 pub use notes::*;
-pub use pdf::*;
 pub use progress::*;
+pub use sections::*;
+pub use toc::*;

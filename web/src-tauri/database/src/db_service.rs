@@ -5,9 +5,8 @@ use std::str::FromStr;
 use tauri::{AppHandle, Manager};
 
 use crate::{
-    BOOKMARKS_TABLE, EPUB_BOOKS_TABLE, EPUB_SECTIONS_TABLE, EPUB_TOC_TABLE, MOBI_BOOKS_TABLE,
-    MOBI_SECTIONS_TABLE, MOBI_TOC_TABLE, NOTES_TABLE, PDF_BOOKS_TABLE, PDF_SECTIONS_TABLE,
-    PDF_TOC_TABLE,
+    BOOKMARKS_TABLE, BOOKS_TABLE, METADATA_TABLE, NOTES_TABLE, PROGRESS_TABLE, SECTIONS_TABLE,
+    TOCS_TABLE,
 };
 
 pub struct DatabaseManager {
@@ -56,21 +55,14 @@ impl DatabaseManager {
             .execute(&self.pool)
             .await?;
 
-        sqlx::query(EPUB_BOOKS_TABLE).execute(&self.pool).await?;
-        sqlx::query(EPUB_TOC_TABLE).execute(&self.pool).await?;
-        sqlx::query(EPUB_SECTIONS_TABLE).execute(&self.pool).await?;
-
-        sqlx::query(MOBI_BOOKS_TABLE).execute(&self.pool).await?;
-        sqlx::query(MOBI_TOC_TABLE).execute(&self.pool).await?;
-        sqlx::query(MOBI_SECTIONS_TABLE).execute(&self.pool).await?;
-
-        sqlx::query(PDF_BOOKS_TABLE).execute(&self.pool).await?;
-        sqlx::query(PDF_TOC_TABLE).execute(&self.pool).await?;
-        sqlx::query(PDF_SECTIONS_TABLE).execute(&self.pool).await?;
-
         sqlx::query(BOOKMARKS_TABLE).execute(&self.pool).await?;
-
         sqlx::query(NOTES_TABLE).execute(&self.pool).await?;
+        sqlx::query(TOCS_TABLE).execute(&self.pool).await?;
+        sqlx::query(SECTIONS_TABLE).execute(&self.pool).await?;
+        sqlx::query(PROGRESS_TABLE).execute(&self.pool).await?;
+        sqlx::query(METADATA_TABLE).execute(&self.pool).await?;
+        sqlx::query(BOOKS_TABLE).execute(&self.pool).await?;
+
         Ok(())
     }
 

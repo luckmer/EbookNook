@@ -1,24 +1,27 @@
-import type { IBindingsBookContent, IBookMetadata } from '@bindings/book'
+import type { IBindingsBook, IBindingsBookStructure } from '@bindings/book'
 import type { FormatType } from '@bindings/format'
-import type { ProgressType } from '@bindings/progress'
-import type { IBookStructure, IBookType, ILocalBookToc } from '@interfaces/book/types'
+import type { IBindingsMetadata } from '@bindings/metadata'
+import type { IBindingsProgress } from '@bindings/progress'
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
 import type { PayloadType } from '@store/helper'
 
 export const booksStore = 'booksStore'
 
+export interface IToc {
+  href: string
+  label: string
+}
+
 export interface IBookState {
   selectedChapter: string
-  books: Partial<Record<FormatType, Partial<Record<string, IBookType>>>>
-  activeToc: ILocalBookToc
+  books: Partial<Record<string, IBindingsBook>>
+  activeToc: IToc
   files: Record<string, File | null>
 }
 
-export const defaultActiveToc = {
-  id: -1,
+export const defaultActiveToc: IToc = {
   label: '',
   href: '',
-  index: -1,
 }
 
 export const defaultState: IBookState = {
@@ -37,15 +40,9 @@ export const store = createSlice({
       return state
     },
 
-    setBook(state, action: PayloadAction<{ id: string; book: IBookType }>) {
+    setBook(state, action: PayloadAction<{ id: string; book: IBindingsBook }>) {
       const { id, book } = action.payload
-      const format = book.format
-
-      if (!state.books[format]) {
-        state.books[format] = {}
-      }
-
-      state.books[format][id] = book
+      state.books[id] = book
     },
 
     setActiveBook(state, action: PayloadAction<{ id: string; book: File }>) {
@@ -64,79 +61,51 @@ export const store = createSlice({
     importBook(state, _: PayloadAction<File>) {
       return state
     },
-    setActiveToc(state, action: PayloadAction<ILocalBookToc>) {
+    setActiveToc(state, action: PayloadAction<IToc>) {
       state.activeToc = action.payload
       return state
     },
 
-    setBookStructure(state, action: PayloadAction<{ id: string; structure: IBookStructure }>) {
+    setBookStructure(state, action: PayloadAction<IBindingsBookStructure>) {
       const { id } = action.payload
 
-      switch (action.payload.structure.format) {
-        case 'EPUB': {
-          const book = state.books.EPUB?.[id]
-          if (book?.format !== 'EPUB') return state
-          book.sections = action.payload.structure.sections
-          book.toc = action.payload.structure.toc
-          break
-        }
-        case 'MOBI': {
-          const book = state.books.MOBI?.[id]
-          if (book?.format !== 'MOBI') return state
-          book.sections = action.payload.structure.sections
-          book.toc = action.payload.structure.toc
-          break
-        }
-        case 'PDF': {
-          const book = state.books.PDF?.[id]
-          if (book?.format !== 'PDF') return state
-          book.sections = action.payload.structure.sections
-          book.toc = action.payload.structure.toc
-          break
-        }
-      }
+      const book = state.books[id]
+      if (!book) return state
+
+      book.sections = action.payload.sections
+      book.toc = action.payload.toc
 
       return state
     },
 
     setUpdateBookMetadata(
       state,
-      action: PayloadAction<{ id: string; format: FormatType; metadata: IBookMetadata }>,
+      action: PayloadAction<{
+        id: string
+        metadata: Partial<IBindingsMetadata>
+      }>,
     ) {
-      const bookShelf = state.books[action.payload.format]
-
-      if (!bookShelf) {
-        return state
-      }
-
-      const book = bookShelf[action.payload.id]
+      const book = state.books[action.payload.id]
 
       if (!book) {
         return state
       }
 
-      book.metadata.author = action.payload.metadata.metadata.author ?? book.metadata.author
-      book.metadata.description =
-        action.payload.metadata.metadata.description ?? book.metadata.description
-      book.metadata.published =
-        action.payload.metadata.metadata.published ?? book.metadata.published
-      book.metadata.publisher =
-        action.payload.metadata.metadata.publisher ?? book.metadata.publisher
-      book.metadata.title = action.payload.metadata.metadata.title ?? book.metadata.title
+      book.metadata.author = action.payload.metadata.author ?? book.metadata.author
+      book.metadata.description = action.payload.metadata.description ?? book.metadata.description
+      book.metadata.published = action.payload.metadata.published ?? book.metadata.published
+      book.metadata.publisher = action.payload.metadata.publisher ?? book.metadata.publisher
+      book.metadata.title = action.payload.metadata.title ?? book.metadata.title
 
       return state
     },
 
     deleteBook(state, action: PayloadAction<{ id: string; format: FormatType }>) {
-      const bookShelf = state.books[action.payload.format]
+      const book = state.books[action.payload.id]
 
-      if (!bookShelf?.[action.payload.id]) return state
+      if (!book) return state
 
-      if (Object.keys(bookShelf).length === 1) {
-        delete state.books[action.payload.format]
-      } else {
-        delete bookShelf[action.payload.id]
-      }
+      delete state.books[action.payload.id]
 
       return state
     },
@@ -145,23 +114,9 @@ export const store = createSlice({
       state.files[action.payload.id] = action.payload.file
       return state
     },
-    setUpdateBookProgress(
-      state,
-      action: PayloadAction<{
-        id: string
-        format: FormatType
-        progress: Partial<Record<ProgressType, string>>
-        percentageProgress: string
-      }>,
-    ) {
-      const bookShelf = state.books[action.payload.format]
-      if (!bookShelf) return state
-
-      const book = bookShelf[action.payload.id]
-
-      if (!book) {
-        return state
-      }
+    setUpdateBookProgress(state, action: PayloadAction<IBindingsProgress>) {
+      const book = state.books[action.payload.id]
+      if (!book) return state
 
       book.progress = action.payload.progress
       book.percentageProgress = action.payload.percentageProgress
@@ -169,10 +124,7 @@ export const store = createSlice({
       return state
     },
 
-    setBooks(
-      state,
-      action: PayloadAction<Partial<Record<FormatType, Partial<Record<string, IBookType>>>>>,
-    ) {
+    setBooks(state, action: PayloadAction<Record<string, IBindingsBook>>) {
       state.books = action.payload
       return state
     },
@@ -180,25 +132,10 @@ export const store = createSlice({
     setDeleteBook(state, _: PayloadAction<{ id: string; format: FormatType }>) {
       return state
     },
-    updateBookMetadata(
-      state,
-      _: PayloadAction<{
-        id: string
-        format: FormatType
-        metadata: Partial<Record<IBindingsBookContent, string>>
-      }>,
-    ) {
+    updateBookMetadata(state, _: PayloadAction<IBindingsMetadata>) {
       return state
     },
-    updateBookProgress(
-      state,
-      _: PayloadAction<{
-        id: string
-        format: FormatType
-        percentageProgress: string
-        progress: Partial<Record<ProgressType, string>>
-      }>,
-    ) {
+    updateBookProgress(state, _: PayloadAction<IBindingsProgress>) {
       return state
     },
   },

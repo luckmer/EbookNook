@@ -1,6 +1,5 @@
 //https://github.com/johnfactotum/foliate-js/blob/main/pdf.js
-import type { IBindingsPDFToc } from '@bindings/pdf'
-import type { IPDFMetadata, IPDFSections, IZoomEvent } from '@interfaces/book/pdf'
+import type { IPDFMetadata, IPDFSections, IToc, IZoomEvent } from '@interfaces/book/pdf'
 import * as pdfjsLib from 'pdfjs-dist'
 import workerUrl from 'pdfjs-dist/build/pdf.worker?url'
 import type { Metadata } from 'pdfjs-dist/types/src/display/metadata'
@@ -34,7 +33,7 @@ export type IOutline = {
 interface Book {
   rendition: { layout: 'pre-paginated' }
   metadata: IPDFMetadata
-  toc?: IBindingsPDFToc[]
+  toc?: IToc[]
   sections: IPDFSections[]
   isExternal: (uri: string) => boolean
   resolveHref: (href: string) => Promise<{ index: number }>
@@ -45,7 +44,7 @@ interface Book {
 }
 
 export class PDFServiceCore {
-  makeTOCItem = (item: IOutline): IBindingsPDFToc => ({
+  makeTOCItem = (item: IOutline): IToc => ({
     label: item.title,
     href: JSON.stringify(item.dest),
     subitems: item.items?.length ? item.items.map((sub) => this.makeTOCItem(sub)) : undefined,

@@ -33,7 +33,7 @@ const HeaderRoot = () => {
 
   const book = useMemo(() => {
     if (!bookState) return
-    return booksMap[bookState.format]?.[bookState.id]
+    return booksMap[bookState.id]
   }, [bookState, booksMap])
 
   const bookmarks = useMemo(
