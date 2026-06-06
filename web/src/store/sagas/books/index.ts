@@ -61,6 +61,7 @@ export function* ImportBook(action: PayloadAction<PayloadTypes['importBook']>) {
     const appService = yield* call(getAppClient)
     const response = yield* call([core, core.init], action.payload)
     const adapterClient = yield* call(getBookAdapterClient)
+
     const bookFormat = yield* call([adapterClient, adapterClient.invokeBookFormat], response)
 
     yield* call(invoke<IBindingsBook>, 'add_book', { book: bookFormat })

@@ -168,6 +168,42 @@ export class BookAdapterCore {
 
         return book
       }
+
+      case 'FB2': {
+        const book: IBindingsBook = {
+          createdAt: Date.now().toString(),
+          updatedAt: Date.now().toString(),
+          id: content.id,
+          format: content.format,
+          percentageProgress: content.percentageProgress,
+          progress: content.progress,
+          metadata: {
+            id: content.id,
+            format: 'FB2',
+            author: this._getContent(content.metadata.author),
+            title: this._getContent(content.metadata.title),
+            contributor: content.metadata.contributor
+              ? this._getContent(content.metadata.contributor)
+              : undefined,
+            description: content.metadata.description,
+            identifier: content.metadata.identifier,
+            language: content.metadata.language,
+            cover: '',
+            publisher: content.metadata.publisher,
+            published: content.metadata.published,
+            modified: content.metadata.modified,
+            rights: content.metadata.rights,
+            subject: content.metadata.subject
+              ? this._getContent(content.metadata.subject)
+              : undefined,
+          },
+          sections: this._formatSections(content.sections, content.id),
+          toc: this._formatToc(content.toc, content.id),
+        }
+
+        return book
+      }
+
       default: {
         throw new Error('format not implemented')
       }
