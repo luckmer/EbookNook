@@ -1,6 +1,6 @@
 use state::AppState;
 use tauri::State;
-use types::{IBindingsBook, IBindingsBookStructure, IBindingsProgress};
+use types::{IBindingsBook, IBindingsBookStructure, IBindingsMetadata, IBindingsProgress};
 
 #[tauri::command]
 pub async fn get_books(state: State<'_, AppState>) -> Result<Vec<IBindingsBook>, String> {
@@ -49,6 +49,18 @@ pub async fn update_book_progress(
     state
         .library_core
         .update_book_progress(&state.db, progress)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub async fn update_book_metadata(
+    state: State<'_, AppState>,
+    metadata: IBindingsMetadata,
+) -> Result<(), String> {
+    state
+        .library_core
+        .update_book_metadata(&state.db, metadata)
         .await
         .map_err(|e| e.to_string())
 }

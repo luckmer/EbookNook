@@ -36,11 +36,27 @@ impl TocService {
         }
     }
 
+    pub async fn toc_exist(
+        &self,
+        db: &DatabaseManager,
+        id: &str,
+    ) -> Result<bool, Box<dyn std::error::Error>> {
+        let conn = db.get_pool();
+        let row = sqlx::query(GET_TOC).bind(id).fetch_optional(conn).await?;
+        Ok(row.is_some())
+    }
+
     pub async fn add_tocs(
         &self,
         db: &DatabaseManager,
         toc: &IBindingsToc,
     ) -> Result<(), Box<dyn Error>> {
+        let exist = self.toc_exist(db, &toc.id).await?;
+
+        if exist {
+            return Err("toc exist".into());
+        }
+
         let conn = db.get_pool();
         let toc_json = serde_json::to_string(&toc.toc)?;
 
@@ -49,13 +65,24 @@ impl TocService {
             .bind(toc_json)
             .execute(conn)
             .await?;
+
         Ok(())
     }
 
     pub async fn delete_toc(&self, db: &DatabaseManager, id: &str) -> Result<(), Box<dyn Error>> {
+        let exist = self.toc_exist(db, &id).await?;
+
+        if !exist {
+            return Err("toc not found".into());
+        }
+
         let conn = db.get_pool();
 
-        sqlx::query(DELETE_TOC).bind(id).execute(conn).await?;
+        let result = sqlx::query(DELETE_TOC).bind(id).execute(conn).await?;
+
+        if result.rows_affected() == 0 {
+            return Err(format!("TOC with id '{}' not found", id).into());
+        }
 
         Ok(())
     }

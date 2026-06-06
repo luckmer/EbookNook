@@ -1,4 +1,4 @@
-use database::{DELETE_METADATA, DatabaseManager, GET_METADATA, INSERT_METADATA};
+use database::{DELETE_METADATA, DatabaseManager, GET_METADATA, INSERT_METADATA, UPDATE_METADATA};
 use sqlx::Row;
 use std::error::Error;
 use types::{FormatType, IBindingsMetadata, ILanguage};
@@ -37,6 +37,19 @@ impl MetadataService {
             rights: row.try_get("rights")?,
             subject: row.try_get("subject")?,
         })
+    }
+
+    pub async fn metadata_exist(
+        &self,
+        db: &DatabaseManager,
+        id: &str,
+    ) -> Result<bool, Box<dyn std::error::Error>> {
+        let conn = db.get_pool();
+        let row = sqlx::query(GET_METADATA)
+            .bind(id)
+            .fetch_optional(conn)
+            .await?;
+        Ok(row.is_some())
     }
 
     pub async fn get_metadata(
@@ -91,9 +104,52 @@ impl MetadataService {
         db: &DatabaseManager,
         id: &str,
     ) -> Result<(), Box<dyn Error>> {
+        let exist = self.metadata_exist(db, id).await?;
+
+        if !exist {
+            return Err("metadata not found".into());
+        }
+
         let conn = db.get_pool();
 
         sqlx::query(DELETE_METADATA).bind(id).execute(conn).await?;
+
+        Ok(())
+    }
+
+    pub async fn update_metadata(
+        &self,
+        db: &DatabaseManager,
+        metadata: IBindingsMetadata,
+    ) -> Result<(), Box<dyn Error>> {
+        let exists = self.metadata_exist(db, &metadata.id).await?;
+
+        if !exists {
+            return Err("metadata not found".into());
+        }
+
+        let conn = db.get_pool();
+
+        let format = serde_json::to_string(&metadata.format)?;
+        let language = serde_json::to_string(&metadata.language)?;
+
+        sqlx::query(UPDATE_METADATA)
+            .bind(&metadata.id)
+            .bind(format)
+            .bind(&metadata.title)
+            .bind(&metadata.author)
+            .bind(&metadata.cover)
+            .bind(language)
+            .bind(&metadata.publisher)
+            .bind(&metadata.published)
+            .bind(&metadata.contributor)
+            .bind(&metadata.description)
+            .bind(&metadata.identifier)
+            .bind(&metadata.modified)
+            .bind(&metadata.rights)
+            .bind(&metadata.subject)
+            .execute(conn)
+            .await?;
 
         Ok(())
     }

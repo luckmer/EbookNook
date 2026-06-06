@@ -1,11 +1,8 @@
-use std::{collections::HashMap, error::Error, vec};
+use std::error::Error;
 
-use crate::MetadataService;
-use database::{DELETE_BOOK, DatabaseManager, GET_BOOKS, INSERT_BOOK};
+use database::{DELETE_BOOK, DatabaseManager, GET_BOOK, GET_BOOKS, INSERT_BOOK};
 use sqlx::Row;
-use types::{
-    FormatType, IBindingsBook, IBindingsMetadata, IBindingsRawBook, IBindingsSection, IBindingsToc,
-};
+use types::{FormatType, IBindingsBook, IBindingsRawBook};
 
 pub struct LibraryService {}
 
@@ -51,11 +48,27 @@ impl LibraryService {
         Ok(books)
     }
 
+    pub async fn book_exist(
+        &self,
+        db: &DatabaseManager,
+        id: &str,
+    ) -> Result<bool, Box<dyn std::error::Error>> {
+        let conn = db.get_pool();
+        let row = sqlx::query(GET_BOOK).bind(id).fetch_optional(conn).await?;
+        Ok(row.is_some())
+    }
+
     pub async fn add_book(
         &self,
         db: &DatabaseManager,
         book: &IBindingsBook,
     ) -> Result<(), Box<dyn Error>> {
+        let exist = self.book_exist(db, &book.id).await?;
+
+        if exist {
+            return Err("Book exist".into());
+        }
+
         let conn = db.get_pool();
 
         let format = serde_json::to_string(&book.format)?;
@@ -72,14 +85,14 @@ impl LibraryService {
     }
 
     pub async fn delete_book(&self, db: &DatabaseManager, id: &str) -> Result<(), Box<dyn Error>> {
+        let exist = self.book_exist(db, id).await?;
+
+        if !exist {
+            return Err("Book not found".into());
+        }
+
         let conn = db.get_pool();
-
         sqlx::query(DELETE_BOOK).bind(id).execute(conn).await?;
-
-        Ok(())
-    }
-
-    pub async fn update_book_metadata(&self, db: &DatabaseManager) -> Result<(), Box<dyn Error>> {
         Ok(())
     }
 }

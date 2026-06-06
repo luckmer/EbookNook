@@ -40,11 +40,30 @@ impl ProgressService {
         }
     }
 
+    pub async fn progress_exist(
+        &self,
+        db: &DatabaseManager,
+        id: &str,
+    ) -> Result<bool, Box<dyn std::error::Error>> {
+        let conn = db.get_pool();
+        let row = sqlx::query(GET_PROGRESS)
+            .bind(id)
+            .fetch_optional(conn)
+            .await?;
+        Ok(row.is_some())
+    }
+
     pub async fn delete_progress(
         &self,
         db: &DatabaseManager,
         id: &String,
     ) -> Result<(), Box<dyn Error>> {
+        let exist = self.progress_exist(db, id).await?;
+
+        if !exist {
+            return Err("progress not found".into());
+        }
+
         let conn = db.get_pool();
 
         sqlx::query(DELETE_PROGRESS).bind(id).execute(conn).await?;
@@ -59,6 +78,12 @@ impl ProgressService {
         progress: &HashMap<ProgressType, String>,
         percentage_progress: &String,
     ) -> Result<(), Box<dyn Error>> {
+        let exist = self.progress_exist(db, &id).await?;
+
+        if exist {
+            return Err("progress exist".into());
+        }
+
         let conn = db.get_pool();
 
         let progress_json = serde_json::to_string(&progress)?;
@@ -78,6 +103,12 @@ impl ProgressService {
         db: &DatabaseManager,
         progress: IBindingsProgress,
     ) -> Result<(), Box<dyn Error>> {
+        let exist = self.progress_exist(db, &progress.id).await?;
+
+        if !exist {
+            return Err("progress not found".into());
+        }
+
         let conn = db.get_pool();
 
         let progress_json = serde_json::to_string(&progress.progress)?;

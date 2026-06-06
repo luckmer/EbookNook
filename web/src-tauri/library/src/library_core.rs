@@ -1,9 +1,10 @@
-use std::{collections::HashMap, error::Error};
+use std::error::Error;
 
 use crate::{LibraryService, MetadataService, ProgressService, SectionsService, TocService};
 use database::DatabaseManager;
 use types::{
-    IBindingsBook, IBindingsBookStructure, IBindingsProgress, IBindingsSection, IBindingsToc,
+    IBindingsBook, IBindingsBookStructure, IBindingsMetadata, IBindingsProgress, IBindingsSection,
+    IBindingsToc,
 };
 
 pub struct LibraryCore {
@@ -33,8 +34,16 @@ impl LibraryCore {
         let mut books_state: Vec<IBindingsBook> = vec![];
 
         for book in &mut books {
-            let metadata = self.metadata_service.get_metadata(db, &book.id).await?;
-            let progress = self.progress_service.get_progress(db, &book.id).await?;
+            let metadata = match self.metadata_service.get_metadata(db, &book.id).await {
+                Ok(m) => m,
+                Err(_) => continue,
+            };
+
+            let progress = match self.progress_service.get_progress(db, &book.id).await {
+                Ok(p) => p,
+                Err(_) => continue,
+            };
+
             let full_book = IBindingsBook {
                 created_at: book.created_at.clone(),
                 format: book.format.clone(),
@@ -72,7 +81,9 @@ impl LibraryCore {
             .set_metadata(db, &book.metadata)
             .await?;
 
-        self.sections_service.add_sections(db).await?;
+        self.sections_service
+            .add_sections(db, &book.sections)
+            .await?;
         Ok(())
     }
 
@@ -88,8 +99,12 @@ impl LibraryCore {
         Ok(())
     }
 
-    pub async fn update_book_metadata(self, db: &DatabaseManager) -> Result<(), Box<dyn Error>> {
-        self.library_service.update_book_metadata(db).await?;
+    pub async fn update_book_metadata(
+        &self,
+        db: &DatabaseManager,
+        metadata: IBindingsMetadata,
+    ) -> Result<(), Box<dyn Error>> {
+        self.metadata_service.update_metadata(db, metadata).await?;
         Ok(())
     }
 
@@ -116,6 +131,4 @@ impl LibraryCore {
             id: id.to_string(),
         })
     }
-
-    pub fn update_metadata() {}
 }
