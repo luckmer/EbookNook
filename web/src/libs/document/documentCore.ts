@@ -125,7 +125,7 @@ export default class DocumentClientCore {
           return cover
         }
 
-        if (format === 'MOBI') {
+        if (format === 'MOBI' || format === 'FB2') {
           const cover = await book.getCover()
           return cover
         }
