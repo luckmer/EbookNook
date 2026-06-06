@@ -378,7 +378,6 @@ describe(booksStore, () => {
         stateWithBook,
         actions.setUpdateBookMetadata({
           id: bindingsBook.id,
-          format: 'EPUB',
           metadata: updatedMetadata,
         }),
       )
@@ -399,7 +398,6 @@ describe(booksStore, () => {
         stateWithBook,
         actions.setUpdateBookMetadata({
           id: 'non-existent',
-          format: 'EPUB',
           metadata: {
             id: bindingsBook.id,
             title: 'updated title',
@@ -422,7 +420,6 @@ describe(booksStore, () => {
         defaultState,
         actions.setUpdateBookMetadata({
           id: 'non-existent',
-          format: 'EPUB',
           metadata: {
             id: bindingsBook.id,
             title: 'updated title',
@@ -449,7 +446,6 @@ describe(booksStore, () => {
         stateWithBook,
         actions.setUpdateBookMetadata({
           id: bindingsBook.id,
-          format: 'EPUB',
           metadata: {
             id: bindingsBook.id,
             title: 'Only title updated',
@@ -479,7 +475,6 @@ describe(booksStore, () => {
         stateWithBook,
         actions.setUpdateBookMetadata({
           id: bindingsBook.id,
-          format: 'EPUB',
           metadata: {
             id: bindingsBook.id,
             title: bindingsBook.metadata.title,
@@ -497,6 +492,25 @@ describe(booksStore, () => {
       const book = result.books![bindingsBook.id]!
       expect(book.metadata.title).toEqual(bindingsBook.metadata.title)
       expect(book.metadata.author).toEqual('Only author updated')
+    })
+
+    test('Expect empty metadata', () => {
+      const stateWithBook = reducers(
+        defaultState,
+        actions.setBooks({ [bindingsBook.id]: bindingsBook }),
+      )
+
+      const result = reducers(
+        stateWithBook,
+        actions.setUpdateBookMetadata({
+          id: bindingsBook.id,
+          metadata: {},
+        }),
+      )
+
+      const book = result.books![bindingsBook.id]!
+      expect(book.metadata.description).toEqual(bindingsBook.metadata.description)
+      expect(book.metadata.title).toEqual(bindingsBook.metadata.title)
     })
   })
 

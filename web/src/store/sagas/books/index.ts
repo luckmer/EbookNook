@@ -179,7 +179,6 @@ export function* updateBookMetadata(action: PayloadAction<PayloadTypes['updateBo
       put(
         actions.setUpdateBookMetadata({
           id: action.payload.id,
-          format: action.payload.format,
           metadata: result,
         }),
       ),

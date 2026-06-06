@@ -80,7 +80,10 @@ export const store = createSlice({
 
     setUpdateBookMetadata(
       state,
-      action: PayloadAction<{ id: string; format: FormatType; metadata: IBindingsMetadata }>,
+      action: PayloadAction<{
+        id: string
+        metadata: Partial<IBindingsMetadata>
+      }>,
     ) {
       const book = state.books[action.payload.id]
 
