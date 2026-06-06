@@ -115,19 +115,16 @@ describe(booksStore, () => {
 
   describe('updateBookMetadata', () => {
     test('dispatches without modifying state', () => {
-      expect(
-        reducers(
-          undefined,
-          actions.updateBookMetadata({
-            id: 'book_1',
-            format: 'EPUB',
-            metadata: {
-              title: 'title',
-              author: 'author',
-            },
-          }),
-        ),
-      ).toEqual(defaultState)
+      const data: IBindingsMetadata = {
+        id: 'book_1',
+        format: 'EPUB',
+        cover: '',
+        language: 'en',
+        title: 'title',
+        author: 'author',
+      }
+
+      expect(reducers(undefined, actions.updateBookMetadata(data))).toEqual(defaultState)
     })
   })
 
