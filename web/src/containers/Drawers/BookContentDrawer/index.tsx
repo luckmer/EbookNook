@@ -1,4 +1,3 @@
-import type { FormatType } from '@bindings/format'
 import ReaderContentDrawer from '@pages/Drawers/ReaderContentDrawer'
 import { actions as bookmarkActions } from '@store/reducers/bookmarks'
 import { actions as bookActions } from '@store/reducers/books'
@@ -14,7 +13,6 @@ import { useLocation, useNavigate } from 'react-router-dom'
 
 export interface ICache {
   id: string
-  format: FormatType
 }
 
 const BookContentDrawerRoot = () => {
@@ -37,11 +35,11 @@ const BookContentDrawerRoot = () => {
   const activeBook = useMemo(() => {
     if (!cache) return
 
-    const bookShelf = books[cache.format]
+    const book = books[cache.id]
 
-    if (!bookShelf) return
+    if (!book) return
 
-    return bookShelf[cache.id]
+    return book
   }, [cache, books])
 
   const activeBookmarks = useMemo(() => {
@@ -61,7 +59,7 @@ const BookContentDrawerRoot = () => {
 
   useEffect(() => {
     if (!bookState) return
-    if (bookState.id !== cache?.id || bookState.format !== cache?.format) {
+    if (bookState.id !== cache?.id) {
       setCache(bookState)
     }
   }, [bookState, cache])
@@ -82,7 +80,7 @@ const BookContentDrawerRoot = () => {
       activeToc={activeToc}
       book={book}
       bookmarks={activeBookmarks}
-      toc={activeBook?.toc ?? []}
+      toc={activeBook?.toc.toc ?? []}
       loaderState={loaderState}
       scopedLoader={scopedLoader}
       isOpen={isOpen}

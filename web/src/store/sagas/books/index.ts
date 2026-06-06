@@ -1,16 +1,16 @@
-import type { IBookMetadata } from '@bindings/book'
-import type { FormatType } from '@bindings/format'
-import type { Books, IBookStructure, IBookType } from '@interfaces/book/types'
+import type { IBindingsBook, IBindingsBookStructure } from '@bindings/book'
+import type { IBindingsMetadata } from '@bindings/metadata'
+import type { IBindingsProgress } from '@bindings/progress'
 import { LOADER_STATE, LOADER_STATUS } from '@interfaces/ui/enums'
 import { getAppClient } from '@libs/appService'
 import { getBookAdapterClient } from '@libs/BookAdapter'
+import { getDocumentClient } from '@libs/document'
 import type { PayloadAction } from '@reduxjs/toolkit'
 import { actions, type PayloadTypes } from '@store/reducers/books'
 import { actions as uiActions } from '@store/reducers/ui'
 import { booksSelector } from '@store/selectors/books'
 import { invoke } from '@tauri-apps/api/core'
 import { notify } from '@utils/notification'
-import { getDocumentClient } from 'src/libs/document'
 import { all, call, put, select, takeEvery, takeLatest } from 'typed-redux-saga'
 
 export function* loadState() {
@@ -22,21 +22,20 @@ export function* loadState() {
       }),
     )
 
-    const booksResponse = yield* call(invoke<Books>, 'get_books')
+    const booksResponse = yield* call(invoke<Array<IBindingsBook>>, 'get_books')
     const adapterClient = yield* call(getBookAdapterClient)
 
-    const updateBooks: Partial<Record<FormatType, Partial<Record<string, IBookType>>>> = {}
+    const updatedBooks: Record<string, IBindingsBook> = {}
 
-    for (const books of Object.values(booksResponse)) {
-      for (const book of books) {
-        const cover = yield* call([adapterClient, adapterClient.getBookImg], book.id)
-        book.metadata.cover = cover
+    for (const book of booksResponse) {
+      const cover = yield* call([adapterClient, adapterClient.getBookImg], book.id)
+      book.metadata.cover = cover
 
-        updateBooks[book.format] = { ...updateBooks[book.format], [book.id]: book }
-      }
+      updatedBooks[book.id] = book
     }
 
-    yield* put(actions.setBooks(updateBooks))
+    console.log('got book with progress', updatedBooks)
+    yield* put(actions.setBooks(updatedBooks))
   } catch (err) {
     console.log('failed to get state', err)
     notify('Failed to open document', 'error')
@@ -57,25 +56,24 @@ export function* ImportBook(action: PayloadAction<PayloadTypes['importBook']>) {
       state: { status: LOADER_STATUS.LOADING },
     }),
   )
+
   try {
     const core = yield* call(getDocumentClient)
     const appService = yield* call(getAppClient)
-
     const response = yield* call([core, core.init], action.payload)
     const adapterClient = yield* call(getBookAdapterClient)
     const bookFormat = yield* call([adapterClient, adapterClient.invokeBookFormat], response)
 
-    yield* call(invoke<IBookType>, 'add_book', { book: bookFormat })
-
+    yield* call(invoke<IBindingsBook>, 'add_book', { book: bookFormat })
     const bookImg = yield* call([response, response.getCover])
     yield* all([
       call([appService, appService.saveCover], response.id, bookImg),
       call([appService, appService.saveBookToStorage], action.payload, response.id),
     ])
 
-    const cover = yield* call([adapterClient, adapterClient.getBookImg], bookFormat.book.id)
+    const cover = yield* call([adapterClient, adapterClient.getBookImg], bookFormat.id)
+    const bookContent = bookFormat
 
-    const bookContent = bookFormat.book
     bookContent.metadata.cover = cover
 
     yield* put(actions.setBook({ id: response.id, book: bookContent }))
@@ -117,14 +115,11 @@ export function* setOpenBook(id: string) {
   }
 }
 
-export function* getBookStructure(id: string, format: FormatType) {
+export function* getBookStructure(id: string) {
   try {
-    const structure = yield* call(invoke<IBookStructure>, 'get_book_structure_by_id', {
-      id,
-      format,
-    })
+    const structure = yield* call(invoke<IBindingsBookStructure>, 'get_book_structure', { id })
 
-    yield* put(actions.setBookStructure({ id, structure }))
+    yield* put(actions.setBookStructure(structure))
   } catch (err) {
     console.log(err)
     console.log('Failed to get book structure')
@@ -175,7 +170,7 @@ export function* updateBookMetadata(action: PayloadAction<PayloadTypes['updateBo
   )
 
   try {
-    const result = yield* call(invoke<IBookMetadata>, 'update_book_metadata', {
+    const result = yield* call(invoke<IBindingsMetadata>, 'update_book_metadata', {
       id: action.payload.id,
       metadata: { format: action.payload.format, metadata: action.payload.metadata },
     })
@@ -207,28 +202,11 @@ export function* updateBookMetadata(action: PayloadAction<PayloadTypes['updateBo
 
 export function* updateBookProgress(action: PayloadAction<PayloadTypes['updateBookProgress']>) {
   try {
-    yield* all([
-      call(invoke<IBookStructure>, 'set_book_progress', {
-        progress: action.payload.progress,
-        format: action.payload.format,
-        id: action.payload.id,
-      }),
+    yield* call(invoke<IBindingsProgress>, 'update_book_progress', {
+      progress: action.payload,
+    })
 
-      call(invoke<IBookStructure>, 'set_book_percentage_progress', {
-        percentageProgress: action.payload.percentageProgress,
-        format: action.payload.format,
-        id: action.payload.id,
-      }),
-    ])
-
-    yield* put(
-      actions.setUpdateBookProgress({
-        id: action.payload.id,
-        format: action.payload.format,
-        progress: action.payload.progress,
-        percentageProgress: action.payload.percentageProgress,
-      }),
-    )
+    yield* put(actions.setUpdateBookProgress(action.payload))
   } catch (err) {
     console.log(err)
     console.log('Failed to update progress')

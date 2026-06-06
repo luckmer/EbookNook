@@ -5,7 +5,6 @@ import { searchSelector } from '@store/selectors/search'
 
 export const booksState = createSelector([booksSelector.books], (books) =>
   Object.values(books)
-    .flatMap((booksByFormat) => Object.values(booksByFormat))
     .filter((book) => !!book)
     .sort((a, b) => +a.createdAt - +b.createdAt)
     .map((book) => ({

@@ -1,4 +1,4 @@
-import type { IBindingsEpubRendition, IBindingsEpubSection, IBindingsEpubToc } from '@bindings/epub'
+// import type { IBindingsEpubRendition, IBindingsEpubSection, IBindingsEpubToc } from '@bindings/epub'
 import type { FormatType } from '@bindings/format'
 import type { ILanguage, ILanguageMap } from './types'
 
@@ -23,15 +23,35 @@ export interface IEpubMetadata {
   seriesTotal?: number
 }
 
+export type IToc = { label: string; href: string; subitems?: Array<IToc> }
+
+export type ISection = {
+  id: string
+  cfi: string
+  size: number
+  linear?: string
+  pageSpread?: ISpread
+}
+
+export type ILayout = 'pre-paginated' | 'reflowable'
+export type ISpread = 'left' | 'right' | 'center' | ''
+export type IViewPort = { width: number; height: number }
+
+export type IRendition = {
+  layout?: ILayout
+  spread?: ISpread
+  viewport?: IViewPort
+}
+
 export interface IEpubBookFile {
   dir?: string
   metadata: IEpubMetadata
-  rendition: IBindingsEpubRendition
+  rendition: IRendition
   percentageProgress: string
   progress: Record<string, string>
   format: FormatType
-  toc: Array<IBindingsEpubToc>
-  sections: Array<IBindingsEpubSection>
+  toc: Array<IToc>
+  sections: Array<ISection>
   id: string
 }
 

@@ -26,7 +26,7 @@ api = { path = "./api" }
 types = { path = "./types" }
 state = { path = "./state" }
 bookmarks = { path = "./bookmarks" }
-library ={path = "./library"}
+library = {path = "./library"}
 
 tauri-plugin-opener = "2"
 serde = { version = "1", features = ["derive"] }

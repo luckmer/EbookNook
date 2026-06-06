@@ -1,5 +1,4 @@
 import type { FormatType } from '@bindings/format'
-import type { IBindingsPDFToc } from '@bindings/pdf'
 
 export interface IPDFMetadata {
   author?: string
@@ -14,6 +13,7 @@ export interface IPDFMetadata {
   subject?: string
   title?: string
 }
+export type IPDFToc = { label: string; href: string; subitems?: Array<IPDFToc> }
 
 export interface IZoomEvent {
   doc: Document
@@ -30,11 +30,12 @@ export interface IPDFSections {
   load: () => Promise<IPDFRenderedPage>
   size: number
 }
+export type IToc = { label: string; href: string; subitems?: Array<IToc> }
 
 export interface IPDFBookFile {
   format: FormatType
   metadata: IPDFMetadata
-  toc?: IBindingsPDFToc[]
+  toc?: IToc[]
   percentageProgress: string
   progress: Record<string, string>
   sections: any[]

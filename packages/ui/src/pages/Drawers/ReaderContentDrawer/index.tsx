@@ -19,7 +19,6 @@ import OverviewLayout from './OverviewLayout'
 export interface ITocItem {
   label: string
   href?: string
-  id?: string
   subitems?: ITocItem[]
 }
 

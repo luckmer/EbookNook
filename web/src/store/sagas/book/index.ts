@@ -43,10 +43,7 @@ export function* loadBookStructure(action: PayloadAction<PayloadTypes['setOpenBo
     }),
   )
 
-  yield* all([
-    call(setOpenBook, action.payload.id),
-    call(getBookStructure, action.payload.id, action.payload.format),
-  ])
+  yield* all([call(setOpenBook, action.payload.id), call(getBookStructure, action.payload.id)])
 
   yield* put(
     uiActions.setLoaderState({

@@ -13,11 +13,11 @@ const BookOverviewModalRoot = () => {
   const dispatch = useDispatch()
 
   const book = useMemo(() => {
-    const bookShelf = booksMap[openSettingsModal.format]
+    const book = booksMap[openSettingsModal.bookId]
 
-    if (!bookShelf) return
+    if (!book) return
 
-    return bookShelf[openSettingsModal.bookId]
+    return book
   }, [booksMap, openSettingsModal])
 
   const [cachedBook, setCachedBook] = useState(book)

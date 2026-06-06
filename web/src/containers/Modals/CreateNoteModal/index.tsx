@@ -1,4 +1,3 @@
-import type { FormatType } from '@bindings/format'
 import type { IBindingsNote } from '@bindings/notes'
 import CreateNoteModal from '@pages/Modals/CreateNoteModal'
 import { actions as noteActions } from '@store/reducers/notes'
@@ -11,7 +10,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useLocation } from 'react-router-dom'
 export interface ICache {
   id: string
-  format: FormatType
 }
 const CreateNoteModalRoot = () => {
   const [cache, setCache] = useState<ICache | null>(null)
@@ -28,16 +26,16 @@ const CreateNoteModalRoot = () => {
   const activeBook = useMemo(() => {
     if (!cache) return
 
-    const bookShelf = books[cache.format]
+    const book = books[cache.id]
 
-    if (!bookShelf) return
+    if (!book) return
 
-    return bookShelf[cache.id]
+    return book
   }, [cache, books])
 
   useEffect(() => {
     if (!bookState) return
-    if (bookState.id !== cache?.id || bookState.format !== cache?.format) {
+    if (bookState.id !== cache?.id) {
       setCache(bookState)
     }
   }, [bookState, cache])
