@@ -20,13 +20,13 @@ tauri-build = { version = "2", features = [] }
 
 [dependencies]
 database = { path = "./database" }
-formats = { path = "./formats" }
 notes = { path = "./notes" }
 utils = { path = "./utils" }
 api = { path = "./api" }
 types = { path = "./types" }
 state = { path = "./state" }
 bookmarks = { path = "./bookmarks" }
+library ={path = "./library"}
 
 tauri-plugin-opener = "2"
 serde = { version = "1", features = ["derive"] }
@@ -59,11 +59,10 @@ tauri = { version = "2", features = [] }
 [workspace]
 members = [
   "database",
-  "formats",
   "api",
   "utils",
   "types",
   "state",
   "notes",
-  "bookmarks",
+  "bookmarks", "library",
 ]

@@ -1,7 +1,7 @@
 pub mod bookmarks;
-pub mod books;
+pub mod library;
 pub mod notes;
 
 pub use bookmarks::*;
-pub use books::*;
+pub use library::*;
 pub use notes::*;

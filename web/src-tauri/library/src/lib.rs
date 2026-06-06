@@ -1,15 +1,15 @@
-pub mod bookmarks;
-pub mod books;
+pub mod library;
+pub mod library_core;
 pub mod metadata;
-pub mod notes;
 pub mod progress;
 pub mod sections;
+pub mod service;
 pub mod toc;
 
-pub use bookmarks::*;
-pub use books::*;
+pub use library::*;
+pub use library_core::*;
 pub use metadata::*;
-pub use notes::*;
 pub use progress::*;
 pub use sections::*;
+pub use service::*;
 pub use toc::*;
