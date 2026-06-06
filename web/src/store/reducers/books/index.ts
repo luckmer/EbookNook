@@ -1,4 +1,4 @@
-import type { IBindingsBook, IBindingsBookContent, IBindingsBookStructure } from '@bindings/book'
+import type { IBindingsBook, IBindingsBookStructure } from '@bindings/book'
 import type { FormatType } from '@bindings/format'
 import type { IBindingsMetadata } from '@bindings/metadata'
 import type { IBindingsProgress } from '@bindings/progress'
@@ -132,14 +132,7 @@ export const store = createSlice({
     setDeleteBook(state, _: PayloadAction<{ id: string; format: FormatType }>) {
       return state
     },
-    updateBookMetadata(
-      state,
-      _: PayloadAction<{
-        id: string
-        format: FormatType
-        metadata: Partial<Record<IBindingsBookContent, string>>
-      }>,
-    ) {
+    updateBookMetadata(state, _: PayloadAction<IBindingsMetadata>) {
       return state
     },
     updateBookProgress(state, _: PayloadAction<IBindingsProgress>) {

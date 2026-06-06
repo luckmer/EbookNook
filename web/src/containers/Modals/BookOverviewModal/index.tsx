@@ -1,3 +1,4 @@
+import type { IBindingsMetadata } from '@bindings/metadata'
 import BookOverviewModal from '@pages/Modals/BookOverviewModal'
 import { actions as bookActions } from '@store/reducers/books'
 import { actions } from '@store/reducers/ui'
@@ -58,11 +59,21 @@ const BookOverviewModalRoot = () => {
         dispatch(bookActions.setDeleteBook({ id: book.id, format: book.format }))
       }}
       onClickEdit={(metadata) => {
+        if (!book) return
         const id = book?.id
 
         if (!id) return
 
-        dispatch(bookActions.updateBookMetadata({ id, metadata, format: book.format }))
+        const content: IBindingsMetadata = {
+          ...book.metadata,
+          author: metadata.author ?? book.metadata.author,
+          description: metadata.description ?? book.metadata.description,
+          title: metadata.title ?? book.metadata.title,
+          publisher: metadata.publisher ?? book.metadata.publisher,
+          published: metadata.published ?? book.metadata.published,
+        }
+
+        dispatch(bookActions.updateBookMetadata(content))
       }}
       isOpen={openSettingsModal.status}
     />

@@ -34,7 +34,6 @@ export function* loadState() {
       updatedBooks[book.id] = book
     }
 
-    console.log('got book with progress', updatedBooks)
     yield* put(actions.setBooks(updatedBooks))
   } catch (err) {
     console.log('failed to get state', err)
@@ -170,16 +169,15 @@ export function* updateBookMetadata(action: PayloadAction<PayloadTypes['updateBo
   )
 
   try {
-    const result = yield* call(invoke<IBindingsMetadata>, 'update_book_metadata', {
-      id: action.payload.id,
-      metadata: { format: action.payload.format, metadata: action.payload.metadata },
+    yield* call(invoke<IBindingsMetadata>, 'update_book_metadata', {
+      metadata: action.payload,
     })
 
     yield* all([
       put(
         actions.setUpdateBookMetadata({
           id: action.payload.id,
-          metadata: result,
+          metadata: action.payload,
         }),
       ),
     ])
