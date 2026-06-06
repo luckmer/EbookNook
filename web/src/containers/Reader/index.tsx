@@ -183,7 +183,7 @@ const ReaderRoot = () => {
       const view = document.createElement('foliate-view') as any
       view.id = `foliate-view-${Date.now()}`
       view.style.width = '100%'
-      view.style.height = '100vh'
+      view.style.height = '100%'
       container.appendChild(view)
 
       viewRef.current = view

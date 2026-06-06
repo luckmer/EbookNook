@@ -3,6 +3,7 @@ import type { IPDFMetadata, IPDFSections, IToc, IZoomEvent } from '@interfaces/b
 import * as pdfjsLib from 'pdfjs-dist'
 import workerUrl from 'pdfjs-dist/build/pdf.worker?url'
 import type { Metadata } from 'pdfjs-dist/types/src/display/metadata'
+import textLayerCSS from 'pdfjs-dist/web/pdf_viewer.css?inline'
 
 const pdfjsBase = new URL('./vendor/', import.meta.url).toString()
 const pdfjsPath = (path: string) => `${pdfjsBase}/${path}`
@@ -127,26 +128,24 @@ export class PDFServiceCore {
       new Blob(
         [
           `
-          <!DOCTYPE html>
-          <html lang="en">
-          <meta charset="utf-8">
-          <meta name="viewport" content="width=${viewport.width}, height=${viewport.height}">
-          <style>
-          html, body {
-              margin: 0;
-              padding: 0;
-          }
-          :root {
-            --user-unit: 1;
-            --total-scale-factor: calc(var(--scale-factor) * var(--user-unit));
-            --scale-round-x: 1px;
-            --scale-round-y: 1px;
-          }
-          </style>
-          <div id="canvas"></div>
-          <div class="textLayer"></div>
-          <div class="annotationLayer"></div>
-      `,
+      <!DOCTYPE html>
+      <html lang="en">
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=${viewport.width}, height=${viewport.height}">
+      <style>
+      html, body { margin: 0; padding: 0; }
+      :root {
+        --user-unit: 1;
+        --total-scale-factor: calc(var(--scale-factor) * var(--user-unit));
+        --scale-round-x: 1px;
+        --scale-round-y: 1px;
+      }
+      </style>
+      <style>${textLayerCSS}</style>
+      <div id="canvas"></div>
+      <div class="textLayer"></div>
+      <div class="annotationLayer"></div>
+    `,
         ],
         { type: 'text/html' },
       ),
