@@ -48,12 +48,12 @@ fn main() {
             api::bookmarks::add_bookmark_by_book_id,
             api::bookmarks::update_bookmark_by_book_id,
             api::bookmarks::delete_bookmark_by_book_id,
-            api::library::update_book_progress,
             api::library::get_books,
             api::library::get_book_structure,
             api::library::add_book,
             api::library::delete_book,
-            api::library::update_book_progress
+            api::library::update_book_progress,
+            api::library::update_book_metadata
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
