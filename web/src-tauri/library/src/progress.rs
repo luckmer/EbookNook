@@ -85,6 +85,7 @@ impl ProgressService {
         sqlx::query(UPDATE_PROGRESS)
             .bind(progress.percentage_progress)
             .bind(progress_json)
+            .bind(progress.id)
             .execute(conn)
             .await?;
 
