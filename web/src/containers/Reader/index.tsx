@@ -117,7 +117,7 @@ const ReaderRoot = () => {
 
     const view = viewRef.current
     setCurrentPageIndex(index + 1)
-
+    setNotesCache([])
     getFoliateDocEvents(doc, {
       mouseUp: () => {
         const selection = doc.getSelection()
@@ -240,7 +240,6 @@ const ReaderRoot = () => {
     if (!view || isLoadingStructure) {
       return
     }
-
     const cachedCFI = new Set(notesCache.map((n) => n.value))
     const currentCFI = new Set(notes.map((n) => n.value))
 
@@ -250,11 +249,13 @@ const ReaderRoot = () => {
       }
     })
 
-    notes.forEach((note) => {
-      if (!cachedCFI.has(note.value)) {
-        view.addAnnotation({ value: note.value, color: note.color })
-      }
-    })
+    setTimeout(() => {
+      notes.forEach((note) => {
+        if (!cachedCFI.has(note.value)) {
+          view.addAnnotation({ value: note.value, color: note.color ?? '#4DA3FF' })
+        }
+      })
+    }, 100)
 
     setNotesCache(notes)
 

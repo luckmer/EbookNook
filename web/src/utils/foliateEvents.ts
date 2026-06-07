@@ -19,6 +19,7 @@ export const getFoliateEvents = (view: any, isContentViewReady: boolean, handler
     return () => {
       view.removeEventListener('relocate', handler.relocate)
       view.removeEventListener('load', handler?.load)
+      view.removeEventListener('draw-annotation', handler.drawAnnotation)
     }
   }, [view, isContentViewReady, handler])
 }
